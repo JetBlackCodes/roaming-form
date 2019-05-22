@@ -1,13 +1,11 @@
 import React from "react";
-import Typography from "@material-ui/core/Typography";
-import Grid from "@material-ui/core/Grid";
-import TextField from "@material-ui/core/TextField";
-import { AddButton } from "./buttons";
+import { Typography, Grid, TextField } from "@material-ui/core";
+import { AddButton, DelButton } from "./buttons";
 
 const currencies = [
   {
     value: "none",
-    label: "Выбрать оператора"
+    label: "-Выбрать оператора-"
   },
   {
     value: "kontur",
@@ -39,66 +37,129 @@ const currencies = [
   }
 ];
 
+const OperatorBlock = (props) => {
+  return (
+    <Grid container spacing={24}>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          required
+          name="inn"
+          label="ИНН"
+          fullWidth
+          onChange={props.onChange}
+        />
+      </Grid>
+      <Grid item xs={12} sm={6}>
+        <TextField
+          required
+          name="kpp"
+          label="КПП"
+          fullWidth
+          onChange={props.onChange}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <TextField
+          required
+          name="name"
+          label="Название организации"
+          fullWidth
+          onChange={props.onChange}
+        />
+      </Grid>
+      <Grid item xs={12}>
+        <TextField
+          select
+          name="oper"
+          label="Выберете оператора"
+          // onChange={this.handleChange("currency")}
+          SelectProps={{
+            native: true
+          }}
+          margin="normal"
+          variant="outlined"
+          fullWidth
+        >
+          {currencies.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </TextField>
+      </Grid>
+    </Grid>
+  );
+};
+
 class SecondForm extends React.Component {
-  handleChange = name => event => {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      operators: [
+        {
+          name: "",
+          inn: "",
+          kpp: "",
+          oper: ""
+        }
+      ]
+    };
+  }
+
+  handleChange = (name) => e => {       
     this.setState({
-      [name]: event.target.value
+      [name]: e.target.value,      
     });
+    // const value = e.target.value; 
+    // console.log(value)
+  };
+
+  AddNewOperator = () => {
+    if (this.state.operators.length < 101) {
+      const newOper = {
+        name: "",
+        inn: "",
+        kpp: "",
+        oper: ""
+      };
+      let operators = this.state.operators;
+      operators.push(newOper);
+      this.setState({ operators });
+    } else alert("Вы можете добавить только 100 операторов");
+  };
+
+  DelOperator = () => {
+    if (this.state.operators.length > 1) {
+      let operators = this.state.operators;
+      operators.pop();
+      this.setState({ operators });
+    } else alert("Вы не можете удалить всех операторов!");
   };
 
   render() {
+    // const { operators } = this.state;
     return (
       <React.Fragment>
         <Typography variant="h6" gutterBottom>
           Другой оператор
         </Typography>
-        <Grid container spacing={24}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              required
-              label="ИНН"
-              fullWidth
-              autoComplete="fname" //?что тут правильно указывать?
+        <div>
+          {this.state.operators.map(item => (
+            <OperatorBlock
+              onChange={this.handleChange}
+              name={item.name}
+              inn={item.inn}
+              kpp={item.kpp}
+              oper={item.oper}
             />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              required
-              label="КПП"
-              fullWidth
-              autoComplete="lname"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              required
-              label="Название организации"
-              fullWidth
-              autoComplete="billing address-line1"
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField
-              select
-              label="Выберете оператора"
-              onChange={this.handleChange("currency")}
-              SelectProps={{
-                native: true,                
-              }}
-              // helperText="Выберете оператора"
-              margin="normal"
-              variant="outlined"
-              fullWidth
-            >
-              {currencies.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </TextField>
-          </Grid>
-        </Grid>
-        <AddButton/>
+          ))}
+        </div>
+        <AddButton
+          AddNewOperator={this.AddNewOperator}
+          // onChange={this.handleChange}
+        />
+        <DelButton DelOperator={this.DelOperator} />
       </React.Fragment>
     );
   }

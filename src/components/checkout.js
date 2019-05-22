@@ -1,20 +1,12 @@
 import React from "react";
 import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
-import Paper from "@material-ui/core/Paper";
-import Stepper from "@material-ui/core/Stepper";
-import Step from "@material-ui/core/Step";
-import StepLabel from "@material-ui/core/StepLabel";
-import Button from "@material-ui/core/Button";
-import Typography from "@material-ui/core/Typography";
+import {Paper, Stepper, Step, StepLabel, Button, Typography} from "@material-ui/core";
 import FirstForm from "./first-step";
 import SecondForm from "./second-step";
 import Summary from "./summary";
 
-const styles = theme => ({
-  appBar: {
-    position: "relative"
-  },
+const styles = theme => ({  
   layout: {
     width: "auto",
     marginLeft: theme.spacing.unit * 2,
@@ -40,7 +32,7 @@ const styles = theme => ({
   },
   buttons: {
     display: "flex",
-    justifyContent: "flex-end"
+    justifyContent: "flex-end"    
   },
   button: {
     marginTop: theme.spacing.unit * 3,
@@ -54,23 +46,41 @@ const steps = [
   "Проверка введенных данных"
 ];
 
-function getStepContent(step) {
+function getStepContent(props, step) {
   switch (step) {
     case 0:
       return <FirstForm />;
     case 1:
-      return <SecondForm />;
+      return <SecondForm updateData={props.updateData}/>;
     case 2:
-      return <Summary />;
+      return <Summary operators={this.state.operators}/>;
     default:
       throw new Error("Unknown step");
   }
 }
 
 class Checkout extends React.Component {
-  state = {
-    activeStep: 0
+  constructor(props) {
+    super(props);
+      
+    this.state = {
+    activeStep: 0,
+   
+    operators: [
+        {
+          name: "",
+          inn: "",
+          kpp: "",
+          oper: ""
+        }
+      ]
+    };
   };
+
+  
+  updateData = (value) => {
+    this.setState({ operators: value })
+  }
 
   handleNext = () => {
     this.setState(state => ({
@@ -125,7 +135,7 @@ class Checkout extends React.Component {
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  {getStepContent(activeStep)}
+                  {getStepContent.call(this, this.props, activeStep)}
                   <div className={classes.buttons}>
                     {activeStep !== 0 && (
                       <Button
@@ -137,7 +147,7 @@ class Checkout extends React.Component {
                     )}
                     <Button
                       variant="contained"
-                      color="primary"
+                      color='primary'
                       onClick={this.handleNext}
                       className={classes.button}
                     >
