@@ -11,7 +11,7 @@ import {
 const first = [
   { name: "ИНН", expl: "474082674748" },
   { name: "КПП", expl: "873570753" },
-  { name: "Наименование организации", expl: "НПО Телеметрия" }, 
+  { name: "Наименование организации", expl: "НПО Телеметрия" },
   { name: "e-mail", expl: "ms.melnikovairina@gmail.com" },
   { name: "Идентификатор", expl: "7595" }
 ];
@@ -76,7 +76,7 @@ class Summary extends React.Component {
                 <Typography variant="body2">{item.oper}</Typography>
               </ListItem>
             ))}
-            }
+
             {/* {second.map(second => (
             <ListItem className={classes.listItem} key={second.name}>
               <ListItemText primary={second.name} secondary={second.desc} />

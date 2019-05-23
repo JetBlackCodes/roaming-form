@@ -1,12 +1,19 @@
 import React from "react";
 import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
-import {Paper, Stepper, Step, StepLabel, Button, Typography} from "@material-ui/core";
+import {
+  Paper,
+  Stepper,
+  Step,
+  StepLabel,
+  Button,
+  Typography
+} from "@material-ui/core";
 import FirstForm from "./first-step";
 import SecondForm from "./second-step";
 import Summary from "./summary";
 
-const styles = theme => ({  
+const styles = theme => ({
   layout: {
     width: "auto",
     marginLeft: theme.spacing.unit * 2,
@@ -32,7 +39,7 @@ const styles = theme => ({
   },
   buttons: {
     display: "flex",
-    justifyContent: "flex-end"    
+    justifyContent: "flex-end"
   },
   button: {
     marginTop: theme.spacing.unit * 3,
@@ -46,27 +53,27 @@ const steps = [
   "Проверка введенных данных"
 ];
 
-function getStepContent(props, step) {
+const getStepContent = ({ updateData, step, operators }) => {
   switch (step) {
     case 0:
       return <FirstForm />;
     case 1:
-      return <SecondForm updateData={props.updateData}/>;
+      return <SecondForm updateData={updateData} />;
     case 2:
-      return <Summary operators={this.state.operators}/>;
+      return <Summary operators={operators} />;
     default:
       throw new Error("Unknown step");
   }
-}
+};
 
 class Checkout extends React.Component {
   constructor(props) {
     super(props);
-      
+
     this.state = {
-    activeStep: 0,
-   
-    operators: [
+      activeStep: 0,
+
+      operators: [
         {
           name: "",
           inn: "",
@@ -75,12 +82,11 @@ class Checkout extends React.Component {
         }
       ]
     };
-  };
-
-  
-  updateData = (value) => {
-    this.setState({ operators: value })
   }
+
+  updateData = value => {
+    this.setState({ operators: value });
+  };
 
   handleNext = () => {
     this.setState(state => ({
@@ -101,8 +107,8 @@ class Checkout extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
-    const { activeStep } = this.state;
+    const { classes, updateData } = this.props;
+    const { activeStep, operators } = this.state;
 
     return (
       <React.Fragment>
@@ -121,13 +127,10 @@ class Checkout extends React.Component {
             <React.Fragment>
               {activeStep === steps.length ? (
                 <React.Fragment>
-                  <Typography variant="h8">
-                    Заявка №04029
-                  </Typography>
+                  <Typography variant="h8">Заявка №04029</Typography>
                   <Typography variant="h5" gutterBottom>
-                    Ваш запрос на установку связи направлен оператору
-                    абонента.
-                  </Typography> 
+                    Ваш запрос на установку связи направлен оператору абонента.
+                  </Typography>
                   <Typography variant="subtitle1">
                     Срок ответа на заявку от 2 до 6 рабочих дней. По итогу
                     настройки на указанный вами e-mail придет извещение.
@@ -135,7 +138,11 @@ class Checkout extends React.Component {
                 </React.Fragment>
               ) : (
                 <React.Fragment>
-                  {getStepContent.call(this, this.props, activeStep)}
+                  {getStepContent({
+                    updateData: updateData,
+                    step: activeStep,
+                    operators
+                  })}
                   <div className={classes.buttons}>
                     {activeStep !== 0 && (
                       <Button
@@ -147,7 +154,7 @@ class Checkout extends React.Component {
                     )}
                     <Button
                       variant="contained"
-                      color='primary'
+                      color="primary"
                       onClick={this.handleNext}
                       className={classes.button}
                     >

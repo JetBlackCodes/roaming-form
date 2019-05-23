@@ -2,92 +2,64 @@ import React from "react";
 import { Typography, Grid, TextField } from "@material-ui/core";
 import { AddButton, DelButton } from "./buttons";
 
-const currencies = [
-  {
-    value: "none",
-    label: "-Выбрать оператора-"
-  },
-  {
-    value: "kontur",
-    label: "СКБ Контур – 2BM"
-  },
-  {
-    value: "taskom",
-    label: "Такском – 2AL"
-  },
-  {
-    value: "synerdocs",
-    label: "Synerdocs – 2IG"
-  },
-  {
-    value: "tasknet",
-    label: "ТаксНет – 2AK"
-  },
-  {
-    value: "tensor",
-    label: "Тензор – 2BE"
-  },
-  {
-    value: "linkservice",
-    label: "Линк-Сервис – 2BN"
-  },
-  {
-    value: "niias",
-    label: "АО НИИАС – 2JD"
-  }
-];
+import { currencies, DEFAULT_OPERATOR } from "../constants/operators";
 
-const OperatorBlock = (props) => {
+const OperatorBlock = props => {
   return (
-    <Grid container spacing={24}>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          required
-          name="inn"
-          label="ИНН"
-          fullWidth
-          onChange={props.onChange}
-        />
+    <>
+      <Grid container spacing={24}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            required
+            name="inn"
+            label="ИНН"
+            fullWidth
+            onChange={props.onChange("inn")}
+            value={props.inn}
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            required
+            name="kpp"
+            label="КПП"
+            fullWidth
+            onChange={props.onChange("kpp")}
+            value={props.kpp}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            required
+            name="name"
+            label="Название организации"
+            fullWidth
+            onChange={props.onChange}
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            select
+            name="oper"
+            label="Выберете оператора"
+            onChange={props.onChange("oper")}
+            value={props.oper}
+            margin="normal"
+            variant="outlined"
+            fullWidth
+          >
+            {currencies.map(option => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </TextField>
+        </Grid>
       </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          required
-          name="kpp"
-          label="КПП"
-          fullWidth
-          onChange={props.onChange}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <TextField
-          required
-          name="name"
-          label="Название организации"
-          fullWidth
-          onChange={props.onChange}
-        />
-      </Grid>
-      <Grid item xs={12}>
-        <TextField
-          select
-          name="oper"
-          label="Выберете оператора"
-          // onChange={this.handleChange("currency")}
-          SelectProps={{
-            native: true
-          }}
-          margin="normal"
-          variant="outlined"
-          fullWidth
-        >
-          {currencies.map(option => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </TextField>
-      </Grid>
-    </Grid>
+      <div className="deleteButton">
+        <DelButton DelOperator={props.actions.delOperator} />
+      </div>
+    </>
   );
 };
 
@@ -96,43 +68,33 @@ class SecondForm extends React.Component {
     super(props);
 
     this.state = {
-      operators: [
-        {
-          name: "",
-          inn: "",
-          kpp: "",
-          oper: ""
-        }
-      ]
+      operators: [{ ...DEFAULT_OPERATOR }]
     };
   }
 
-  handleChange = (name) => e => {       
+  handleChange = index => name => e => {
+    const operators = this.state.operators;
+    operators[index][name] = e.target.value;
     this.setState({
-      [name]: e.target.value,      
+      operators
     });
-    // const value = e.target.value; 
+    // const value = e.target.value;
     // console.log(value)
   };
 
   AddNewOperator = () => {
     if (this.state.operators.length < 101) {
-      const newOper = {
-        name: "",
-        inn: "",
-        kpp: "",
-        oper: ""
-      };
+      const newOper = { ...DEFAULT_OPERATOR };
       let operators = this.state.operators;
       operators.push(newOper);
       this.setState({ operators });
     } else alert("Вы можете добавить только 100 операторов");
   };
 
-  DelOperator = () => {
-    if (this.state.operators.length > 1) {
-      let operators = this.state.operators;
-      operators.pop();
+  DelOperator = index => () => {
+    let { operators } = this.state;
+    if (operators.length > 1) {
+      operators.splice(index, 1);
       this.setState({ operators });
     } else alert("Вы не можете удалить всех операторов!");
   };
@@ -145,13 +107,14 @@ class SecondForm extends React.Component {
           Другой оператор
         </Typography>
         <div>
-          {this.state.operators.map(item => (
+          {this.state.operators.map((item, index) => (
             <OperatorBlock
-              onChange={this.handleChange}
+              onChange={this.handleChange(index)}
               name={item.name}
               inn={item.inn}
               kpp={item.kpp}
               oper={item.oper}
+              actions={{ delOperator: this.DelOperator(index) }}
             />
           ))}
         </div>
@@ -159,7 +122,6 @@ class SecondForm extends React.Component {
           AddNewOperator={this.AddNewOperator}
           // onChange={this.handleChange}
         />
-        <DelButton DelOperator={this.DelOperator} />
       </React.Fragment>
     );
   }
