@@ -1,4 +1,12 @@
-export const currencies = [
+export const OPERATORS = [
+  {
+    value: "niias",
+    label: "АО НИИАС – 2JD"
+  },
+  {
+    value: "linkservice",
+    label: "Линк-Сервис – 2BN"
+  },
   {
     value: "kontur",
     label: "СКБ Контур – 2BM"
@@ -6,10 +14,6 @@ export const currencies = [
   {
     value: "taskom",
     label: "Такском – 2AL"
-  },
-  {
-    value: "synerdocs",
-    label: "Synerdocs – 2IG"
   },
   {
     value: "tasknet",
@@ -20,13 +24,9 @@ export const currencies = [
     label: "Тензор – 2BE"
   },
   {
-    value: "linkservice",
-    label: "Линк-Сервис – 2BN"
-  },
-  {
-    value: "niias",
-    label: "АО НИИАС – 2JD"
-  }
+    value: "synerdocs",
+    label: "Synerdocs – 2IG"
+  }  
 ];
 
 export const MAX_OPERATORS_COUNT = 100;

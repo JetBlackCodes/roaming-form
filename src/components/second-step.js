@@ -1,8 +1,7 @@
 import React from "react";
 import { Typography, Grid, TextField } from "@material-ui/core";
 import { AddButton, DelButton } from "./buttons";
-
-import { currencies, DEFAULT_OPERATOR } from "../constants/operators";
+import { OPERATORS, DEFAULT_OPERATOR, MAX_OPERATORS_COUNT } from "../constants/customer-form";
 
 const OperatorBlock = props => {
   return (
@@ -48,7 +47,7 @@ const OperatorBlock = props => {
             variant="outlined"
             fullWidth
           >
-            {currencies.map(option => (
+            {OPERATORS.map(option => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -63,7 +62,7 @@ const OperatorBlock = props => {
   );
 };
 
-class SecondForm extends React.Component {
+class SecondStep extends React.Component {
   constructor(props) {
     super(props);
 
@@ -78,12 +77,10 @@ class SecondForm extends React.Component {
     this.setState({
       operators
     });
-    // const value = e.target.value;
-    // console.log(value)
   };
 
   AddNewOperator = () => {
-    if (this.state.operators.length < 101) {
+    if (this.state.operators.length <= MAX_OPERATORS_COUNT) {
       const newOper = { ...DEFAULT_OPERATOR };
       let operators = this.state.operators;
       operators.push(newOper);
@@ -100,11 +97,10 @@ class SecondForm extends React.Component {
   };
 
   render() {
-    // const { operators } = this.state;
     return (
       <React.Fragment>
         <Typography variant="h6" gutterBottom>
-          Другой оператор
+          Введите данные операторов
         </Typography>
         <div>
           {this.state.operators.map((item, index) => (
@@ -120,11 +116,10 @@ class SecondForm extends React.Component {
         </div>
         <AddButton
           AddNewOperator={this.AddNewOperator}
-          // onChange={this.handleChange}
         />
       </React.Fragment>
     );
   }
 }
 
-export default SecondForm;
+export default SecondStep;

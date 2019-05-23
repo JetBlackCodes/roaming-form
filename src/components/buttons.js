@@ -1,8 +1,6 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
-import Button from "@material-ui/core/Button";
-import Fab from "@material-ui/core/Fab";
-import { Grid } from "@material-ui/core";
+import { Grid, Button, Fab } from "@material-ui/core";
 
 const styles = theme => ({
   button: {
@@ -41,8 +39,8 @@ const UploadButton = props => {
   );
 };
 
-const u = withStyles(styles)(UploadButton);    //вот эта конструкция особенно ТОП
-export { u as UploadButton };
+const u = withStyles(styles)(UploadButton);    //вот эта конструкция особенно ТОП,
+export { u as UploadButton };                  //надо с этим что-то сделать
 
 export const AddButton = props => {
   return (
@@ -52,7 +50,6 @@ export const AddButton = props => {
   );
 };
 
-//некрасиво и не удобно. надо переделать как удаление конкретного элемента, а не последнего.
 export const DelButton = props => {
   return (
     <Grid>      

@@ -9,8 +9,8 @@ import {
   Button,
   Typography
 } from "@material-ui/core";
-import FirstForm from "./first-step";
-import SecondForm from "./second-step";
+import FirstStep from "./first-step";
+import SecondStep from "./second-step";
 import Summary from "./summary";
 
 const styles = theme => ({
@@ -48,17 +48,17 @@ const styles = theme => ({
 });
 
 const steps = [
-  "Оператор ЗАО «Калуга Астрал»",
-  "Другой оператор",
+  "Данные вашей организации",
+  "Данные операторов",
   "Проверка введенных данных"
 ];
 
 const getStepContent = ({ updateData, step, operators }) => {
   switch (step) {
     case 0:
-      return <FirstForm />;
+      return <FirstStep />;
     case 1:
-      return <SecondForm updateData={updateData} />;
+      return <SecondStep updateData={updateData} />;
     case 2:
       return <Summary operators={operators} />;
     default:
@@ -115,7 +115,7 @@ class Checkout extends React.Component {
         <main className={classes.layout}>
           <Paper className={classes.paper}>
             <Typography component="h1" variant="h4" align="center">
-              Форма приема заявок от клиентов
+              Заявка на роуминг
             </Typography>
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map(label => (

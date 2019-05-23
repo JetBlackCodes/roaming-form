@@ -49,7 +49,7 @@ class Summary extends React.Component {
     return (
       <React.Fragment>
         <Typography variant="h6" gutterBottom>
-          Оператор ЗАО «Калуга Астрал»
+          Проверьте данные вашей организации
         </Typography>
         <List disablePadding>
           {first.map(first => (
@@ -61,7 +61,7 @@ class Summary extends React.Component {
         </List>
         <Grid>
           <Typography variant="h6" gutterBottom className={classes.title}>
-            Другие операторы
+            Проверьте данные операторов
           </Typography>
           <List disablePadding>
             {this.state.operators.map(item => (

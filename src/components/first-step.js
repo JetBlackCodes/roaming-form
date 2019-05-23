@@ -2,11 +2,11 @@ import React from "react";
 import { Grid, Typography, TextField } from "@material-ui/core";
 import {UploadButton} from "./buttons";
 
-function FirstForm() {
+function FirstStep() {
   return (
     <React.Fragment>
       <Typography variant="h6" gutterBottom>
-        ЗАО "Калуга Астрал"
+        Введите данные вашей организации
       </Typography>
       <Grid container spacing={24}>
         <Grid item xs={12} sm={6}>
@@ -57,4 +57,4 @@ function FirstForm() {
   );
 }
 
-export default FirstForm;
+export default FirstStep;
