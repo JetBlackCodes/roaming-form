@@ -37,3 +37,12 @@ export const DEFAULT_OPERATOR = {
   kpp: "",
   oper: ""
 };
+
+export const MY_ORGANISATION_DEFAULT_DATA = {
+  inn: '',
+  kpp: '',
+  name: '',
+  guid: '',
+  email: '',
+  dop_sog: ''
+};

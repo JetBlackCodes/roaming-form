@@ -1,4 +1,4 @@
-import React from "react";
+import React, {Component} from "react";
 import PropTypes from "prop-types";
 import withStyles from "@material-ui/core/styles/withStyles";
 import {
@@ -12,6 +12,7 @@ import {
 import FirstStep from "./first-step";
 import SecondStep from "./second-step";
 import Summary from "./summary";
+import { DEFAULT_OPERATOR, MY_ORGANISATION_DEFAULT_DATA } from "../constants/customer-form"
 
 const styles = theme => ({
   layout: {
@@ -47,76 +48,108 @@ const styles = theme => ({
   }
 });
 
-const steps = [
-  "Данные вашей организации",
-  "Данные операторов",
-  "Проверка введенных данных"
-];
+// const steps = [
+//   "Данные вашей организации",
+//   "Данные операторов",
+//   "Проверка введенных данных"
+// ];
+function getSteps() {
+  return ["Данные вашей организации", "Данные операторов", "Проверка введенных данных"]
+}
 
-const getStepContent = ({ updateData, step, operators }) => {
+
+const getStepContent = ({ updateData, step, operators, dataMyOrganisation }) => {
   switch (step) {
     case 0:
-      return <FirstStep />;
+      return <FirstStep dataMyOrganisation={dataMyOrganisation} />
     case 1:
-      return <SecondStep updateData={updateData} />;
+      return <SecondStep updateData={updateData} />
     case 2:
-      return <Summary operators={operators} />;
+      return <Summary operators={operators} />
     default:
-      throw new Error("Unknown step");
+      throw new Error("Unknown step")
   }
-};
+}
 
-class Checkout extends React.Component {
+class Checkout extends Component {
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       activeStep: 0,
-
-      operators: [
-        {
-          name: "",
-          inn: "",
-          kpp: "",
-          oper: ""
-        }
-      ]
-    };
+      operators: [{ ...DEFAULT_OPERATOR }],
+      dataMyOrganisation: [{...MY_ORGANISATION_DEFAULT_DATA}]
+      
+      // operators: [
+      //   {
+      //     name: "",
+      //     inn: "",
+      //     kpp: "",
+      //     oper: ""
+      //   }
+      // ],
+     
+      // dataMyOrganisation: {
+      //   inn: '',
+      //   kpp: '',
+      //   name: '',
+      //   guid: '',
+      //   email: '',
+      //   dop_sog: ''
+      // }
+    }
   }
 
   updateData = value => {
-    this.setState({ operators: value });
-  };
+    this.setState({ operators: value })
+  }
 
   handleNext = () => {
+    this.handleSubmit(this.form)
     this.setState(state => ({
       activeStep: state.activeStep + 1
-    }));
-  };
+    }))
+  }
 
   handleBack = () => {
     this.setState(state => ({
       activeStep: state.activeStep - 1
-    }));
-  };
+    }))
+  }
 
   handleReset = () => {
     this.setState({
       activeStep: 0
-    });
-  };
+    })
+  }
 
+  handleSubmit = (event) => {
+    this.setState({
+      dataMyOrganisation: {
+        inn: event.inn.value,
+        kpp: event.kpp.value,
+        name: event.name.value,
+        guid: this.state.activeStep === 0 ? event.guid.value : '',
+        email: this.state.activeStep === 0 ? event.email.value : '',
+      }
+    })
+  }
+  
   render() {
-    const { classes, updateData } = this.props;
-    const { activeStep, operators } = this.state;
+    const { classes, updateData } = this.props
+    const { activeStep, operators, dataMyOrganisation } = this.state
+
+    const steps = getSteps()
 
     return (
-      <React.Fragment>
+      <form id="roaming-form" ref={(form) => { this.form = form }} >
         <main className={classes.layout}>
           <Paper className={classes.paper}>
             <Typography component="h1" variant="h4" align="center">
-              Заявка на роуминг
+              Заявление на подключение роуминга между контрагентами
             </Typography>
+
+
             <Stepper activeStep={activeStep} className={classes.stepper}>
               {steps.map(label => (
                 <Step key={label}>
@@ -124,9 +157,13 @@ class Checkout extends React.Component {
                 </Step>
               ))}
             </Stepper>
-            <React.Fragment>
-              {activeStep === steps.length ? (
-                <React.Fragment>
+
+
+
+            <>
+
+              {activeStep === steps.length ? ( // ласт этап
+                <>
                   <Typography variant="h8">Заявка №04029</Typography>
                   <Typography variant="h5" gutterBottom>
                     Ваш запрос на установку связи направлен оператору абонента.
@@ -135,15 +172,19 @@ class Checkout extends React.Component {
                     Срок ответа на заявку от 2 до 6 рабочих дней. По итогу
                     настройки на указанный вами e-mail придет извещение.
                   </Typography>
-                </React.Fragment>
-              ) : (
-                <React.Fragment>
+                </>
+              )
+              : // не ласт этап
+              (
+                <>
                   {getStepContent({
                     updateData: updateData,
                     step: activeStep,
-                    operators
+                    operators,
+                    dataMyOrganisation
                   })}
                   <div className={classes.buttons}>
+
                     {activeStep !== 0 && (
                       <Button
                         onClick={this.handleBack}
@@ -152,6 +193,7 @@ class Checkout extends React.Component {
                         Назад
                       </Button>
                     )}
+
                     <Button
                       variant="contained"
                       color="primary"
@@ -160,19 +202,21 @@ class Checkout extends React.Component {
                     >
                       {activeStep === steps.length - 1 ? "Оправить" : "Далее"}
                     </Button>
+
                   </div>
-                </React.Fragment>
+                </>
               )}
-            </React.Fragment>
+
+            </>
           </Paper>
         </main>
-      </React.Fragment>
-    );
+      </form>
+    )
   }
 }
 
 Checkout.propTypes = {
   classes: PropTypes.object.isRequired
-};
+}
 
-export default withStyles(styles)(Checkout);
+export default withStyles(styles)(Checkout)
