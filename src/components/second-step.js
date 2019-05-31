@@ -6,7 +6,7 @@ import { OPERATORS, DEFAULT_OPERATOR, MAX_OPERATORS_COUNT } from "../constants/c
 const OperatorBlock = props => {
   return (
     <>
-      <Grid container spacing={24}>
+      <Grid container spacing={3}>
         <Grid item xs={12} sm={6}>
           <TextField
             required
@@ -67,7 +67,7 @@ class SecondStep extends React.Component {
     super(props);
 
     this.state = {
-      operators: [{ ...DEFAULT_OPERATOR }]
+      operators: this.props.operators
     };
   }
 

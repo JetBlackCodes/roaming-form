@@ -1,11 +1,21 @@
-import React, {Component, Fragment} from "react";
+import React, { Component, Fragment } from "react";
 import { Grid, Typography, TextField } from "@material-ui/core";
-import {UploadButton} from "./buttons";
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
+import { UploadButton } from "./buttons";
+import Radio from "@material-ui/core/Radio";
+import RadioGroup from "@material-ui/core/RadioGroup";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
-class FirstStep extends Component{
+import { Field } from "react-final-form";
+import { Checkbox, Select } from "final-form-material-ui";
+
+import {
+  composeValidators,
+  maxLength,
+  require,
+  minLength
+} from "../utils/validation";
+
+class FirstStep extends Component {
   state = {
     inn: this.props.dataMyOrganisation.inn,
     kpp: this.props.dataMyOrganisation.kpp,
@@ -14,17 +24,27 @@ class FirstStep extends Component{
     email: this.props.dataMyOrganisation.email,
     dop_sog: this.props.dataMyOrganisation.dop_sog,
 
-    radioValue:'FL',
-  }
+    radioValue: "UL",
+    disableKpp: false,
 
-  handleChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
-  }
+    errorInn: false,
+    errorKpp: false,
+    errorName: false,
+    errorGuid: false,
+    errorEmail: false
+  };
+
+  handleChange = event => {
+    this.setState({
+      [event.target.name]: event.target.value,
+      disableKpp: event.target.value === "UL" ? false : true
+    });
+  };
 
   stat = () => {
-    console.log(this.props)
-    console.log(this.state)
-  }
+    console.log(this.props);
+    console.log(this.state);
+  };
 
   render() {
     return (
@@ -35,45 +55,70 @@ class FirstStep extends Component{
 
         <RadioGroup
           aria-label="position"
-          name="position"
-          value={this.state.value}
+          name="radioValue"
+          value={this.state.radioValue}
           onChange={this.handleChange}
           row
-        >          
-          <FormControlLabel
-            value="FL"
-            control={<Radio color="primary"/>}
-            label="Физическое лицо"
-          />
+          style={{ display: "flex", justifyContent: "space-around" }}
+        >
           <FormControlLabel
             value="UL"
-            control={<Radio color="primary"/>}
+            control={<Radio color="primary" />}
             label="Юридическое лицо"
           />
           <FormControlLabel
             value="IP"
-            control={<Radio color="primary"/>}
+            control={<Radio color="primary" />}
             label="ИП"
+          />
+          <FormControlLabel
+            value="FL"
+            control={<Radio color="primary" />}
+            label="Физическое лицо"
           />
         </RadioGroup>
 
-        <Grid container spacing={24}>
+        <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
-            <TextField
+            <Field
+              component={({
+                input: { onChange, name, value, onBlur, onFocus },
+                meta: { error, touched },
+                ...props
+              }) => {
+                return (
+                  <TextField
+                    {...props}
+                    name={name}
+                    error={!!error && touched}
+                    helperText={touched && error}
+                    onChange={onChange}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                    value={value}
+                  />
+                );
+              }}
               required
-              number
+              error={this.props.error.errorInn}
               id=""
               label="ИНН"
               fullWidth
               name="inn"
+              validate={composeValidators(
+                require,
+                maxLength(12),
+                minLength(10)
+              )}
               value={this.state.inn}
-              onChange={this.handleChange}
+              // onChange={this.handleChange}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
+              disabled={this.state.disableKpp === false ? false : true}
               required
-              number
+              error={this.props.error.errorKpp}
               label="КПП"
               fullWidth
               name="kpp"
@@ -84,6 +129,7 @@ class FirstStep extends Component{
           <Grid item xs={12}>
             <TextField
               required
+              error={this.props.error.errorName}
               label="Название организации"
               fullWidth
               name="name"
@@ -94,6 +140,7 @@ class FirstStep extends Component{
           <Grid item xs={12} sm={6}>
             <TextField
               required
+              error={this.props.error.errorGuid}
               label="Идентификатор"
               fullWidth
               name="guid"
@@ -104,6 +151,7 @@ class FirstStep extends Component{
           <Grid item xs={12} sm={6}>
             <TextField
               required
+              error={this.props.error.errorEmail}
               label="e-mail"
               fullWidth
               name="email"
@@ -116,7 +164,7 @@ class FirstStep extends Component{
           </Grid>
         </Grid>
       </>
-    )
+    );
   }
 }
 

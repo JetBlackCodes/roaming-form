@@ -5,8 +5,14 @@ import {
   List,
   ListItem,
   ListItemText,
-  Grid
+  Grid,
+  Paper,
+  IconButton,
+  Tooltip
 } from "@material-ui/core";
+import {Delete, Edit } from '@material-ui/icons';
+
+import { OPERATORS } from "../constants/customer-form"
 
 const first = [
   { name: "ИНН", expl: "474082674748" },
@@ -32,6 +38,23 @@ const styles = theme => ({
   },
   title: {
     marginTop: theme.spacing.unit * 2
+  },
+  grid: {
+    marginTop: '25px'
+  },
+  gridButton: {
+    marginTop: '-10px',
+    textAlign: 'center'
+  },
+  listName: {
+    display: 'flex',
+    justifyContent: 'space-around',
+  },
+  gridOperName: {
+    minHeight: '30px',
+  },
+  gridOperInn: {
+    minHeight: '30px'
   }
 });
 
@@ -40,7 +63,8 @@ class Summary extends React.Component {
     super(props);
 
     this.state = {
-      operators: this.props.operators
+      operators: this.props.operators,
+      dataMyOrganisation: this.props.dataMyOrganisation
     };
   }
 
@@ -52,38 +76,85 @@ class Summary extends React.Component {
           Проверьте данные вашей организации
         </Typography>
         <List disablePadding>
-          {first.map(first => (
-            <ListItem className={classes.listItem} key={first.name}>
-              <ListItemText primary={first.name} secondary={first.desc} />
-              <Typography variant="body2">{first.expl}</Typography>
-            </ListItem>
-          ))}
+
+          <ListItem className={classes.listItem}>
+            <ListItemText primary="ИНН"/>
+            <Typography variant="body2">{this.state.dataMyOrganisation.inn}</Typography>
+          </ListItem>
+
+          <ListItem className={classes.listItem}>
+            <ListItemText primary="КПП"/>
+            <Typography variant="body2">{this.state.dataMyOrganisation.kpp}</Typography>
+          </ListItem>
+
+          <ListItem className={classes.listItem}>
+            <ListItemText primary="Наименование организации"/>
+            <Typography variant="body2">{this.state.dataMyOrganisation.name}</Typography>
+          </ListItem>
+
+          <ListItem className={classes.listItem}>
+            <ListItemText primary="e-mail"/>
+            <Typography variant="body2">{this.state.dataMyOrganisation.email}</Typography>
+          </ListItem>
+
+          <ListItem className={classes.listItem}>
+            <ListItemText primary="Идентификатор"/>
+            <Typography variant="body2">{this.state.dataMyOrganisation.guid}</Typography>
+          </ListItem>
+
         </List>
         <Grid>
           <Typography variant="h6" gutterBottom className={classes.title}>
             Проверьте данные операторов
           </Typography>
-          <List disablePadding>
+          <List disablePadding className={classes.listName}>
+            <ListItemText primary={"ИНН/КПП"} />
+            <ListItemText primary={"Оператор"} />
+            <ListItemText primary={"Действие"} />
+          </List>
+
+          <Grid container spacing={1}>
+
             {this.state.operators.map(item => (
-              <ListItem className={classes.listItem}>
-                <ListItemText primary={"ИНН"} />
-                <Typography variant="body2">{item.inn}</Typography>
-                <ListItemText primary={"КПП"} />
-                <Typography variant="body2">{item.kpp}</Typography>
-                <ListItemText primary={"Название организации"} />
-                <Typography variant="body2">{item.name}</Typography>
-                <ListItemText primary={"Оператор"} />
-                <Typography variant="body2">{item.oper}</Typography>
-              </ListItem>
+
+              <Grid container item xs={12} spacing={3} className={classes.grid}>
+                <React.Fragment>
+                  <Grid item xs={4}>
+                    <Paper className={classes.gridOperName}>{item.inn} {item.kpp === '' ? '' : `(${item.kpp})`}</Paper>
+                  </Grid>
+                  <Grid item xs={4}>
+                    <Paper className={classes.gridOperInn}>
+                      {OPERATORS.map(value => (
+                        <Typography variant="body2">{item.oper === value.value ? value.label : ''}</Typography>
+                      ))}
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={4} className={classes.gridButton}>
+
+                    <React.Fragment>
+
+                      <Tooltip title="Редактировать" placement="top">
+                        <IconButton aria-label="Delete" className={classes.margin}>
+                          <Edit fontSize="small" alt="alt" />
+                        </IconButton>
+                      </Tooltip>
+
+                      <Tooltip title="Удалить" placement="top">
+                        <IconButton aria-label="Delete" className={classes.margin}>
+                          <Delete fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
+
+                    </React.Fragment>
+
+                  </Grid>
+                </React.Fragment>
+              </Grid>
+
             ))}
 
-            {/* {second.map(second => (
-            <ListItem className={classes.listItem} key={second.name}>
-              <ListItemText primary={second.name} secondary={second.desc} />
-              <Typography variant="body2">{second.expl}</Typography>
-            </ListItem>
-          ))}           */}
-          </List>
+          </Grid>
+
         </Grid>
       </React.Fragment>
     );
