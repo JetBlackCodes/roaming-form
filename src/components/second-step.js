@@ -1,81 +1,20 @@
-import React from "react";
-import { Typography, Grid, TextField } from "@material-ui/core";
-import { AddButton, DelButton } from "./buttons";
-import { OPERATORS, DEFAULT_OPERATOR, MAX_OPERATORS_COUNT } from "../constants/customer-form";
-
-const OperatorBlock = props => {
-  return (
-    <>
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            required
-            name="inn"
-            label="ИНН"
-            fullWidth
-            onChange={props.onChange("inn")}
-            value={props.inn}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            required
-            name="kpp"
-            label="КПП"
-            fullWidth
-            onChange={props.onChange("kpp")}
-            value={props.kpp}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            required
-            name="name"
-            label="Название организации"
-            fullWidth
-            onChange={props.onChange}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextField
-            select
-            name="oper"
-            label="Выберете оператора"
-            onChange={props.onChange("oper")}
-            value={props.oper}
-            margin="normal"
-            variant="outlined"
-            fullWidth
-          >
-            {OPERATORS.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </TextField>
-        </Grid>
-      </Grid>
-      <div className="deleteButton">
-        <DelButton DelOperator={props.actions.delOperator} />
-      </div>
-    </>
-  );
-};
+import React from 'react';
+import { Typography, Grid, TextField, Divider, Fab, IconButton } from '@material-ui/core';
+import { OPERATORS, DEFAULT_OPERATOR, MAX_OPERATORS_COUNT } from '../constants/customer-form';
+import { makeStyles } from '@material-ui/core/styles';
+import DeleteIcon from '@material-ui/icons/Delete';
+//import { ReactComponent } from "*.svg";
 
 class SecondStep extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      operators: this.props.operators
-    };
-  }
+  state = {
+    operators: this.props.operators,
+  };
 
   handleChange = index => name => e => {
     const operators = this.state.operators;
     operators[index][name] = e.target.value;
     this.setState({
-      operators
+      operators,
     });
   };
 
@@ -85,7 +24,7 @@ class SecondStep extends React.Component {
       let operators = this.state.operators;
       operators.push(newOper);
       this.setState({ operators });
-    } else alert("Вы можете добавить только 100 операторов");
+    } else alert('Вы можете добавить только 100 операторов');
   };
 
   DelOperator = index => () => {
@@ -93,7 +32,7 @@ class SecondStep extends React.Component {
     if (operators.length > 1) {
       operators.splice(index, 1);
       this.setState({ operators });
-    } else alert("Вы не можете удалить всех операторов!");
+    } else alert('Вы не можете удалить всех операторов!');
   };
 
   render() {
@@ -102,6 +41,7 @@ class SecondStep extends React.Component {
         <Typography variant="h6" gutterBottom>
           Введите данные операторов
         </Typography>
+        {/* <Divider className={useStyles.divider} mb={1}/> */}
         <div>
           {this.state.operators.map((item, index) => (
             <OperatorBlock
@@ -114,12 +54,93 @@ class SecondStep extends React.Component {
             />
           ))}
         </div>
-        <AddButton
-          AddNewOperator={this.AddNewOperator}
-        />
+        <Fab color="primary" title="Добавить оператора" onClick={this.AddNewOperator}>
+          +
+        </Fab>
       </React.Fragment>
     );
   }
 }
+
+const useStyles = makeStyles(theme => ({
+  divider: {
+    margin: theme.spacing(1, 0, 2, 0),
+  },
+  button: {
+    margin: theme.spacing.unit,
+  },
+}));
+
+const OperatorBlock = props => {
+  const classes = useStyles();
+  return (
+    <Grid container>
+      <Grid item xs={12} sm={11}>
+        <TextField
+          required
+          name="name"
+          label="Название организации"
+          fullWidth
+          onChange={props.onChange}
+          autoComplete="off"
+        />
+      </Grid>
+      <Grid item xs={12} sm={1}>
+        <IconButton
+          className={classes.button}
+          color="primary"
+          onClick={props.actions.delOperator}
+          title="Удалить оператора"
+        >
+          <DeleteIcon />
+        </IconButton>
+      </Grid>
+      <Grid container spacing={1}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            required
+            name="inn"
+            label="ИНН"
+            fullWidth
+            onChange={props.onChange('inn')}
+            value={props.inn}
+            autoComplete="off"
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            required
+            name="kpp"
+            label="КПП"
+            fullWidth
+            onChange={props.onChange('kpp')}
+            value={props.kpp}
+            autoComplete="off"
+          />
+        </Grid>
+      </Grid>
+      <Grid item xs={12}>
+        <TextField
+          select
+          name="oper"
+          label="Выберете оператора"
+          onChange={props.onChange('oper')}
+          value={props.oper}
+          margin="normal"
+          variant="outlined"
+          fullWidth
+          autoComplete="off"
+        >
+          {OPERATORS.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </TextField>
+        <Divider className={classes.divider} />
+      </Grid>
+    </Grid>
+  );
+};
 
 export default SecondStep;
