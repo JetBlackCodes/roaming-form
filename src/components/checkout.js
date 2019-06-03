@@ -17,6 +17,7 @@ import {
   MY_ORGANISATION_DEFAULT_DATA
 } from "../constants/customer-form";
 
+import { validate } from "./validate"
 import { Form } from "react-final-form";
 
 function getSteps() {
@@ -32,12 +33,14 @@ const getStepContent = ({
   step,
   operators,
   dataMyOrganisation,
-  error
+  error,
+  handleChangeRadio,
+  disableKpp
 }) => {
   switch (step) {
     case 0:
       return (
-        <FirstStep dataMyOrganisation={dataMyOrganisation} error={error} />
+        <FirstStep dataMyOrganisation={dataMyOrganisation} handleChangeRadio={handleChangeRadio} disableKpp={disableKpp}/>
       );
     case 1:
       return <SecondStep operators={operators} />;
@@ -58,19 +61,12 @@ class Checkout extends Component {
     activeStep: 0,
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
-
+    disableKpp: false,
     error: {}
   };
 
   updateData = value => {
     this.setState({ operators: value });
-  };
-
-  handleNext = async () => {
-    await this.checkData(this.form);
-
-    this.handleSubmit(this.form);
-    console.log(this.state);
   };
 
   handleBack = () => {
@@ -85,108 +81,49 @@ class Checkout extends Component {
     });
   };
 
-  checkData = async event => {
-    if (this.state.activeStep === 0) {
-      let error = this.state.error;
-      let check = 0;
-      if (event.radioValue.value === "UL" && event.inn.value.length !== 10) {
-        error["errorInn"] = true;
-        check = 1;
-      }
-      if (
-        event.radioValue.value === "UL" &&
-        (event.kpp.value.length !== 9 || event.kpp.value.length !== 0)
-      ) {
-        error["errorKpp"] = true;
-        check = 1;
-      }
-      if (event.name.value === "") {
-        error["errorName"] = true;
-        check = 1;
-      }
-      if (event.guid.value === "" || event.guid.value.length !== 35) {
-        error["errorGuid"] = true;
-        check = 1;
-      }
-
-      this.setState({
-        error
-      });
-
-      return check;
-    } else {
-      return 0;
-    }
-  };
-
-  handleSubmit = event => {
-    const step = this.state.activeStep;
-    let temp_data = {}; // пустой объект
-    let temp_arr = []; // пустой массив
-    if (step === 0) {
-      // 1 этап
-
-      temp_data = {
-        // заносим данные
-        inn: event.inn.value,
-        kpp: event.kpp.value,
-        name: event.name.value,
-        guid: event.guid.value,
-        email: event.email.value
-      };
-    } else if (step === 1) {
-      // данные со 2 этапа
-
-      if (!event.inn.length) {
-        // один контрагент
-        temp_arr = [
-          {
-            inn: event.inn.value,
-            kpp: event.kpp.value,
-            name: event.name.value,
-            oper: event.oper.value
-          }
-        ];
-      } else {
-        // несколько контрагентов
-        event.inn.forEach(function(elem, index) {
-          // перебор по полученному массиву
-          temp_arr[index] = {
-            inn: event.inn[index].value,
-            kpp: event.kpp[index].value,
-            name: event.name[index].value,
-            oper: event.oper[index].value
-          };
-        });
-      }
-    } else {
-      // проверка данных 3 этапа
-      console.log(event);
-    }
-    //console.log(temp_data)
+  handleChangeRadio = event => {
+    const {value} = event.target
+    let obj = this.state.dataMyOrganisation
+    obj.radioValue = value
     this.setState({
-      dataMyOrganisation:
-        step === 0 ? temp_data : this.state.dataMyOrganisation, // если этап 1 то записать данные с временного объекта иначе оставить данные state
-      operators: step === 1 ? temp_arr : this.state.operators
-    });
-  };
+      dataMyOrganisation: obj,
+      disableKpp: value === 'UL' ? false : true
+    })
+  }
+
+  onSubmit = event => {
+    if (this.state.activeStep === 0) {
+      let dataMyOrganisation = event;
+      this.setState(state => ({
+        dataMyOrganisation,
+        activeStep: state.activeStep + 1
+      }));
+    } else {
+      console.log(this.state)
+      this.setState(state => ({
+        activeStep: state.activeStep + 1
+      }));
+    }
+  }
+
 
   render() {
     const { classes, updateData } = this.props;
-    const { activeStep, operators, dataMyOrganisation, error } = this.state;
+    const { activeStep, operators, dataMyOrganisation, error, disableKpp } = this.state;
 
     const steps = getSteps();
 
     return (
       <Form
-        onSubmit={this.handleSubmit}
+        onSubmit={this.onSubmit}
         id="roaming-form"
         ref={form => {
           this.form = form;
         }}
-        render={({handleSumbit, form}) => {
+        validate={validate(this.state.dataMyOrganisation.radioValue)}
+        render={({ handleSubmit, reset, submitting, pristine, values}) => {
           return (
-            <form onSumbmit={handleSumbit}>
+            <form onSubmit={handleSubmit}>
               <main className={classes.layout}>
                 <Paper className={classes.paper}>
                   <Typography component="h1" variant="h4" align="center">
@@ -222,7 +159,8 @@ class Checkout extends Component {
                           step: activeStep,
                           operators,
                           dataMyOrganisation,
-                          error
+                          handleChangeRadio: this.handleChangeRadio,
+                          disableKpp
                         })}
                         <div className={classes.buttons}>
                           {activeStep !== 0 && (
@@ -237,8 +175,9 @@ class Checkout extends Component {
                           <Button
                             variant="contained"
                             color="primary"
-                            onClick={this.handleNext}
                             className={classes.button}
+                            type="submit"
+                            disabled={submitting}
                           >
                             {activeStep === steps.length - 1
                               ? "Оправить"
