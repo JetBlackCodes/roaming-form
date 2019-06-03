@@ -1,65 +1,68 @@
 export const validate = radioValue => values => {
   let errors = {};
-  // values = upperCaseGuid(values)
-  errors = validationInn({values, errors, radioValue})
-  errors = validationKpp({values, errors, radioValue})
-  errors = validateEmail({values, errors})
-  errors = validateGuid({values, errors})
-  if (!values.name) {
-    errors.name = 'Обязательное поле';
-  }
+
+  errors['inn'] = validationInn({ values, radioValue })
+  errors['kpp'] = validationKpp({ values, radioValue })
+  errors['email'] = validationEmail({ values })
+  errors['guid'] = validationGuid({ values })
+  errors['name'] = validationName({ values })
+
   return errors;
 };
 
-const validationInn = ({values, errors, radioValue}) => {
-  // переписать с учетом прихода radioValue
+const validationInn = ({ values, radioValue }) => {
+  let inn = ''
   if (isNaN(values.inn))
-    errors.inn = 'Некорректный ИНН'
+    inn = 'Некорректный ИНН'
   if (!values.inn)
-    errors.inn = 'Обязательное поле';
+    inn = 'Обязательное поле';
   if (values.inn){
     if (radioValue === 'UL' && values.inn.length !== 10)
-      errors.inn = 'Некорректный ИНН'
+      inn = 'Некорректный ИНН'
     else if (radioValue !== 'UL' && values.inn.length !== 12)
-      errors.inn = 'Некорректный ИНН'
+      inn = 'Некорректный ИНН'
   }
-  return errors
+  return inn
 }
 
-const validationKpp = ({values, errors, radioValue}) => {
+const validationKpp = ({ values, radioValue }) => {
+  let kpp = ''
   if (!values.kpp && radioValue === 'UL')
-    errors.kpp = 'Обязательное поле';
+    kpp = 'Обязательное поле';
   if (values.kpp && values.kpp.length !== 9)
-    errors.kpp = 'Некорректный КПП'
-  return errors
+    kpp = 'Некорректный КПП'
+  return kpp
 }
 
-const validateEmail = ({values, errors}) => {
+const validationEmail = ({ values }) => {
+  let email = ''
   if (!values.email)
-    errors.email = 'Обязательное поле';
+    email = 'Обязательное поле';
   if (values.email) {
     let emailValid = values.email.match(/^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i);
     if (!emailValid)
-      errors.email = 'Некорректный e-mail'
+      email = 'Некорректный e-mail'
   }
-  return errors
+  return email
 }
 
-const validateGuid = ({values, errors}) => {
-
+const validationGuid = ({ values }) => {
+  let guid = ''
   if (!values.guid)
-    errors.guid = 'Обязательное поле';
+    guid = 'Обязательное поле';
   if (values.guid && values.guid.length < 39)
-    errors.guid = 'Некорректный идентификатор'
+    guid = 'Некорректный идентификатор'
   if (values.guid && values.guid.length > 3) {
     if (values.guid.substr(0, 3) !== '2AE')
-      errors.guid = 'Некорректный идентификатор'
+      guid = 'Некорректный идентификатор'
   }
-  return errors
+  return guid
 }
-//
-// const upperCaseGuid = values => {
-//   if (values.guid)
-//     values.guid = values.guid.toUpperCase()
-//   return values
-// }
+
+const validationName = ({ values }) => {
+  let name = ''
+  if (!values.name) {
+    name = 'Обязательное поле';
+  }
+  return name
+}
