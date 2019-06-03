@@ -1,52 +1,60 @@
 import React, { Component, Fragment } from "react";
-import { Grid, Typography, TextField } from "@material-ui/core";
+import { withStyles,
+  Grid,
+  Typography,
+  Checkbox,
+  Select,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  IconButton,
+  Popper,
+  Paper,
+  Fade} from "@material-ui/core";
+import { Help } from "@material-ui/icons"
 import { UploadButton } from "./buttons";
-import Radio from "@material-ui/core/Radio";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
+import { TextField } from 'final-form-material-ui';
 
 import { Field } from "react-final-form";
-import { Checkbox, Select } from "final-form-material-ui";
+import formatString from "format-string-by-pattern";
 
-import {
-  composeValidators,
-  maxLength,
-  require,
-  minLength
-} from "../utils/validation";
+const styles = theme => ({
+  radioGroup: {
+    display: "flex",
+    justifyContent: "space-around"
+  },
+  iconButton: {
+    width: 45,
+    height: 45,
+    marginTop: 20,
+  },
+  paperPopper: {
+    padding: 5,
+    background: 'rgba(255,36,0,0.8)',
+    color: '#ffffff'
+  }
+
+});
 
 class FirstStep extends Component {
   state = {
-    inn: this.props.dataMyOrganisation.inn,
-    kpp: this.props.dataMyOrganisation.kpp,
-    name: this.props.dataMyOrganisation.name,
-    guid: this.props.dataMyOrganisation.guid,
-    email: this.props.dataMyOrganisation.email,
-    dop_sog: this.props.dataMyOrganisation.dop_sog,
-
-    radioValue: "UL",
-    disableKpp: false,
-
-    errorInn: false,
-    errorKpp: false,
-    errorName: false,
-    errorGuid: false,
-    errorEmail: false
+    anchorEl: null,
+    open: null,
+    placement: null,
   };
 
-  handleChange = event => {
-    this.setState({
-      [event.target.name]: event.target.value,
-      disableKpp: event.target.value === "UL" ? false : true
-    });
-  };
-
-  stat = () => {
-    console.log(this.props);
-    console.log(this.state);
+  handleClick = placement => event => {
+    const { currentTarget } = event;
+    this.setState(state => ({
+      anchorEl: currentTarget,
+      open: state.placement !== placement || !state.open,
+      placement,
+    }));
   };
 
   render() {
+    const { anchorEl, open, placement } = this.state
+    const { classes, handleChangeRadio, dataMyOrganisation, disableKpp } = this.props;
     return (
       <>
         <Typography variant="h6" gutterBottom>
@@ -56,10 +64,10 @@ class FirstStep extends Component {
         <RadioGroup
           aria-label="position"
           name="radioValue"
-          value={this.state.radioValue}
-          onChange={this.handleChange}
+          value={dataMyOrganisation.radioValue}
+          onChange={handleChangeRadio}
           row
-          style={{ display: "flex", justifyContent: "space-around" }}
+          className={classes.radioGroup}
         >
           <FormControlLabel
             value="UL"
@@ -80,83 +88,78 @@ class FirstStep extends Component {
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
+
             <Field
-              component={({
-                input: { onChange, name, value, onBlur, onFocus },
-                meta: { error, touched },
-                ...props
-              }) => {
-                return (
-                  <TextField
-                    {...props}
-                    name={name}
-                    error={!!error && touched}
-                    helperText={touched && error}
-                    onChange={onChange}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                    value={value}
-                  />
-                );
-              }}
-              required
-              error={this.props.error.errorInn}
-              id=""
-              label="ИНН"
               fullWidth
+              required
               name="inn"
-              validate={composeValidators(
-                require,
-                maxLength(12),
-                minLength(10)
-              )}
-              value={this.state.inn}
-              // onChange={this.handleChange}
+              component={TextField}
+              type="text"
+              parse={formatString('999999999999')}
+              label="ИНН"
             />
+
           </Grid>
           <Grid item xs={12} sm={6}>
-            <TextField
-              disabled={this.state.disableKpp === false ? false : true}
-              required
-              error={this.props.error.errorKpp}
-              label="КПП"
+            <Field
               fullWidth
+              disabled={disableKpp}
+              required={!disableKpp}
               name="kpp"
-              value={this.state.kpp}
-              onChange={this.handleChange}
+              component={TextField}
+              type="text"
+              parse={formatString('999999999')}
+              label="КПП"
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              required
-              error={this.props.error.errorName}
-              label="Название организации"
+            <Field
               fullWidth
+              required
               name="name"
-              value={this.state.name}
-              onChange={this.handleChange}
+              component={TextField}
+              type="text"
+              label="Наименование"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              required
-              error={this.props.error.errorGuid}
-              label="Идентификатор"
+
+          <Popper open={open} anchorEl={anchorEl} placement={placement} transition>
+            {({ TransitionProps }) => (
+              <Fade {...TransitionProps} timeout={350}>
+                <Paper className={classes.paperPopper}>
+                  <Typography>
+                    <b>Астрал отчет:</b> Документооборот - Адресная книга - Данные пользователя - Идентификатор<br />
+                    <b>Астрал Онлайн:</b> Личный кабинет - Моя организация - id участника<br />
+                    <b>1С-ЭДО:</b> Раздела ЭДО - Профили настроек - Обмен с контрагентами
+                  </Typography>
+                </Paper>
+              </Fade>
+            )}
+          </Popper>
+
+          <IconButton aria-label="Delete" onClick={this.handleClick('top')} className={classes.iconButton}>
+            <Help fontSize="small" />
+          </IconButton>
+
+          <Grid item xs={11}>
+            <Field
               fullWidth
+              required
               name="guid"
-              value={this.state.guid}
-              onChange={this.handleChange}
+              component={TextField}
+              type="text"
+              parse={formatString('XXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')}
+              label="Идентификатор"
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              required
-              error={this.props.error.errorEmail}
-              label="e-mail"
+          <Grid item xs={12}>
+            <Field
               fullWidth
+              required
               name="email"
-              value={this.state.email}
-              onChange={this.handleChange}
+              component={TextField}
+              type="email"
+              label="E-mail"
             />
           </Grid>
           <Grid item xs={12}>
@@ -168,4 +171,4 @@ class FirstStep extends Component {
   }
 }
 
-export default FirstStep;
+export default withStyles(styles)(FirstStep);
