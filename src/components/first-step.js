@@ -16,7 +16,7 @@ import { UploadButton } from "./buttons";
 import { TextField } from 'final-form-material-ui';
 
 import { Field } from "react-final-form";
-import formatString from "format-string-by-pattern";
+import formatStringByPattern from "format-string-by-pattern";
 
 const styles = theme => ({
   radioGroup: {
@@ -67,6 +67,7 @@ class FirstStep extends Component {
           value={dataMyOrganisation.radioValue}
           onChange={handleChangeRadio}
           row
+          required
           className={classes.radioGroup}
         >
           <FormControlLabel
@@ -95,7 +96,7 @@ class FirstStep extends Component {
               name="inn"
               component={TextField}
               type="text"
-              parse={formatString('999999999999')}
+              parse={formatStringByPattern('999999999999')}
               label="ИНН"
             />
 
@@ -108,7 +109,7 @@ class FirstStep extends Component {
               name="kpp"
               component={TextField}
               type="text"
-              parse={formatString('999999999')}
+              parse={formatStringByPattern('999999999')}
               label="КПП"
             />
           </Grid>
@@ -148,7 +149,6 @@ class FirstStep extends Component {
               name="guid"
               component={TextField}
               type="text"
-              parse={formatString('XXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')}
               label="Идентификатор"
               parse={parse}
             />
@@ -173,7 +173,8 @@ class FirstStep extends Component {
 }
 
 const parse = value => {
-  let newValue = value.toUpperCase()
+  const someFormat = formatStringByPattern('XXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
+  let newValue = someFormat(value.toUpperCase())
   return newValue
 }
 
