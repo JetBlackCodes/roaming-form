@@ -150,6 +150,7 @@ class FirstStep extends Component {
               type="text"
               parse={formatString('XXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')}
               label="Идентификатор"
+              parse={parse}
             />
           </Grid>
           <Grid item xs={12}>
@@ -169,6 +170,11 @@ class FirstStep extends Component {
       </>
     );
   }
+}
+
+const parse = value => {
+  let newValue = value.toUpperCase()
+  return newValue
 }
 
 export default withStyles(styles)(FirstStep);
