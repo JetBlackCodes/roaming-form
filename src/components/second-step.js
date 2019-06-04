@@ -19,10 +19,9 @@ class SecondStep extends React.Component {
   };
 
   AddNewOperator = () => {
-    if (this.state.operators.length <= MAX_OPERATORS_COUNT) {
-      const newOper = { ...DEFAULT_OPERATOR };
-      let operators = this.state.operators;
-      operators.push(newOper);
+    const {operators} = this.state;
+    if (operators.length <= MAX_OPERATORS_COUNT) {
+      operators.push({ ...DEFAULT_OPERATOR });
       this.setState({ operators });
     } else alert('Вы можете добавить только 100 операторов');
   };

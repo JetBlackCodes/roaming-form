@@ -9,13 +9,13 @@ import {
   Button,
   Typography
 } from "@material-ui/core";
-import FirstStep from "./first-step";
-import SecondStep from "./second-step";
-import Summary from "./summary";
+import FirstStep from "components/first-step";
+import SecondStep from "components/second-step";
+import Summary from "components/summary";
 import {
   DEFAULT_OPERATOR,
   MY_ORGANISATION_DEFAULT_DATA
-} from "../constants/customer-form";
+} from "constants/customer-form";
 
 import { validate } from "./validate"
 import { Form } from "react-final-form";
