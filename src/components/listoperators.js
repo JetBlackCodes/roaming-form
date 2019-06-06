@@ -45,7 +45,6 @@ function OperatorBlock(props) {
   }
 
   const getNameComponent = (type) => {
-    console.log(type)
     let index = +type
     switch (index) {
       case 0:
