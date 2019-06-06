@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from "react";
-import { withStyles,
+import {
+  withStyles,
   Grid,
   Typography,
   Checkbox,
@@ -8,15 +9,19 @@ import { withStyles,
   FormControlLabel,
   Radio,
   IconButton,
-  Popper,
+  Popover,
   Paper,
-  Fade} from "@material-ui/core";
-import { Help } from "@material-ui/icons"
+  Fade
+} from "@material-ui/core";
+import { Help } from "@material-ui/icons";
 import { UploadButton } from "./buttons";
-import { TextField } from 'final-form-material-ui';
+import { TextField } from "final-form-material-ui";
 
 import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
+import purple from "@material-ui/core/colors/purple";
+
+import Name from "./name";
 
 const styles = theme => ({
   radioGroup: {
@@ -26,35 +31,36 @@ const styles = theme => ({
   iconButton: {
     width: 45,
     height: 45,
-    marginTop: 20,
+    marginTop: 20
   },
-  paperPopper: {
+  textPopover: {
     padding: 5,
-    background: 'rgba(255,36,0,0.8)',
-    color: '#ffffff'
+    color: purple[800]
   }
-
 });
 
 class FirstStep extends Component {
   state = {
-    anchorEl: null,
-    open: null,
-    placement: null,
+    anchorEl: null
   };
 
-  handleClick = placement => event => {
-    const { currentTarget } = event;
-    this.setState(state => ({
-      anchorEl: currentTarget,
-      open: state.placement !== placement || !state.open,
-      placement,
-    }));
+  handlePopoverOpen = event => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handlePopoverClose = () => {
+    this.setState({ anchorEl: null });
   };
 
   render() {
-    const { anchorEl, open, placement } = this.state
-    const { classes, handleChangeRadio, dataMyOrganisation, disableKpp } = this.props;
+    const { anchorEl } = this.state;
+    const open = Boolean(anchorEl);
+    const {
+      classes,
+      handleChangeRadio,
+      dataMyOrganisation,
+      disableKpp
+    } = this.props;
     return (
       <>
         <Typography variant="h6" gutterBottom>
@@ -78,28 +84,21 @@ class FirstStep extends Component {
           <FormControlLabel
             value="IP"
             control={<Radio color="primary" />}
-            label="ИП"
-          />
-          <FormControlLabel
-            value="FL"
-            control={<Radio color="primary" />}
-            label="Физическое лицо"
+            label="Индивидуальный предприниматель"
           />
         </RadioGroup>
 
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6}>
-
             <Field
               fullWidth
               required
               name="inn"
               component={TextField}
               type="text"
-              parse={formatStringByPattern('999999999999')}
+              parse={formatStringByPattern("999999999999")}
               label="ИНН"
             />
-
           </Grid>
           <Grid item xs={12} sm={6}>
             <Field
@@ -109,36 +108,43 @@ class FirstStep extends Component {
               name="kpp"
               component={TextField}
               type="text"
-              parse={formatStringByPattern('999999999')}
+              parse={formatStringByPattern("999999999")}
               label="КПП"
             />
           </Grid>
-          <Grid item xs={12}>
-            <Field
-              fullWidth
-              required
-              name="name"
-              component={TextField}
-              type="text"
-              label="Наименование"
-            />
-          </Grid>
 
-          <Popper open={open} anchorEl={anchorEl} placement={placement} transition>
-            {({ TransitionProps }) => (
-              <Fade {...TransitionProps} timeout={350}>
-                <Paper className={classes.paperPopper}>
-                  <Typography>
-                    <b>Астрал отчет:</b> Документооборот - Адресная книга - Данные пользователя - Идентификатор<br />
-                    <b>Астрал Онлайн:</b> Личный кабинет - Моя организация - id участника<br />
-                    <b>1С-ЭДО:</b> Раздела ЭДО - Профили настроек - Обмен с контрагентами
-                  </Typography>
-                </Paper>
-              </Fade>
-            )}
-          </Popper>
+          <Name value={dataMyOrganisation.radioValue} />
 
-          <IconButton aria-label="Delete" onClick={this.handleClick('top')} className={classes.iconButton}>
+          <Popover
+            onClose={this.handlePopoverClose}
+            open={open}
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "center",
+              horizontal: "right"
+            }}
+            transformOrigin={{
+              vertical: "center",
+              horizontal: "left"
+            }}
+          >
+            <Typography className={classes.textPopover}>
+              <b>Астрал отчет:</b> Документооборот - Адресная книга - Данные
+              пользователя - Идентификатор
+              <br />
+              <b>Астрал Онлайн:</b> Личный кабинет - Моя организация - id
+              участника
+              <br />
+              <b>1С-ЭДО:</b> Раздела ЭДО - Профили настроек - Обмен с
+              контрагентами
+            </Typography>
+          </Popover>
+
+          <IconButton
+            aria-label="Delete"
+            className={classes.iconButton}
+            onClick={this.handlePopoverOpen}
+          >
             <Help fontSize="small" />
           </IconButton>
 
@@ -173,9 +179,11 @@ class FirstStep extends Component {
 }
 
 const parse = value => {
-  const someFormat = formatStringByPattern('XXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX');
-  let newValue = someFormat(value.toUpperCase())
-  return newValue
-}
+  const someFormat = formatStringByPattern(
+    "XXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+  );
+  let newValue = someFormat(value.toUpperCase());
+  return newValue;
+};
 
 export default withStyles(styles)(FirstStep);
