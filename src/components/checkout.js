@@ -7,18 +7,21 @@ import {
   Step,
   StepLabel,
   Button,
-  Typography
+  Typography,
+  Grid
 } from "@material-ui/core";
 import FirstStep from "components/first-step";
 import SecondStep from "components/second-step";
 import Summary from "components/summary";
 import {
   DEFAULT_OPERATOR,
-  MY_ORGANISATION_DEFAULT_DATA
+  MY_ORGANISATION_DEFAULT_DATA,
+  MAX_OPERATORS_COUNT
 } from "constants/customer-form";
 
-import { validate } from "./validate"
+import { validate } from "./validate";
 import { Form } from "react-final-form";
+import axios from "axios";
 
 function getSteps() {
   return [
@@ -40,7 +43,11 @@ const getStepContent = ({
   switch (step) {
     case 0:
       return (
-        <FirstStep dataMyOrganisation={dataMyOrganisation} handleChangeRadio={handleChangeRadio} disableKpp={disableKpp}/>
+        <FirstStep
+          dataMyOrganisation={dataMyOrganisation}
+          handleChangeRadio={handleChangeRadio}
+          disableKpp={disableKpp}
+        />
       );
     case 1:
       return <SecondStep operators={operators} />;
@@ -82,14 +89,14 @@ class Checkout extends Component {
   };
 
   handleChangeRadio = event => {
-    const {value} = event.target
-    let obj = this.state.dataMyOrganisation
-    obj.radioValue = value
+    const { value } = event.target;
+    let obj = this.state.dataMyOrganisation;
+    obj.radioValue = value;
     this.setState({
       dataMyOrganisation: obj,
-      disableKpp: value === 'UL' ? false : true
-    })
-  }
+      disableKpp: value === "UL" ? false : true
+    });
+  };
 
   onSubmit = event => {
     if (this.state.activeStep === 0) {
@@ -99,17 +106,43 @@ class Checkout extends Component {
         activeStep: state.activeStep + 1
       }));
     } else {
-      console.log(this.state)
+      console.log(this.state);
       this.setState(state => ({
         activeStep: state.activeStep + 1
       }));
     }
-  }
+  };
 
+  AddNewOperator = () => {
+    const { operators } = this.state;
+    if (operators.length <= MAX_OPERATORS_COUNT) {
+      operators.push({ ...DEFAULT_OPERATOR });
+      this.setState({ operators });
+    } else alert("Вы можете добавить только 100 операторов");
+  };
+
+  sendDataOnServer = event => {
+    const { inn, kpp } = this.state.dataMyOrganisation;
+    const data = JSON.stringify({ inn: inn, kpp: kpp });
+    axios
+      .post("/sender", { sender: data })
+      .then(response => {
+        console.log(response);
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+  };
 
   render() {
     const { classes, updateData } = this.props;
-    const { activeStep, operators, dataMyOrganisation, error, disableKpp } = this.state;
+    const {
+      activeStep,
+      operators,
+      dataMyOrganisation,
+      error,
+      disableKpp
+    } = this.state;
 
     const steps = getSteps();
 
@@ -121,7 +154,7 @@ class Checkout extends Component {
           this.form = form;
         }}
         validate={validate(this.state.dataMyOrganisation.radioValue)}
-        render={({ handleSubmit, reset, submitting, pristine, values}) => {
+        render={({ handleSubmit, reset, submitting, pristine, values }) => {
           return (
             <form onSubmit={handleSubmit}>
               <main className={classes.layout}>
@@ -162,28 +195,41 @@ class Checkout extends Component {
                           handleChangeRadio: this.handleChangeRadio,
                           disableKpp
                         })}
-                        <div className={classes.buttons}>
-                          {activeStep !== 0 && (
-                            <Button
-                              onClick={this.handleBack}
-                              className={classes.button}
-                            >
-                              Назад
-                            </Button>
-                          )}
 
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            className={classes.button}
-                            type="submit"
-                            disabled={submitting}
-                          >
-                            {activeStep === steps.length - 1
-                              ? "Оправить"
-                              : "Далее"}
-                          </Button>
-                        </div>
+                        <Grid contaner className={classes.buttons}>
+                          <Grid xs={12} sm={12}>
+                            {activeStep === 1 && (
+                              <Button
+                                onClick={this.AddNewOperator}
+                                variant="contained"
+                                color="primary"
+                              >
+                                Добавить оператора
+                              </Button>
+                            )}
+                          </Grid>
+
+                          <Grid container className={classes.mainButtons} xs={12} sm={12}>
+                            {activeStep !== 0 && (
+                              <Button
+                                onClick={this.handleBack}
+                              >
+                                Назад
+                              </Button>
+                            )}
+                          
+                            <Button
+                              variant="contained"
+                              color="primary"
+                              type="submit"
+                              disabled={submitting}
+                            >
+                              {activeStep === steps.length - 1
+                                ? "Оправить"
+                                : "Далее"}
+                            </Button>
+                          </Grid>
+                        </Grid>
                       </>
                     )}
                   </>
@@ -223,12 +269,13 @@ const styles = theme => ({
   },
   buttons: {
     display: "flex",
+    align: "center",
+    height: 37,
+    marginTop: theme.spacing(1)    
+  },
+  mainButtons:{
     justifyContent: "flex-end"
   },
-  button: {
-    marginTop: theme.spacing.unit * 3,
-    marginLeft: theme.spacing.unit
-  }
 });
 
 Checkout.propTypes = {
