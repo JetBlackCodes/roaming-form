@@ -45,12 +45,8 @@ class SecondStep extends React.Component {
         <div>
           {this.state.operators.map((item, index) => (
             <OperatorBlock
-              onChange={this.handleChange(index)}
-              name={item.name}
-              inn={item.inn}
-              kpp={item.kpp}
-              oper={item.oper}
               actions={{ delOperator: this.DelOperator(index) }}
+              index={index}
             />
           ))}
         </div>
