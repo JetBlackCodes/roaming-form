@@ -20,6 +20,8 @@ import {
 import { validate } from "../utils/validate"
 import { Form } from "react-final-form";
 
+import axios from 'axios'
+
 function getSteps() {
   return [
     "Данные вашей организации",
@@ -58,7 +60,7 @@ const getStepContent = ({
 
 class Checkout extends Component {
   state = {
-    activeStep: 1,
+    activeStep: 0,
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
@@ -93,11 +95,11 @@ class Checkout extends Component {
 
   onSubmit = ffJson => { // final form json
     const { activeStep, dataMyOrganisation, operators } = this.state
-    let data = activeStep === 0 ? ffJson : dataMyOrganisation;
-    data.radioValue = dataMyOrganisation.radioValue
+    let dataMy = activeStep === 0 ? ffJson : dataMyOrganisation;
+    dataMy.radioValue = dataMyOrganisation.radioValue
     let dataOperators = activeStep === 1 ? dataSort(ffJson) : operators;
     this.setState({
-      dataMyOrganisation: data,
+      dataMyOrganisation: dataMy,
       operators: dataOperators,
       activeStep: activeStep + 1
     })
