@@ -9,15 +9,15 @@ import {
   Button,
   Typography
 } from "@material-ui/core";
-import FirstStep from "components/first-step";
-import SecondStep from "components/second-step";
-import Summary from "components/summary";
+import FirstStep from "../components/first-step";
+import SecondStep from "../components/second-step";
+import Summary from "../components/summary";
 import {
   DEFAULT_OPERATOR,
   MY_ORGANISATION_DEFAULT_DATA
-} from "constants/customer-form";
+} from "../constants/customer-form";
 
-import { validate } from "./validate"
+import { validate } from "../utils/validate"
 import { Form } from "react-final-form";
 
 function getSteps() {
@@ -58,11 +58,10 @@ const getStepContent = ({
 
 class Checkout extends Component {
   state = {
-    activeStep: 0,
+    activeStep: 1,
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
-    error: {}
   };
 
   updateData = value => {
@@ -83,27 +82,26 @@ class Checkout extends Component {
 
   handleChangeRadio = event => {
     const {value} = event.target
-    let obj = this.state.dataMyOrganisation
-    obj.radioValue = value
+    let dataMyOrganisation = this.state.dataMyOrganisation
+    dataMyOrganisation['radioValue'] = value
     this.setState({
-      dataMyOrganisation: obj,
+      dataMyOrganisation,
       disableKpp: value === 'UL' ? false : true
     })
+
   }
 
-  onSubmit = event => {
-    if (this.state.activeStep === 0) {
-      let dataMyOrganisation = event;
-      this.setState(state => ({
-        dataMyOrganisation,
-        activeStep: state.activeStep + 1
-      }));
-    } else {
-      console.log(this.state)
-      this.setState(state => ({
-        activeStep: state.activeStep + 1
-      }));
-    }
+  onSubmit = ffJson => { // final form json
+    const { activeStep, dataMyOrganisation, operators } = this.state
+    let data = activeStep === 0 ? ffJson : dataMyOrganisation;
+    data.radioValue = dataMyOrganisation.radioValue
+    let dataOperators = activeStep === 1 ? dataSort(ffJson) : operators;
+    this.setState({
+      dataMyOrganisation: data,
+      operators: dataOperators,
+      activeStep: activeStep + 1
+    })
+    
   }
 
 
@@ -116,10 +114,6 @@ class Checkout extends Component {
     return (
       <Form
         onSubmit={this.onSubmit}
-        id="roaming-form"
-        ref={form => {
-          this.form = form;
-        }}
         validate={validate(this.state.dataMyOrganisation.radioValue)}
         render={({ handleSubmit, reset, submitting, pristine, values}) => {
           return (
@@ -234,5 +228,22 @@ const styles = theme => ({
 Checkout.propTypes = {
   classes: PropTypes.object.isRequired
 };
+
+const dataSort = (obj) => {
+  let newArr = []
+
+  Object.keys(obj).forEach(function(key) { // пройдемся по объекту
+    let value = this[key]; // key - имя артрибута, value - значение артрибута
+
+    let arrIndex = parseInt(key.replace(/\D+/g,"")); // получаем  номер контрагента по списку
+    if (!newArr[arrIndex])
+      newArr[arrIndex] = {} // если еще не объявлен, объявляем как объект
+
+    let arrKey = key.split("Kontr")[0] // имя артрибута
+    newArr[arrIndex][arrKey] = value // заносим данные
+  }, obj);
+
+  return newArr // возвращаем переработанный массив
+}
 
 export default withStyles(styles)(Checkout);
