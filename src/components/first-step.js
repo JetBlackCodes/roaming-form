@@ -11,9 +11,11 @@ import {
   IconButton,
   Popover,
   Paper,
-  Fade
+  Fade,
+  Chip,
+  Avatar
 } from "@material-ui/core";
-import { Help } from "@material-ui/icons";
+import { Help, Done, AttachFile } from "@material-ui/icons";
 import { UploadButton } from "./buttons";
 import { TextField } from "final-form-material-ui";
 
@@ -59,7 +61,9 @@ class FirstStep extends Component {
       classes,
       handleChangeRadio,
       dataMyOrganisation,
-      disableKpp
+      disableKpp,
+      dop_sog,
+      upload
     } = this.props;
     return (
       <>
@@ -128,7 +132,7 @@ class FirstStep extends Component {
               horizontal: "left"
             }}
           >
-            <Typography className={classes.textPopover}>
+            <Typography>
               <b>Астрал отчет:</b> Документооборот - Адресная книга - Данные
               пользователя - Идентификатор
               <br />
@@ -152,7 +156,7 @@ class FirstStep extends Component {
             <Field
               fullWidth
               required
-              name="guid"
+              name="id"
               component={TextField}
               type="text"
               label="Идентификатор"
@@ -170,8 +174,13 @@ class FirstStep extends Component {
             />
           </Grid>
           <Grid item xs={12}>
-            <UploadButton />
+            <UploadButton upload={upload}/>
           </Grid>
+          <Chip
+            avatar={<Avatar><AttachFile/></Avatar>}
+            label={ dop_sog.name }
+            deleteIcon={<Done />}
+         />
         </Grid>
       </>
     );
