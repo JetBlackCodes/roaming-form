@@ -29,7 +29,7 @@ function OperatorBlock(props) {
     inn: `innKontr${props.index}`,
     kpp: `kppKontr${props.index}`,
     name: `nameKontr${props.index}`,
-    oper: `operKontr${props.index}`,
+    oper: `operatorKontr${props.index}`,
     lastname: `lastnameKontr${props.index}`,
     firstname: `firstnameKontr${props.index}`,
     patronymic: `patronymicKontr${props.index}`,
