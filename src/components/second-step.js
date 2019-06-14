@@ -43,12 +43,14 @@ class SecondStep extends React.Component {
         </Typography>
         {/* <Divider className={useStyles.divider} mb={1}/> */}
         <div>
-          {this.state.operators.map((item, index) => (
+          {
+            this.state.operators.map((item, index) => (
             <OperatorBlock
               actions={{ delOperator: this.DelOperator(index) }}
               index={index}
             />
-          ))}
+          ))
+        }
         </div>
         <Fab color="primary" title="Добавить оператора" onClick={this.AddNewOperator}>
           +
