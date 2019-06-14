@@ -35,15 +35,21 @@ export const DEFAULT_OPERATOR = {
   name: "",
   inn: "",
   kpp: "",
-  oper: ""
+  operator: "",
+  lastname: "",
+  firstname: "",
+  patronymic: ""
 };
 
 export const MY_ORGANISATION_DEFAULT_DATA = {
   inn: "",
   kpp: "",
   name: "",
-  guid: "",
+  id: "",
   email: "",
   dop_sog: "",
-  radioValue: "UL"
+  radioValue: "UL",
+  lastname: "",
+  firstname: "",
+  patronymic: ""
 };
