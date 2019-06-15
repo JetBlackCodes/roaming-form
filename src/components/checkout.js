@@ -13,6 +13,7 @@ import {
   IconButton,
   Avatar,
   Chip,
+  Grid
 } from "@material-ui/core";
 import { Error, Close } from "@material-ui/icons";
 import FirstStep from "../components/first-step";
@@ -20,11 +21,13 @@ import SecondStep from "../components/second-step";
 import Summary from "../components/summary";
 import {
   DEFAULT_OPERATOR,
-  MY_ORGANISATION_DEFAULT_DATA
-} from "../constants/customer-form";
+  MY_ORGANISATION_DEFAULT_DATA,
+  MAX_OPERATORS_COUNT
+} from "constants/customer-form";
 
-import { validate } from "../utils/validate"
+import { validate } from "./validate";
 import { Form } from "react-final-form";
+import axios from "axios";
 
 import axios from 'axios'
 
@@ -117,7 +120,6 @@ class Checkout extends Component {
       dataMyOrganisation,
       disableKpp: value === 'UL' ? false : true
     })
-
   }
 
   onSubmit = ffJson => { // final form json
@@ -152,8 +154,28 @@ class Checkout extends Component {
       })
 
     }
-  }
+  };
 
+  AddNewOperator = () => {
+    const { operators } = this.state;
+    if (operators.length <= MAX_OPERATORS_COUNT) {
+      operators.push({ ...DEFAULT_OPERATOR });
+      this.setState({ operators });
+    } else alert("Вы можете добавить только 100 операторов");
+  };
+
+  sendDataOnServer = event => {
+    const { inn, kpp } = this.state.dataMyOrganisation;
+    const data = JSON.stringify({ inn: inn, kpp: kpp });
+    axios
+      .post("/sender", { sender: data })
+      .then(response => {
+        console.log(response);
+      })
+      .catch(function(error) {
+        console.log(error);
+      });
+  };
 
   render() {
     const { classes, updateData } = this.props;
@@ -165,7 +187,7 @@ class Checkout extends Component {
       <Form
         onSubmit={this.onSubmit}
         validate={validate(this.state.dataMyOrganisation.radioValue)}
-        render={({ handleSubmit, reset, submitting, pristine, values}) => {
+        render={({ handleSubmit, reset, submitting, pristine, values }) => {
           return (
             <form onSubmit={handleSubmit}>
               <main className={classes.layout}>
@@ -207,13 +229,38 @@ class Checkout extends Component {
                           upload: this.upload,
                           dop_sog
                         })}
-                        <div className={classes.buttons}>
-                          {activeStep !== 0 && (
+
+                        <Grid contaner className={classes.buttons}>
+                          <Grid xs={12} sm={12}>
+                            {activeStep === 1 && (
+                              <Button
+                                onClick={this.AddNewOperator}
+                                variant="contained"
+                                color="primary"
+                              >
+                                Добавить оператора
+                              </Button>
+                            )}
+                          </Grid>
+
+                          <Grid container className={classes.mainButtons} xs={12} sm={12}>
+                            {activeStep !== 0 && (
+                              <Button
+                                onClick={this.handleBack}
+                              >
+                                Назад
+                              </Button>
+                            )}
+                          
                             <Button
-                              onClick={this.handleBack}
-                              className={classes.button}
+                              variant="contained"
+                              color="primary"
+                              type="submit"
+                              disabled={submitting}
                             >
-                              Назад
+                              {activeStep === steps.length - 1
+                                ? "Оправить"
+                                : "Далее"}
                             </Button>
                           )}
 
@@ -305,6 +352,11 @@ const styles = theme => ({
   },
   buttons: {
     display: "flex",
+    align: "center",
+    height: 37,
+    marginTop: theme.spacing(1)    
+  },
+  mainButtons:{
     justifyContent: "flex-end"
   },
   button: {

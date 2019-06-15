@@ -24,23 +24,6 @@ import formatStringByPattern from "format-string-by-pattern";
 import purple from "@material-ui/core/colors/purple";
 
 import Name from "./name";
-
-const styles = theme => ({
-  radioGroup: {
-    display: "flex",
-    justifyContent: "space-around"
-  },
-  iconButton: {
-    width: 45,
-    height: 45,
-    marginTop: 20
-  },
-  textPopover: {
-    padding: 5,
-    color: purple[800]
-  }
-});
-
 class FirstStep extends Component {
   state = {
     anchorEl: null
@@ -118,37 +101,35 @@ class FirstStep extends Component {
           </Grid>
 
           <Name value={dataMyOrganisation.radioValue} />
-
-          <Popover
-            onClose={this.handlePopoverClose}
+          <Popper
             open={open}
             anchorEl={anchorEl}
-            anchorOrigin={{
-              vertical: "center",
-              horizontal: "right"
-            }}
-            transformOrigin={{
-              vertical: "center",
-              horizontal: "left"
-            }}
+            placement={placement}
+            transition
           >
-            <Typography>
-              <b>Астрал отчет:</b> Документооборот - Адресная книга - Данные
-              пользователя - Идентификатор
-              <br />
-              <b>Астрал Онлайн:</b> Личный кабинет - Моя организация - id
-              участника
-              <br />
-              <b>1С-ЭДО:</b> Раздела ЭДО - Профили настроек - Обмен с
-              контрагентами
-            </Typography>
-          </Popover>
+            {({ TransitionProps }) => (
+              <Fade {...TransitionProps} timeout={350}>
+                <Paper className={classes.paperPopper}>
+                  <Typography>
+                    <b>Астрал отчет:</b> Документооборот - Адресная книга -
+                    Данные пользователя - Идентификатор
+                    <br />
+                    <b>Астрал Онлайн:</b> Личный кабинет - Моя организация - id
+                    участника
+                    <br />
+                    <b>1С-ЭДО:</b> Раздела ЭДО - Профили настроек - Обмен с
+                    контрагентами
+                  </Typography>
+                </Paper>
+              </Fade>
+            )}
+          </Popper>
 
           <IconButton
             aria-label="Delete"
             className={classes.iconButton}
-            onClick={this.handlePopoverOpen}
           >
+            onClick={this.handlePopoverOpen}
             <Help fontSize="small" />
           </IconButton>
 
@@ -194,5 +175,22 @@ const parse = value => {
   let newValue = someFormat(value.toUpperCase());
   return newValue;
 };
+
+const styles = theme => ({
+  radioGroup: {
+    display: "flex",
+    justifyContent: "space-around"
+  },
+  iconButton: {
+    width: 45,
+    height: 45,
+    marginTop: 20
+  },
+  paperPopper: {
+    padding: 5,
+    background: "rgba(255,36,0,0.8)",
+    color: "#ffffff"
+  }
+});
 
 export default withStyles(styles)(FirstStep);

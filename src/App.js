@@ -1,12 +1,10 @@
 import React, {Component} from 'react';
-import Checkout from './components/checkout'
+import Checkout from 'components/checkout'
 
 export default class App extends Component {
   render(){
-    return (
-      <div>
-        <Checkout/>
-      </div>
+    return (      
+      <Checkout/>      
     );
   }  
 }

@@ -6,15 +6,15 @@ import {
   ListItem,
   ListItemText,
   Grid,
-  Divider,
-} from '@material-ui/core';
-import { OPERATORS } from '../constants/customer-form';
+  Divider
+} from "@material-ui/core";
+import { OPERATORS } from "../constants/customer-form";
 
 class Summary extends React.Component {
   state = {
     operators: this.props.operators,
-    dataMyOrganisation: this.props.dataMyOrganisation,
-  };
+    dataMyOrganisation: this.props.dataMyOrganisation
+  };  
 
   render() {
     const { typ, listItem, onlyForName, title } = this.props.classes;
@@ -77,7 +77,9 @@ class Summary extends React.Component {
 
               <ListItem className={listItem}>
                 <ListItemText primary="КПП" />
-                <Typography variant="body2">{item.kpp === '' ? '' : `(${item.kpp})`}</Typography>
+                <Typography variant="body2">
+                  {item.kpp === "" ? "" : `(${item.kpp})`}
+                </Typography>
               </ListItem>
 
               <ListItem className={listItem}>
@@ -85,7 +87,7 @@ class Summary extends React.Component {
                 <Typography variant="body2">
                   {OPERATORS.map(value => (
                     <Typography variant="body2">
-                      {item.oper === value.value ? value.label : ''}
+                      {item.oper === value.value ? value.label : ""}
                     </Typography>
                   ))}
                 </Typography>
@@ -102,18 +104,18 @@ class Summary extends React.Component {
 const styles = theme => ({
   onlyForName: {
     padding: `${theme.spacing.unit}px 0`,
-    height: 'auto',
+    height: "auto"
   },
   typ: {
-    maxWidth: 270,
+    maxWidth: 270
   },
   listItem: {
     padding: `${theme.spacing.unit}px 0`,
-    height: 30,
+    height: 30
   },
   title: {
-    marginTop: theme.spacing.unit * 2,
-  },
+    marginTop: theme.spacing.unit * 2
+  }
 });
 
 export default withStyles(styles)(Summary);
