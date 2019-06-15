@@ -7,18 +7,26 @@ import {
   Step,
   StepLabel,
   Button,
-  Typography
+  Typography,
+  Snackbar,
+  SnackbarContent,
+  IconButton,
+  Avatar,
+  Chip,
 } from "@material-ui/core";
-import FirstStep from "components/first-step";
-import SecondStep from "components/second-step";
-import Summary from "components/summary";
+import { Error, Close } from "@material-ui/icons";
+import FirstStep from "../components/first-step";
+import SecondStep from "../components/second-step";
+import Summary from "../components/summary";
 import {
   DEFAULT_OPERATOR,
   MY_ORGANISATION_DEFAULT_DATA
-} from "constants/customer-form";
+} from "../constants/customer-form";
 
-import { validate } from "./validate"
+import { validate } from "../utils/validate"
 import { Form } from "react-final-form";
+
+import axios from 'axios'
 
 function getSteps() {
   return [
@@ -35,12 +43,14 @@ const getStepContent = ({
   dataMyOrganisation,
   error,
   handleChangeRadio,
-  disableKpp
+  disableKpp,
+  upload,
+  dop_sog
 }) => {
   switch (step) {
     case 0:
       return (
-        <FirstStep dataMyOrganisation={dataMyOrganisation} handleChangeRadio={handleChangeRadio} disableKpp={disableKpp}/>
+        <FirstStep dataMyOrganisation={dataMyOrganisation} handleChangeRadio={handleChangeRadio} disableKpp={disableKpp} dop_sog={dop_sog} upload={upload}/>
       );
     case 1:
       return <SecondStep operators={operators} />;
@@ -62,12 +72,30 @@ class Checkout extends Component {
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
-    error: {}
+    dop_sog: {
+      name: 'Файл не выбран',
+      file: '',
+    },
+    errorText: '',
+    open: false
   };
+
+  upload = file => {
+    this.setState({
+      dop_sog: {
+        name: file.target.files[0].name,
+        file: file.target.files[0]
+      }
+    })
+  }
 
   updateData = value => {
     this.setState({ operators: value });
   };
+
+  handleClose = event => {
+    this.setState({ open: false });
+  }
 
   handleBack = () => {
     this.setState(state => ({
@@ -83,43 +111,59 @@ class Checkout extends Component {
 
   handleChangeRadio = event => {
     const {value} = event.target
-    let obj = this.state.dataMyOrganisation
-    obj.radioValue = value
+    let dataMyOrganisation = this.state.dataMyOrganisation
+    dataMyOrganisation['radioValue'] = value
     this.setState({
-      dataMyOrganisation: obj,
+      dataMyOrganisation,
       disableKpp: value === 'UL' ? false : true
     })
+
   }
 
-  onSubmit = event => {
-    if (this.state.activeStep === 0) {
-      let dataMyOrganisation = event;
-      this.setState(state => ({
-        dataMyOrganisation,
-        activeStep: state.activeStep + 1
-      }));
-    } else {
-      console.log(this.state)
-      this.setState(state => ({
-        activeStep: state.activeStep + 1
-      }));
+  onSubmit = ffJson => { // final form json
+    const { activeStep, dataMyOrganisation, operators, dop_sog } = this.state
+    let dataMy = activeStep === 0 ? ffJson : dataMyOrganisation;
+    dataMy.radioValue = dataMyOrganisation.radioValue
+    this.setState({
+      dataMyOrganisation: dataMy,
+      operators: activeStep === 1 ? dataSort(ffJson) : operators,
+      activeStep: activeStep < 2 ? activeStep + 1 : activeStep
+    })
+    if (activeStep === 2 ) {
+      let data = {
+        sender: [dataMyOrganisation],
+        receiver: operators
+      }
+
+      axios({
+        method: 'post',
+        url: `http://roaming.api.staging.keydisk.ru/abonent`,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data; boundary=---------------------------5273914420626',
+         },
+        data: `-----------------------------18467633426500\r\nContent-Disposition: form-data; name="agreement"\r\n\r\n${JSON.stringify(dop_sog)}
+-----------------------------5273914420626\r\nContent-Disposition: form-data; name="data"\r\n\r\n${JSON.stringify(data)}\r\n-----------------------------5273914420626--`
+      })
+      .then(res => {
+        // console.log(res);
+        if (res.data.status === 0) this.setState({ activeStep: activeStep + 1 })
+        else this.setState({ errorText: res.data.code, open: true })
+      })
+
     }
   }
 
 
   render() {
     const { classes, updateData } = this.props;
-    const { activeStep, operators, dataMyOrganisation, error, disableKpp } = this.state;
+    const { activeStep, operators, dataMyOrganisation, errorText, disableKpp, dop_sog, open } = this.state;
 
     const steps = getSteps();
 
     return (
       <Form
         onSubmit={this.onSubmit}
-        id="roaming-form"
-        ref={form => {
-          this.form = form;
-        }}
         validate={validate(this.state.dataMyOrganisation.radioValue)}
         render={({ handleSubmit, reset, submitting, pristine, values}) => {
           return (
@@ -141,7 +185,6 @@ class Checkout extends Component {
                   <>
                     {activeStep === steps.length ? ( // ласт этап
                       <>
-                        <Typography variant="h8">Заявка №04029</Typography>
                         <Typography variant="h5" gutterBottom>
                           Ваш запрос на установку связи направлен оператору
                           абонента.
@@ -160,7 +203,9 @@ class Checkout extends Component {
                           operators,
                           dataMyOrganisation,
                           handleChangeRadio: this.handleChangeRadio,
-                          disableKpp
+                          disableKpp,
+                          upload: this.upload,
+                          dop_sog
                         })}
                         <div className={classes.buttons}>
                           {activeStep !== 0 && (
@@ -184,6 +229,43 @@ class Checkout extends Component {
                               : "Далее"}
                           </Button>
                         </div>
+
+                        <Snackbar
+                          anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                          }}
+                          open={open}
+                          autoHideDuration={6000}
+                          onClose={this.handleClose}
+                        >
+
+                          <SnackbarContent
+                            aria-describedby="client-snackbar"
+                            className={classes.snack}
+                            message={
+                              <span id="client-snackbar">
+                              <Chip
+                                avatar={
+                                  <Avatar>
+                                    <Error />
+                                  </Avatar>
+                                }
+                                label={errorText}
+                                className={classes.snack}
+                                color="secondary"
+                              />
+                              </span>
+                            }
+                            action={[
+                              <IconButton key="close" aria-label="Close" color="inherit" onClick={this.handleClose}>
+                                <Close/>
+                              </IconButton>,
+                            ]}
+                          />
+
+                        </Snackbar>
+
                       </>
                     )}
                   </>
@@ -228,11 +310,36 @@ const styles = theme => ({
   button: {
     marginTop: theme.spacing.unit * 3,
     marginLeft: theme.spacing.unit
+  },
+  snack: {
+    background: '#cc3300',
+    color: '#fff',
+    fontSize: '12pt'
   }
 });
 
 Checkout.propTypes = {
   classes: PropTypes.object.isRequired
 };
+
+const dataSort = (obj) => {
+  let newArr = []
+
+  Object.keys(obj).forEach(function(key) { // пройдемся по объекту
+    let value = this[key]; // key - имя артрибута, value - значение артрибута
+
+    let arrIndex = parseInt(key.replace(/\D+/g,"")); // получаем  номер контрагента по списку
+
+    if (arrIndex >= 0) {
+      if (!newArr[arrIndex])
+        newArr[arrIndex] = {} // если еще не объявлен, объявляем как объект
+
+      let arrKey = key.split("Kontr")[0] // имя артрибута
+      newArr[arrIndex][arrKey] = value // заносим данные
+    }
+  }, obj);
+
+  return newArr // возвращаем переработанный массив
+}
 
 export default withStyles(styles)(Checkout);
