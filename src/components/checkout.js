@@ -16,20 +16,19 @@ import {
   Grid
 } from "@material-ui/core";
 import { Error, Close } from "@material-ui/icons";
-import FirstStep from "../components/first-step";
-import SecondStep from "../components/second-step";
-import Summary from "../components/summary";
+import FirstStep from "components/steps/first-step";
+import SecondStep from "components/steps/second-step";
+import Summary from "components/steps/summary";
+import CompleteStep from "components/steps/complete-step";
 import {
   DEFAULT_OPERATOR,
-  MY_ORGANISATION_DEFAULT_DATA,
-  MAX_OPERATORS_COUNT
-} from "constants/customer-form";
+  MY_ORGANISATION_DEFAULT_DATA
+} from "../constants/customer-form";
 
-import { validate } from "./validate";
+import { validate } from "../utils/validate";
 import { Form } from "react-final-form";
-import axios from "axios";
 
-import axios from 'axios'
+import axios from "axios";
 
 function getSteps() {
   return [
@@ -53,7 +52,13 @@ const getStepContent = ({
   switch (step) {
     case 0:
       return (
-        <FirstStep dataMyOrganisation={dataMyOrganisation} handleChangeRadio={handleChangeRadio} disableKpp={disableKpp} dop_sog={dop_sog} upload={upload}/>
+        <FirstStep
+          dataMyOrganisation={dataMyOrganisation}
+          handleChangeRadio={handleChangeRadio}
+          disableKpp={disableKpp}
+          dop_sog={dop_sog}
+          upload={upload}
+        />
       );
     case 1:
       return <SecondStep operators={operators} />;
@@ -71,15 +76,15 @@ const getStepContent = ({
 
 class Checkout extends Component {
   state = {
-    activeStep: 0,
+    activeStep: 0,    
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
     dop_sog: {
-      name: 'Файл не выбран',
-      file: '',
+      name: "Файл не выбран",
+      file: ""
     },
-    errorText: '',
+    errorText: "",
     open: false
   };
 
@@ -89,8 +94,8 @@ class Checkout extends Component {
         name: file.target.files[0].name,
         file: file.target.files[0]
       }
-    })
-  }
+    });
+  };
 
   updateData = value => {
     this.setState({ operators: value });
@@ -98,7 +103,7 @@ class Checkout extends Component {
 
   handleClose = event => {
     this.setState({ open: false });
-  }
+  };
 
   handleBack = () => {
     this.setState(state => ({
@@ -113,73 +118,65 @@ class Checkout extends Component {
   };
 
   handleChangeRadio = event => {
-    const {value} = event.target
-    let dataMyOrganisation = this.state.dataMyOrganisation
-    dataMyOrganisation['radioValue'] = value
+    const { value } = event.target;
+    let dataMyOrganisation = this.state.dataMyOrganisation;
+    dataMyOrganisation["radioValue"] = value;
     this.setState({
       dataMyOrganisation,
-      disableKpp: value === 'UL' ? false : true
-    })
-  }
+      disableKpp: value === "UL" ? false : true
+    });
+  };
 
-  onSubmit = ffJson => { // final form json
-    const { activeStep, dataMyOrganisation, operators, dop_sog } = this.state
+  onSubmit = ffJson => {
+    // final form json
+    const { activeStep, dataMyOrganisation, operators, dop_sog } = this.state;
     let dataMy = activeStep === 0 ? ffJson : dataMyOrganisation;
-    dataMy.radioValue = dataMyOrganisation.radioValue
+    dataMy.radioValue = dataMyOrganisation.radioValue;
     this.setState({
       dataMyOrganisation: dataMy,
       operators: activeStep === 1 ? dataSort(ffJson) : operators,
       activeStep: activeStep < 2 ? activeStep + 1 : activeStep
-    })
-    if (activeStep === 2 ) {
+    });
+    if (activeStep === 2) {
       let data = {
         sender: [dataMyOrganisation],
         receiver: operators
-      }
+      };
 
       axios({
-        method: 'post',
+        method: "post",
         url: `http://roaming.api.staging.keydisk.ru/abonent`,
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data; boundary=---------------------------5273914420626',
-         },
-        data: `-----------------------------18467633426500\r\nContent-Disposition: form-data; name="agreement"\r\n\r\n${JSON.stringify(dop_sog)}
------------------------------5273914420626\r\nContent-Disposition: form-data; name="data"\r\n\r\n${JSON.stringify(data)}\r\n-----------------------------5273914420626--`
-      })
-      .then(res => {
+          Accept: "application/json",
+          "Content-Type":
+            "multipart/form-data; boundary=---------------------------5273914420626"
+        },
+        data: `-----------------------------18467633426500\r\nContent-Disposition: form-data; name="agreement"\r\n\r\n${JSON.stringify(
+          dop_sog
+        )}
+-----------------------------5273914420626\r\nContent-Disposition: form-data; name="data"\r\n\r\n${JSON.stringify(
+          data
+        )}\r\n-----------------------------5273914420626--`
+      }).then(res => {
         // console.log(res);
-        if (res.data.status === 0) this.setState({ activeStep: activeStep + 1 })
-        else this.setState({ errorText: res.data.code, open: true })
-      })
-
-    }
-  };
-
-  AddNewOperator = () => {
-    const { operators } = this.state;
-    if (operators.length <= MAX_OPERATORS_COUNT) {
-      operators.push({ ...DEFAULT_OPERATOR });
-      this.setState({ operators });
-    } else alert("Вы можете добавить только 100 операторов");
-  };
-
-  sendDataOnServer = event => {
-    const { inn, kpp } = this.state.dataMyOrganisation;
-    const data = JSON.stringify({ inn: inn, kpp: kpp });
-    axios
-      .post("/sender", { sender: data })
-      .then(response => {
-        console.log(response);
-      })
-      .catch(function(error) {
-        console.log(error);
+        if (res.data.status === 0)
+          this.setState({ activeStep: activeStep + 1 });
+        else this.setState({ errorText: res.data.code, open: true });
       });
+    }
   };
 
   render() {
     const { classes, updateData } = this.props;
-    const { activeStep, operators, dataMyOrganisation, errorText, disableKpp, dop_sog, open } = this.state;
+    const {
+      activeStep,
+      operators,
+      dataMyOrganisation,
+      errorText,
+      disableKpp,
+      dop_sog,
+      open
+    } = this.state;
 
     const steps = getSteps();
 
@@ -205,19 +202,9 @@ class Checkout extends Component {
                   </Stepper>
 
                   <>
-                    {activeStep === steps.length ? ( // ласт этап
-                      <>
-                        <Typography variant="h5" gutterBottom>
-                          Ваш запрос на установку связи направлен оператору
-                          абонента.
-                        </Typography>
-                        <Typography variant="subtitle1">
-                          Срок ответа на заявку от 2 до 6 рабочих дней. По итогу
-                          настройки на указанный вами e-mail придет извещение.
-                        </Typography>
-                      </>
+                    {activeStep === steps.length ? (
+                      <CompleteStep />
                     ) : (
-                      // не ласт этап
                       <>
                         {getStepContent({
                           updateData: updateData,
@@ -230,31 +217,27 @@ class Checkout extends Component {
                           dop_sog
                         })}
 
-                        <Grid contaner className={classes.buttons}>
-                          <Grid xs={12} sm={12}>
-                            {activeStep === 1 && (
-                              <Button
-                                onClick={this.AddNewOperator}
-                                variant="contained"
-                                color="primary"
-                              >
-                                Добавить оператора
-                              </Button>
-                            )}
-                          </Grid>
-
-                          <Grid container className={classes.mainButtons} xs={12} sm={12}>
+                        <Grid
+                          container
+                          direction="row"
+                          justify="flex-end"
+                          alignItems="center"
+                        >
+                          <Grid item>
                             {activeStep !== 0 && (
                               <Button
                                 onClick={this.handleBack}
+                                className={classes.button}
                               >
                                 Назад
                               </Button>
                             )}
-                          
+                          </Grid>
+                          <Grid item>
                             <Button
                               variant="contained"
                               color="primary"
+                              className={classes.button}
                               type="submit"
                               disabled={submitting}
                             >
@@ -262,57 +245,47 @@ class Checkout extends Component {
                                 ? "Оправить"
                                 : "Далее"}
                             </Button>
-                          )}
-
-                          <Button
-                            variant="contained"
-                            color="primary"
-                            className={classes.button}
-                            type="submit"
-                            disabled={submitting}
-                          >
-                            {activeStep === steps.length - 1
-                              ? "Оправить"
-                              : "Далее"}
-                          </Button>
-                        </div>
+                          </Grid>
+                        </Grid>
 
                         <Snackbar
                           anchorOrigin={{
-                            vertical: 'bottom',
-                            horizontal: 'left',
+                            vertical: "bottom",
+                            horizontal: "left"
                           }}
                           open={open}
                           autoHideDuration={6000}
                           onClose={this.handleClose}
                         >
-
                           <SnackbarContent
                             aria-describedby="client-snackbar"
                             className={classes.snack}
                             message={
                               <span id="client-snackbar">
-                              <Chip
-                                avatar={
-                                  <Avatar>
-                                    <Error />
-                                  </Avatar>
-                                }
-                                label={errorText}
-                                className={classes.snack}
-                                color="secondary"
-                              />
+                                <Chip
+                                  avatar={
+                                    <Avatar>
+                                      <Error />
+                                    </Avatar>
+                                  }
+                                  label={errorText}
+                                  className={classes.snack}
+                                  color="secondary"
+                                />
                               </span>
                             }
                             action={[
-                              <IconButton key="close" aria-label="Close" color="inherit" onClick={this.handleClose}>
-                                <Close/>
-                              </IconButton>,
+                              <IconButton
+                                key="close"
+                                aria-label="Close"
+                                color="inherit"
+                                onClick={this.handleClose}
+                              >
+                                <Close />
+                              </IconButton>
                             ]}
                           />
-
                         </Snackbar>
-
                       </>
                     )}
                   </>
@@ -350,23 +323,14 @@ const styles = theme => ({
   stepper: {
     padding: `${theme.spacing.unit * 3}px 0 ${theme.spacing.unit * 5}px`
   },
-  buttons: {
-    display: "flex",
-    align: "center",
-    height: 37,
-    marginTop: theme.spacing(1)    
-  },
-  mainButtons:{
-    justifyContent: "flex-end"
-  },
   button: {
     marginTop: theme.spacing.unit * 3,
     marginLeft: theme.spacing.unit
   },
   snack: {
-    background: '#cc3300',
-    color: '#fff',
-    fontSize: '12pt'
+    background: "#cc3300",
+    color: "#fff",
+    fontSize: "12pt"
   }
 });
 
@@ -374,24 +338,24 @@ Checkout.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-const dataSort = (obj) => {
-  let newArr = []
+const dataSort = obj => {
+  let newArr = [];
 
-  Object.keys(obj).forEach(function(key) { // пройдемся по объекту
+  Object.keys(obj).forEach(function(key) {
+    // пройдемся по объекту
     let value = this[key]; // key - имя артрибута, value - значение артрибута
 
-    let arrIndex = parseInt(key.replace(/\D+/g,"")); // получаем  номер контрагента по списку
+    let arrIndex = parseInt(key.replace(/\D+/g, "")); // получаем  номер контрагента по списку
 
     if (arrIndex >= 0) {
-      if (!newArr[arrIndex])
-        newArr[arrIndex] = {} // если еще не объявлен, объявляем как объект
+      if (!newArr[arrIndex]) newArr[arrIndex] = {}; // если еще не объявлен, объявляем как объект
 
-      let arrKey = key.split("Kontr")[0] // имя артрибута
-      newArr[arrIndex][arrKey] = value // заносим данные
+      let arrKey = key.split("Kontr")[0]; // имя артрибута
+      newArr[arrIndex][arrKey] = value; // заносим данные
     }
   }, obj);
 
-  return newArr // возвращаем переработанный массив
-}
+  return newArr; // возвращаем переработанный массив
+};
 
 export default withStyles(styles)(Checkout);

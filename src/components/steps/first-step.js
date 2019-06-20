@@ -1,29 +1,28 @@
-import React, { Component, Fragment } from "react";
+import React, { Component } from "react";
 import {
   withStyles,
   Grid,
   Typography,
-  Checkbox,
-  Select,
   RadioGroup,
   FormControlLabel,
   Radio,
   IconButton,
   Popover,
   Paper,
-  Fade,
   Chip,
-  Avatar
+  Avatar,
+  InputAdornment
 } from "@material-ui/core";
 import { Help, Done, AttachFile } from "@material-ui/icons";
-import { UploadButton } from "./buttons";
+import { UploadButton } from "components/upload-button";
 import { TextField } from "final-form-material-ui";
 
 import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
 import purple from "@material-ui/core/colors/purple";
 
-import Name from "./name";
+import { NameAndFIO } from "components/name-and-fio";
+
 class FirstStep extends Component {
   state = {
     anchorEl: null
@@ -75,7 +74,7 @@ class FirstStep extends Component {
           />
         </RadioGroup>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={1}>
           <Grid item xs={12} sm={6}>
             <Field
               fullWidth
@@ -100,40 +99,46 @@ class FirstStep extends Component {
             />
           </Grid>
 
-          <Name value={dataMyOrganisation.radioValue} />
-          <Popper
+          <NameAndFIO value={dataMyOrganisation.radioValue} />
+
+          <Popover
+            onClose={this.handlePopoverClose}
             open={open}
             anchorEl={anchorEl}
-            placement={placement}
-            transition
+            anchorOrigin={{
+              vertical: "center",
+              horizontal: "right"
+            }}
+            transformOrigin={{
+              vertical: "center",
+              horizontal: "left"
+            }}
           >
-            {({ TransitionProps }) => (
-              <Fade {...TransitionProps} timeout={350}>
-                <Paper className={classes.paperPopper}>
-                  <Typography>
-                    <b>Астрал отчет:</b> Документооборот - Адресная книга -
-                    Данные пользователя - Идентификатор
-                    <br />
-                    <b>Астрал Онлайн:</b> Личный кабинет - Моя организация - id
-                    участника
-                    <br />
-                    <b>1С-ЭДО:</b> Раздела ЭДО - Профили настроек - Обмен с
-                    контрагентами
-                  </Typography>
-                </Paper>
-              </Fade>
-            )}
-          </Popper>
+            <Paper className={classes.paperPopper}>
+              <Typography>
+                <b>Астрал отчет:</b> Документооборот - Адресная книга - Данные
+                пользователя - Идентификатор
+                <br />
+                <b>Астрал Онлайн:</b> Личный кабинет - Моя организация - id
+                участника
+                <br />
+                <b>1С-ЭДО:</b> Раздела ЭДО - Профили настроек - Обмен с
+                контрагентами
+              </Typography>
+            </Paper>
+          </Popover>
 
-          <IconButton
-            aria-label="Delete"
+          {/* <IconButton
+            aria-label="Delete
+            </Paper>
+            "
             className={classes.iconButton}
-          >
             onClick={this.handlePopoverOpen}
+          >
             <Help fontSize="small" />
-          </IconButton>
+          </IconButton> */}
 
-          <Grid item xs={11}>
+          <Grid item xs={12}>
             <Field
               fullWidth
               required
@@ -142,6 +147,15 @@ class FirstStep extends Component {
               type="text"
               label="Идентификатор"
               parse={parse}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={this.handlePopoverOpen}>
+                      <Help fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
             />
           </Grid>
           <Grid item xs={12}>
@@ -155,13 +169,17 @@ class FirstStep extends Component {
             />
           </Grid>
           <Grid item xs={12}>
-            <UploadButton upload={upload}/>
+            <UploadButton upload={upload} />
           </Grid>
           <Chip
-            avatar={<Avatar><AttachFile/></Avatar>}
-            label={ dop_sog.name }
+            avatar={
+              <Avatar>
+                <AttachFile />
+              </Avatar>
+            }
+            label={dop_sog.name}
             deleteIcon={<Done />}
-         />
+          />
         </Grid>
       </>
     );
@@ -181,15 +199,16 @@ const styles = theme => ({
     display: "flex",
     justifyContent: "space-around"
   },
-  iconButton: {
-    width: 45,
-    height: 45,
-    marginTop: 20
-  },
   paperPopper: {
-    padding: 5,
-    background: "rgba(255,36,0,0.8)",
-    color: "#ffffff"
+    padding: 10,
+    background: theme.palette.primary.light,
+    color: theme.palette.primary.contrastText,
+    maxWidth: 800
+  },
+  textField: {
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+    width: 200
   }
 });
 
