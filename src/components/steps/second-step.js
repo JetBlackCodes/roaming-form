@@ -41,6 +41,7 @@ class SecondStep extends React.Component {
   };
 
   render() {
+    const { values } = this.props
     return (
       <>
         <Typography variant="h6" gutterBottom>
@@ -52,6 +53,7 @@ class SecondStep extends React.Component {
             <OperatorBlock
               actions={{ delOperator: this.DelOperator(index) }}
               index={index}
+              value={values}
             />
           ))}
         </div>

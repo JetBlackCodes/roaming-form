@@ -8,10 +8,6 @@ import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
 
 const OperatorBlock = (props) => {
-  const [values, setValues] = React.useState({
-    type: false
-  });
-  const { type } = values;
 
   const useStyles = makeStyles(theme => ({
     divider: {
@@ -32,69 +28,72 @@ const OperatorBlock = (props) => {
     patronymic: `patronymicKontr${props.index}`
   };
 
-  const parse = value => {
-    const someFormat = formatStringByPattern("999999999999");
-    let newValue = someFormat(value);
+  const getNameComponent = () => {
+    const { value } = props;
+    const innK = `innKontr${props.index}`
+    let nameF = false
 
-    setValues({ ...values, type: newValue.length === 12 ? true : false });
+    if (value[innK]) {
+      nameF = value[innK].length === 12 ? true : false
+    }
 
-    return newValue;
-  };
-
-  const getNameComponent = type => {
-    let index = +type;
-    switch (index) {
-      case 0:
-        return (
-          <Field
-            required
-            name={nameField.name}
-            label="Название организации"
-            fullWidth
-            autoComplete="off"
-            component={TextField}
-          />
-        );
-      case 1:
-        return (
-          <Grid container spacing={1}>
-            <Grid item xs={12} sm={4}>
-              <Field
-                required
-                name={nameField.lastname}
-                label="Фамилия"
-                fullWidth
-                autoComplete="off"
-                component={TextField}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Field
-                required
-                name={nameField.firstname}
-                label="Имя"
-                fullWidth
-                autoComplete="off"
-                component={TextField}
-              />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Field
-                name={nameField.patronymic}
-                label="Отчество"
-                fullWidth
-                autoComplete="off"
-                component={TextField}
-              />
-            </Grid>
+    if (nameF === false) {
+      return (
+        <Field
+          required
+          name={nameField.name}
+          label="Название организации"
+          fullWidth
+          autoComplete="off"
+          component={TextField}
+        />
+      )
+    } else {
+      return (
+        <Grid container spacing={1}>
+          <Grid item xs={12} sm={4}>
+            <Field
+              required
+              name={nameField.lastname}
+              label="Фамилия"
+              fullWidth
+              autoComplete="off"
+              component={TextField}
+            />
           </Grid>
-        );
-      default:
-        throw new Error("Unknown thread");
+          <Grid item xs={12} sm={4}>
+            <Field
+              required
+              name={nameField.firstname}
+              label="Имя"
+              fullWidth
+              autoComplete="off"
+              component={TextField}
+            />
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <Field
+              name={nameField.patronymic}
+              label="Отчество"
+              fullWidth
+              autoComplete="off"
+              component={TextField}
+            />
+          </Grid>
+        </Grid>
+      )
     }
   };
 
-  const classes = useStyles();
+  const classes = useStyles(); // глав. комп
+  // начало инициализации
+  const { value } = props;
+  const innK = `innKontr${props.index}`
+  let disable = true // для КПП
+  // подготовка завершена
+  if (value[innK] && value[innK].length === 10)
+      disable = false
+
   return (
     <Grid container>
       <Grid container spacing={1}>
@@ -106,7 +105,7 @@ const OperatorBlock = (props) => {
             fullWidth
             autoComplete="off"
             component={TextField}
-            parse={parse}
+            parse={formatStringByPattern("999999999999")}
           />
         </Grid>
         <Grid item xs={12} sm={5}>
@@ -114,8 +113,8 @@ const OperatorBlock = (props) => {
             required
             name={nameField.kpp}
             label="КПП"
-            disabled={type}
-            required={!type}
+            disabled={disable}
+            required={!disable}
             fullWidth
             autoComplete="off"
             component={TextField}
@@ -134,7 +133,7 @@ const OperatorBlock = (props) => {
         </Grid>
       </Grid>
 
-      {getNameComponent(type)}
+      { getNameComponent() }
 
       <Grid item xs={12} sm={12}>
         <Field

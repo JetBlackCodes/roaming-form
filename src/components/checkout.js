@@ -66,7 +66,7 @@ const getStepContent = ({
         />
       );
     case 1:
-      return <SecondStep operators={operators} />;
+      return <SecondStep operators={operators} values={values}/>;
     case 2:
       return (
         <Summary
