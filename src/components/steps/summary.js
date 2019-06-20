@@ -8,13 +8,13 @@ import {
   Grid,
   Divider
 } from "@material-ui/core";
-import { OPERATORS } from "../constants/customer-form";
+import { OPERATORS } from "../../constants/customer-form";
 
 class Summary extends React.Component {
   state = {
     operators: this.props.operators,
     dataMyOrganisation: this.props.dataMyOrganisation
-  };  
+  };
 
   render() {
     const { typ, listItem, onlyForName, title } = this.props.classes;
