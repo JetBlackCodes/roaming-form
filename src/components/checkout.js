@@ -16,10 +16,10 @@ import {
   Grid
 } from "@material-ui/core";
 import { Error, Close } from "@material-ui/icons";
-import FirstStep from "components/steps/first-step";
-import SecondStep from "components/steps/second-step";
-import Summary from "components/steps/summary";
-import CompleteStep from "components/steps/complete-step";
+import FirstStep from "../components/steps/first-step";
+import SecondStep from "../components/steps/second-step";
+import Summary from "../components/steps/summary";
+import CompleteStep from "../components/steps/complete-step";
 import {
   DEFAULT_OPERATOR,
   MY_ORGANISATION_DEFAULT_DATA
@@ -76,7 +76,7 @@ const getStepContent = ({
 
 class Checkout extends Component {
   state = {
-    activeStep: 0,    
+    activeStep: 0,
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
@@ -137,32 +137,33 @@ class Checkout extends Component {
       operators: activeStep === 1 ? dataSort(ffJson) : operators,
       activeStep: activeStep < 2 ? activeStep + 1 : activeStep
     });
-    if (activeStep === 2) {
+    if (activeStep === 2 ) {
+      this.setState({ modal: true })
       let data = {
         sender: [dataMyOrganisation],
         receiver: operators
-      };
+      }
+
+      var dataForm = new FormData();
+
+      dataForm.set('data', JSON.stringify(data) );
+      dataForm.append(' agreement', dop_sog.file);
 
       axios({
-        method: "post",
+        method: 'post',
         url: `http://roaming.api.staging.keydisk.ru/abonent`,
         headers: {
-          Accept: "application/json",
-          "Content-Type":
-            "multipart/form-data; boundary=---------------------------5273914420626"
-        },
-        data: `-----------------------------18467633426500\r\nContent-Disposition: form-data; name="agreement"\r\n\r\n${JSON.stringify(
-          dop_sog
-        )}
------------------------------5273914420626\r\nContent-Disposition: form-data; name="data"\r\n\r\n${JSON.stringify(
-          data
-        )}\r\n-----------------------------5273914420626--`
-      }).then(res => {
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data',
+         },
+        data: dataForm
+      })
+      .then(res => {
         // console.log(res);
-        if (res.data.status === 0)
-          this.setState({ activeStep: activeStep + 1 });
-        else this.setState({ errorText: res.data.code, open: true });
-      });
+        if (res.data.status === 0) this.setState({ activeStep: activeStep + 1, modal: false })
+        else this.setState({ errorText: res.data.code, open: true, modal: false })
+      })
+
     }
   };
 
