@@ -1,6 +1,7 @@
 import React from 'react';
 import { withStyles } from '@material-ui/core/styles';
 import { Button } from '@material-ui/core';
+import { Upload } from 'material-ui-upload';
 
 const styles = theme => ({
   button: {
@@ -19,10 +20,11 @@ const UploadButton = props => {
   return (
     <>
       <input
-        accept="image/*"
+        accept="application/pdf"
         className={classes.input}
         id="contained-button-file"
         multiple
+        onChange={props.upload}
         type="file"
       />
       <label htmlFor="contained-button-file">

@@ -14,6 +14,7 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
 //import { ReactComponent } from "*.svg";
+import OperatorBlock from './listoperators'
 
 class SecondStep extends React.Component {
   state = {
@@ -46,14 +47,11 @@ class SecondStep extends React.Component {
         </Typography>
         {/* <Divider className={useStyles.divider} mb={1}/> */}
         <div>
-          {this.state.operators.map((item, index) => (
+          {
+            this.state.operators.map((item, index) => (
             <OperatorBlock
-              onChange={this.handleChange(index)}
-              name={item.name}
-              inn={item.inn}
-              kpp={item.kpp}
-              oper={item.oper}
               actions={{ delOperator: this.DelOperator(index) }}
+              index={index}
             />
           ))}
         </div>        

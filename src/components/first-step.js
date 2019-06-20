@@ -9,40 +9,44 @@ import {
   FormControlLabel,
   Radio,
   IconButton,
-  Popper,
+  Popover,
   Paper,
-  Fade
+  Fade,
+  Chip,
+  Avatar
 } from "@material-ui/core";
-import { Help } from "@material-ui/icons";
+import { Help, Done, AttachFile } from "@material-ui/icons";
 import { UploadButton } from "./buttons";
 import { TextField } from "final-form-material-ui";
 
 import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
+import purple from "@material-ui/core/colors/purple";
 
+import Name from "./name";
 class FirstStep extends Component {
   state = {
-    anchorEl: null,
-    open: null,
-    placement: null
+    anchorEl: null
   };
 
-  handleClick = placement => event => {
-    const { currentTarget } = event;
-    this.setState(state => ({
-      anchorEl: currentTarget,
-      open: state.placement !== placement || !state.open,
-      placement
-    }));
+  handlePopoverOpen = event => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handlePopoverClose = () => {
+    this.setState({ anchorEl: null });
   };
 
   render() {
-    const { anchorEl, open, placement } = this.state;
+    const { anchorEl } = this.state;
+    const open = Boolean(anchorEl);
     const {
       classes,
       handleChangeRadio,
       dataMyOrganisation,
-      disableKpp
+      disableKpp,
+      dop_sog,
+      upload
     } = this.props;
     return (
       <>
@@ -67,12 +71,7 @@ class FirstStep extends Component {
           <FormControlLabel
             value="IP"
             control={<Radio color="primary" />}
-            label="ИП"
-          />
-          <FormControlLabel
-            value="FL"
-            control={<Radio color="primary" />}
-            label="Физическое лицо"
+            label="Индивидуальный предприниматель"
           />
         </RadioGroup>
 
@@ -100,17 +99,8 @@ class FirstStep extends Component {
               label="КПП"
             />
           </Grid>
-          <Grid item xs={12}>
-            <Field
-              fullWidth
-              required
-              name="name"
-              component={TextField}
-              type="text"
-              label="Наименование"
-            />
-          </Grid>
 
+          <Name value={dataMyOrganisation.radioValue} />
           <Popper
             open={open}
             anchorEl={anchorEl}
@@ -137,9 +127,9 @@ class FirstStep extends Component {
 
           <IconButton
             aria-label="Delete"
-            onClick={this.handleClick("top")}
             className={classes.iconButton}
           >
+            onClick={this.handlePopoverOpen}
             <Help fontSize="small" />
           </IconButton>
 
@@ -147,7 +137,7 @@ class FirstStep extends Component {
             <Field
               fullWidth
               required
-              name="guid"
+              name="id"
               component={TextField}
               type="text"
               label="Идентификатор"
@@ -165,8 +155,13 @@ class FirstStep extends Component {
             />
           </Grid>
           <Grid item xs={12}>
-            <UploadButton />
+            <UploadButton upload={upload}/>
           </Grid>
+          <Chip
+            avatar={<Avatar><AttachFile/></Avatar>}
+            label={ dop_sog.name }
+            deleteIcon={<Done />}
+         />
         </Grid>
       </>
     );
