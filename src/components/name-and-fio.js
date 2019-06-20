@@ -4,14 +4,23 @@ import { Field } from "react-final-form";
 import { Grid } from "@material-ui/core";
 
 export const NameAndFIO = props => {
-  const { value } = props;
-  if (value === "UL") {
+  const { values } = props;
+  let named = 0
+  let disable = true
+
+  if (values && values.inn) {
+    named = values.inn.length === 12 ? 1 : 0
+    disable = values.inn.length === 10 ? false : true
+  }
+
+  if (named === 0) {
     return (
       <>
         <Grid item xs={12}>
           <Field
             fullWidth
-            required
+            required={!disable}
+            disabled={disable}
             name="name"
             component={TextField}
             type="text"
@@ -19,7 +28,7 @@ export const NameAndFIO = props => {
           />
         </Grid>
       </>
-    );
+    )
   } else {
     return (
       <>
@@ -53,6 +62,6 @@ export const NameAndFIO = props => {
           />
         </Grid>
       </>
-    );
+    )
   }
 };

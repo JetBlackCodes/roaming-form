@@ -7,7 +7,7 @@ import { TextField } from "final-form-material-ui";
 import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
 
-function OperatorBlock(props) {
+const OperatorBlock = (props) => {
   const [values, setValues] = React.useState({
     type: false
   });

@@ -27,6 +27,7 @@ import {
 
 import { validate } from "../utils/validate";
 import { Form } from "react-final-form";
+import createDecorator from 'final-form-calculate'
 
 import axios from "axios";
 
@@ -47,7 +48,9 @@ const getStepContent = ({
   handleChangeRadio,
   disableKpp,
   upload,
-  dop_sog
+  dop_sog,
+  values,
+  handleDelete
 }) => {
   switch (step) {
     case 0:
@@ -58,6 +61,8 @@ const getStepContent = ({
           disableKpp={disableKpp}
           dop_sog={dop_sog}
           upload={upload}
+          values={values}
+          handleDelete={handleDelete}
         />
       );
     case 1:
@@ -74,6 +79,35 @@ const getStepContent = ({
   }
 };
 
+const calculator = createDecorator(
+  // {
+  //   field: 'inn',
+  //   updates: {
+  //     kpp: (value, allValues) => {
+  //       allValues.kpp = allValues.inn.length === 12 ? '' : allValues.kpp
+  //     }
+  //   }
+  // },
+  // {
+  //   field: 'lastname', // when maximum changes...
+  //   updates: {
+  //     name: (value, allValues) => {
+  //       allValues.name = value !== '' ? '' : allValues.name
+  //     }
+  //   }
+  // },
+  // {
+  //   field: 'name', // when maximum changes...
+  //   updates: {
+  //     lastname: (value, allValues) => {
+  //       allValues.lastname = value !== '' ? '' : allValues.lastname
+  //       allValues.firstname = value !== '' ? '' : allValues.firstname
+  //       allValues.patronymic = value !== '' ? '' : allValues.patronymic
+  //     }
+  //   }
+  // }
+)
+
 class Checkout extends Component {
   state = {
     activeStep: 0,
@@ -81,7 +115,7 @@ class Checkout extends Component {
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
     dop_sog: {
-      name: "Файл не выбран",
+      name: '',
       file: ""
     },
     errorText: "",
@@ -110,6 +144,12 @@ class Checkout extends Component {
       activeStep: state.activeStep - 1
     }));
   };
+
+  handleDelete = () => {
+    this.setState({
+      dop_sog: { name: '', file: "" }
+    });
+  }
 
   handleReset = () => {
     this.setState({
@@ -185,6 +225,7 @@ class Checkout extends Component {
       <Form
         onSubmit={this.onSubmit}
         validate={validate(this.state.dataMyOrganisation.radioValue)}
+        decorators={[calculator]}
         render={({ handleSubmit, reset, submitting, pristine, values }) => {
           return (
             <form onSubmit={handleSubmit}>
@@ -215,7 +256,9 @@ class Checkout extends Component {
                           handleChangeRadio: this.handleChangeRadio,
                           disableKpp,
                           upload: this.upload,
-                          dop_sog
+                          dop_sog,
+                          values,
+                          handleDelete: this.handleDelete
                         })}
 
                         <Grid
