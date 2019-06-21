@@ -3,9 +3,10 @@ import { Grid, Divider, IconButton } from "@material-ui/core";
 import { OPERATORS } from "../constants/customer-form";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { TextField } from "final-form-material-ui";
+import { TextField, Select } from "final-form-material-ui";
 import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
+import MenuItem from "@material-ui/core/MenuItem";
 
 function OperatorBlock(props) {
   const [values, setValues] = React.useState({
@@ -18,7 +19,15 @@ function OperatorBlock(props) {
       margin: theme.spacing(1, 0, 2, 0)
     },
     delButton: {
-      margin: theme.spacing.unit,
+      position: "absolute",
+      bottom: "32px",
+      right: "1px"
+    },
+    grid: {
+      position: "relative"
+    },
+    select: {
+      marginBottom: theme.spacing(2)
     }
   }));
 
@@ -46,25 +55,25 @@ function OperatorBlock(props) {
     switch (index) {
       case 0:
         return (
-          <Field
-            required
-            name={nameField.name}
-            label="Название организации"
-            fullWidth
-            autoComplete="off"
-            component={TextField}
-          />
+          <Grid container autoComplete="off">
+            <Field
+              required
+              name={nameField.name}
+              label="Название организации"
+              fullWidth
+              component={TextField}
+            />
+          </Grid>
         );
       case 1:
         return (
-          <Grid container spacing={1}>
+          <Grid container autoComplete="off" spacing={1}>
             <Grid item xs={12} sm={4}>
               <Field
                 required
                 name={nameField.lastname}
                 label="Фамилия"
                 fullWidth
-                autoComplete="off"
                 component={TextField}
               />
             </Grid>
@@ -74,7 +83,6 @@ function OperatorBlock(props) {
                 name={nameField.firstname}
                 label="Имя"
                 fullWidth
-                autoComplete="off"
                 component={TextField}
               />
             </Grid>
@@ -83,7 +91,6 @@ function OperatorBlock(props) {
                 name={nameField.patronymic}
                 label="Отчество"
                 fullWidth
-                autoComplete="off"
                 component={TextField}
               />
             </Grid>
@@ -96,15 +103,14 @@ function OperatorBlock(props) {
 
   const classes = useStyles();
   return (
-    <Grid container>
-      <Grid container spacing={1}>
+    <form container autoComplete="off" >
+      <Grid container className={classes.grid} spacing={1}>
         <Grid item xs={12} sm={6}>
           <Field
             required
             name={nameField.inn}
             label="ИНН"
             fullWidth
-            autoComplete="off"
             component={TextField}
             parse={parse}
           />
@@ -117,45 +123,42 @@ function OperatorBlock(props) {
             disabled={type}
             required={!type}
             fullWidth
-            autoComplete="off"
             component={TextField}
             parse={formatStringByPattern("999999999")}
           />
         </Grid>
         <Grid item xs={12} sm={1}>
           <IconButton
-            className={classes.delButton}
+            // className={classes.delButton}
             color="primary"
             onClick={props.actions.delOperator}
             title="Удалить оператора"
           >
-            <DeleteIcon />
+            <DeleteIcon fontSize="small" />
           </IconButton>
         </Grid>
       </Grid>
 
       {getNameComponent(type)}
 
-      <Grid item xs={12} sm={12}>
+      <Grid item xs={12}>
         <Field
-          select
+          fullWidth
           name={nameField.oper}
           label="Выберете оператора"
-          margin="normal"
-          variant="outlined"
-          fullWidth
-          autoComplete="off"
-          component={TextField}
+          component={Select}
+          formControlProps={{ fullWidth: true }}
+          className={classes.select}
         >
           {OPERATORS.map(option => (
-            <option key={option.value} value={option.value}>
+            <MenuItem key={option.value} value={option.value}>
               {option.label}
-            </option>
+            </MenuItem>
           ))}
         </Field>
-        <Divider className={classes.divider} />
       </Grid>
-    </Grid>
+      <Divider className={classes.divider} />
+    </form>
   );
 }
 

@@ -9,7 +9,7 @@ import {
   MAX_OPERATORS_COUNT
 } from "../../constants/customer-form";
 import { makeStyles } from "@material-ui/core/styles";
-import OperatorBlock from "components/operator-block";
+import OperatorBlock from "../operator-block";
 
 class SecondStep extends React.Component {
   state = {
@@ -59,7 +59,8 @@ class SecondStep extends React.Component {
           onClick={this.AddNewOperator}
           variant="contained"
           color="primary"
-          className="deleteButton"
+          className="addButton"
+          // className={useStyles.addButton}             
         >
           Добавить оператора
         </Button>
@@ -74,7 +75,11 @@ const useStyles = makeStyles(theme => ({
   },
   button: {
     margin: theme.spacing.unit
-  }
+  },
+  // addButton: {
+  //   position: "absolute",
+  //   bottom: "-57px",      
+  // }   
 }));
 
 export default SecondStep;
