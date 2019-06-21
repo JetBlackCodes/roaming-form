@@ -22,7 +22,6 @@ import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
 import { NameAndFIO } from "../name-and-fio";
 
-import { NameAndFIO } from "../name-and-fio";
 class FirstStep extends Component {
   state = {
     anchorEl: null
@@ -133,7 +132,7 @@ class FirstStep extends Component {
                 label="Идентификатор"
                 parse={parse}
                 InputProps={{
-                  startAdornment: (
+                  endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={this.handlePopoverOpen}>
                         <Help fontSize="small" />
