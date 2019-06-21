@@ -16,10 +16,10 @@ import {
   Grid
 } from "@material-ui/core";
 import { Error, Close } from "@material-ui/icons";
-import FirstStep from "components/steps/first-step";
-import SecondStep from "components/steps/second-step";
-import Summary from "components/steps/summary";
-import CompleteStep from "components/steps/complete-step";
+import FirstStep from "../components/steps/first-step";
+import SecondStep from "../components/steps/second-step";
+import Summary from "../components/steps/summary";
+import CompleteStep from "../components/steps/complete-step";
 import {
   DEFAULT_OPERATOR,
   MY_ORGANISATION_DEFAULT_DATA
@@ -27,7 +27,6 @@ import {
 
 import { validate } from "../utils/validate";
 import { Form } from "react-final-form";
-
 import axios from "axios";
 
 function getSteps() {
@@ -181,7 +180,7 @@ class Checkout extends Component {
     const steps = getSteps();
 
     return (
-      <Form
+      <Form 
         onSubmit={this.onSubmit}
         validate={validate(this.state.dataMyOrganisation.radioValue)}
         render={({ handleSubmit, reset, submitting, pristine, values }) => {
@@ -302,6 +301,7 @@ class Checkout extends Component {
 const styles = theme => ({
   layout: {
     width: "auto",
+    position: "relative",
     marginLeft: theme.spacing.unit * 2,
     marginRight: theme.spacing.unit * 2,
     [theme.breakpoints.up(600 + theme.spacing.unit * 2 * 2)]: {
@@ -318,7 +318,8 @@ const styles = theme => ({
       marginTop: theme.spacing.unit * 6,
       marginBottom: theme.spacing.unit * 6,
       padding: theme.spacing.unit * 3
-    }
+    },
+    position: "relative"
   },
   stepper: {
     padding: `${theme.spacing.unit * 3}px 0 ${theme.spacing.unit * 5}px`
