@@ -11,9 +11,11 @@ import {
   Paper,
   Chip,
   Avatar,
-  InputAdornment
+  InputAdornment,
+  FormControl,
+  FormHelperText
 } from "@material-ui/core";
-import { Help, Done, AttachFile } from "@material-ui/icons";
+import { Help, Done, AttachFile, Clear } from "@material-ui/icons";
 import { UploadButton } from "../upload-button";
 import { TextField } from "final-form-material-ui";
 import { Field } from "react-final-form";
@@ -42,61 +44,55 @@ class FirstStep extends Component {
       dataMyOrganisation,
       disableKpp,
       dop_sog,
-      upload
+      upload,
+      values,
+      handleDelete
     } = this.props;
+
+    let disable = true
+    if (values && values.inn)
+      disable = values.inn.length === 10 ? false : true
+
     return (
       <>
         <Typography variant="h6" gutterBottom>
           Введите данные вашей организации
         </Typography>
 
-        <RadioGroup
-          aria-label="position"
-          name="radioValue"
-          value={dataMyOrganisation.radioValue}
-          onChange={handleChangeRadio}
-          row
-          required
-          className={classes.radioGroup}
-        >
-          <FormControlLabel
-            value="UL"
-            control={<Radio color="primary" />}
-            label="Юридическое лицо"
-          />
-          <FormControlLabel
-            value="IP"
-            control={<Radio color="primary" />}
-            label="Индивидуальный предприниматель"
-          />
-        </RadioGroup>
-
         <Grid container spacing={1}>
           <Grid item xs={12} sm={6}>
-            <Field
-              fullWidth
-              required
-              name="inn"
-              component={TextField}
-              type="text"
-              parse={formatStringByPattern("999999999999")}
-              label="ИНН"
-            />
+            <FormControl fullWidth>
+              <Field
+                fullWidth
+                required
+                name="inn"
+                component={TextField}
+                type="text"
+                parse={formatStringByPattern("999999999999")}
+                label="ИНН"
+                aria-describedby="inn-helper-text"
+              />
+              <FormHelperText id="inn-helper-text"></FormHelperText>
+            </FormControl>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Field
-              fullWidth
-              disabled={disableKpp}
-              required={!disableKpp}
-              name="kpp"
-              component={TextField}
-              type="text"
-              parse={formatStringByPattern("999999999")}
-              label="КПП"
-            />
+            <FormControl fullWidth>
+              <Field
+                fullWidth
+                disabled={disable}
+                required={!disable}
+                name="kpp"
+                component={TextField}
+                type="text"
+                parse={formatStringByPattern("999999999")}
+                label="КПП"
+                aria-describedby="kpp-helper-text"
+              />
+              <FormHelperText id="kpp-helper-text"></FormHelperText>
+            </FormControl>
           </Grid>
 
-          <NameAndFIO value={dataMyOrganisation.radioValue} />
+          <NameAndFIO values={values} classes={classes} />
 
           <Popover
             onClose={this.handlePopoverClose}
@@ -125,35 +121,29 @@ class FirstStep extends Component {
             </Paper>
           </Popover>
 
-          {/* <IconButton
-            aria-label="Delete
-            </Paper>
-            "
-            className={classes.iconButton}
-            onClick={this.handlePopoverOpen}
-          >
-            <Help fontSize="small" />
-          </IconButton> */}
-
           <Grid item xs={12}>
-            <Field
-              fullWidth
-              required
-              name="id"
-              component={TextField}
-              type="text"
-              label="Идентификатор"
-              parse={parse}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={this.handlePopoverOpen}>
-                      <Help fontSize="small" />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-            />
+            <FormControl fullWidth>
+              <Field
+                fullWidth
+                required
+                name="id"
+                component={TextField}
+                type="text"
+                label="Идентификатор"
+                parse={parse}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={this.handlePopoverOpen}>
+                        <Help fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                aria-describedby="guid-helper-text"
+              />
+            <FormHelperText id="guid-helper-text"></FormHelperText>
+            </FormControl>
           </Grid>
           <Grid item xs={12}>
             <Field
@@ -166,21 +156,29 @@ class FirstStep extends Component {
             />
           </Grid>
           <Grid item xs={12}>
-            <UploadButton upload={upload} />
+            <UploadButton upload={upload}/>
           </Grid>
-          <Chip
-            avatar={
-              <Avatar>
-                <AttachFile />
-              </Avatar>
-            }
-            label={dop_sog.name}
-            deleteIcon={<Done />}
-          />
+          <Files name={dop_sog.name} classes={classes} handleDelete={handleDelete}/>
         </Grid>
       </>
     );
   }
+}
+
+
+const Files = (props) => {
+  const { name, handleDelete, classes } = props
+  if (name)
+    return (
+      <Chip
+        avatar={ <Avatar> <AttachFile /> </Avatar> }
+        label={name}
+        className={classes.chip}
+        onDelete={handleDelete}
+      />
+    )
+  else
+    return null
 }
 
 const parse = value => {
@@ -192,9 +190,9 @@ const parse = value => {
 };
 
 const styles = theme => ({
-  radioGroup: {
+  space: {
     display: "flex",
-    justifyContent: "space-around"
+    justifyContent: "space-around",
   },
   paperPopper: {
     padding: 10,
@@ -206,7 +204,10 @@ const styles = theme => ({
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
     width: 200
-  }
+  },
+  chip: {
+    margin: theme.spacing(1),
+  },
 });
 
 export default withStyles(styles)(FirstStep);

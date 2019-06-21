@@ -16,9 +16,8 @@ const validationInn = ({ value, radioValue }) => {
   if (isNaN(value)) inn = "Некорректный ИНН";
   if (!value) inn = "Обязательное поле";
   if (value) {
-    if (radioValue === "UL" && value.length !== 10) inn = "Некорректный ИНН";
-    else if (radioValue !== "UL" && value.length !== 12)
-      inn = "Некорректный ИНН";
+    if (value.length !== 10 && value.length !== 12)
+      inn = 'Некорректный ИНН'
   }
   return inn;
 };

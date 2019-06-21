@@ -26,7 +26,6 @@ const UploadButton = props => {
         accept="application/pdf"
         className={classes.input}
         id="contained-button-file"
-        multiple
         onChange={props.upload}
         type="file"
       />
