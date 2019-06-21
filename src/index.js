@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Checkout from "components/checkout";
+import Checkout from "./components/checkout";
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles";
 import purple from "@material-ui/core/colors/purple";
 import './index.css';
@@ -8,7 +8,7 @@ import './index.css';
 const theme = createMuiTheme({
   palette: {
     primary: {
-      light: "#AA70CD",
+      light: "#fff",
       main: purple[800],
       dark: purple[900],
       contrastText: '#fff',

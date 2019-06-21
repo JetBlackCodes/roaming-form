@@ -14,14 +14,11 @@ import {
   InputAdornment
 } from "@material-ui/core";
 import { Help, Done, AttachFile } from "@material-ui/icons";
-import { UploadButton } from "components/upload-button";
+import { UploadButton } from "../upload-button";
 import { TextField } from "final-form-material-ui";
-
 import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
-import purple from "@material-ui/core/colors/purple";
-
-import { NameAndFIO } from "components/name-and-fio";
+import { NameAndFIO } from "../name-and-fio";
 
 class FirstStep extends Component {
   state = {
@@ -148,7 +145,7 @@ class FirstStep extends Component {
               label="Идентификатор"
               parse={parse}
               InputProps={{
-                startAdornment: (
+                endAdornment: (
                   <InputAdornment position="end">
                     <IconButton onClick={this.handlePopoverOpen}>
                       <Help fontSize="small" />
@@ -202,7 +199,7 @@ const styles = theme => ({
   paperPopper: {
     padding: 10,
     background: theme.palette.primary.light,
-    color: theme.palette.primary.contrastText,
+    color: "#000",
     maxWidth: 800
   },
   textField: {
