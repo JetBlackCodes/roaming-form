@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { TextField } from "final-form-material-ui";
 import { Field } from "react-final-form";
-import { Grid } from "@material-ui/core";
+import { Grid, FormControl, FormHelperText } from "@material-ui/core";
 
 export const NameAndFIO = props => {
-  const { values } = props;
+  const { values, classes } = props;
   let named = 0
   let disable = true
 
@@ -17,15 +17,19 @@ export const NameAndFIO = props => {
     return (
       <>
         <Grid item xs={12}>
-          <Field
-            fullWidth
-            required={!disable}
-            disabled={disable}
-            name="name"
-            component={TextField}
-            type="text"
-            label="Наименование"
-          />
+          <FormControl fullWidth>
+            <Field
+              fullWidth
+              required={!disable}
+              disabled={disable}
+              name="name"
+              component={TextField}
+              type="text"
+              label="Наименование"
+              aria-describedby="name-helper-text"
+            />
+            <FormHelperText id="name-helper-text"></FormHelperText>
+          </FormControl>
         </Grid>
       </>
     )
@@ -33,33 +37,45 @@ export const NameAndFIO = props => {
     return (
       <>
         <Grid item xs={4}>
-          <Field
-            fullWidth
-            required
-            name="lastname"
-            component={TextField}
-            type="text"
-            label="Фамилия"
-          />
+          <FormControl>
+            <Field
+              fullWidth
+              required
+              name="lastname"
+              component={TextField}
+              type="text"
+              label="Фамилия"
+              aria-describedby="name-helper-text"
+            />
+            <FormHelperText id="name-helper-text"></FormHelperText>
+          </FormControl>
         </Grid>
         <Grid item xs={4}>
-          <Field
-            fullWidth
-            required
-            name="firstname"
-            component={TextField}
-            type="text"
-            label="Имя"
-          />
+          <FormControl>
+            <Field
+              fullWidth
+              required
+              name="firstname"
+              component={TextField}
+              type="text"
+              label="Имя"
+              aria-describedby="name-helper-text"
+            />
+            <FormHelperText id="name-helper-text"></FormHelperText>
+          </FormControl>
         </Grid>
         <Grid item xs={4}>
-          <Field
-            fullWidth
-            name="patronymic"
-            component={TextField}
-            type="text"
-            label="Отчетство"
-          />
+          <FormControl>
+            <Field
+              fullWidth
+              name="patronymic"
+              component={TextField}
+              type="text"
+              label="Отчетство"
+              aria-describedby="name-helper-text"
+            />
+            <FormHelperText id="name-helper-text"></FormHelperText>
+          </FormControl>
         </Grid>
       </>
     )

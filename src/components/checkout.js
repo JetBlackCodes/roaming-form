@@ -123,6 +123,10 @@ class Checkout extends Component {
   };
 
   upload = file => {
+    if (file.target.files[0].type !== 'application/pdf') {
+      this.setState({ errorText: 'Загрузить можно только .pdf', open: true })
+      return 0
+    }
     this.setState({
       dop_sog: {
         name: file.target.files[0].name,

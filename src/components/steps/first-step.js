@@ -11,7 +11,9 @@ import {
   Paper,
   Chip,
   Avatar,
-  InputAdornment
+  InputAdornment,
+  FormControl,
+  FormHelperText
 } from "@material-ui/core";
 import { Help, Done, AttachFile, Clear } from "@material-ui/icons";
 import { UploadButton } from "../upload-button";
@@ -62,31 +64,38 @@ class FirstStep extends Component {
 
         <Grid container spacing={1}>
           <Grid item xs={12} sm={6}>
-            <Field
-              fullWidth
-              required
-              name="inn"
-              component={TextField}
-              type="text"
-              parse={formatStringByPattern("999999999999")}
-              label="ИНН"
-              helperText=''
-            />
+            <FormControl fullWidth>
+              <Field
+                fullWidth
+                required
+                name="inn"
+                component={TextField}
+                type="text"
+                parse={formatStringByPattern("999999999999")}
+                label="ИНН"
+                aria-describedby="inn-helper-text"
+              />
+              <FormHelperText id="inn-helper-text"></FormHelperText>
+            </FormControl>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Field
-              fullWidth
-              disabled={disable}
-              required={!disable}
-              name="kpp"
-              component={TextField}
-              type="text"
-              parse={formatStringByPattern("999999999")}
-              label="КПП"
-            />
+            <FormControl fullWidth>
+              <Field
+                fullWidth
+                disabled={disable}
+                required={!disable}
+                name="kpp"
+                component={TextField}
+                type="text"
+                parse={formatStringByPattern("999999999")}
+                label="КПП"
+                aria-describedby="kpp-helper-text"
+              />
+              <FormHelperText id="kpp-helper-text"></FormHelperText>
+            </FormControl>
           </Grid>
 
-          <NameAndFIO values={values} />
+          <NameAndFIO values={values} classes={classes} />
 
           <Popover
             onClose={this.handlePopoverClose}
@@ -116,24 +125,28 @@ class FirstStep extends Component {
           </Popover>
 
           <Grid item xs={12}>
-            <Field
-              fullWidth
-              required
-              name="id"
-              component={TextField}
-              type="text"
-              label="Идентификатор"
-              parse={parse}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={this.handlePopoverOpen}>
-                      <Help fontSize="small" />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-            />
+            <FormControl fullWidth>
+              <Field
+                fullWidth
+                required
+                name="id"
+                component={TextField}
+                type="text"
+                label="Идентификатор"
+                parse={parse}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={this.handlePopoverOpen}>
+                        <Help fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                aria-describedby="guid-helper-text"
+              />
+            <FormHelperText id="guid-helper-text"></FormHelperText>
+            </FormControl>
           </Grid>
           <Grid item xs={12}>
             <Field
@@ -180,9 +193,9 @@ const parse = value => {
 };
 
 const styles = theme => ({
-  radioGroup: {
+  space: {
     display: "flex",
-    justifyContent: "space-around"
+    justifyContent: "space-around",
   },
   paperPopper: {
     padding: 10,
