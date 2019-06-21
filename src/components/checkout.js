@@ -27,6 +27,7 @@ import {
 
 import { validate } from "../utils/validate";
 import { Form } from "react-final-form";
+import createDecorator from 'final-form-calculate'
 import axios from "axios";
 
 function getSteps() {
@@ -46,7 +47,9 @@ const getStepContent = ({
   handleChangeRadio,
   disableKpp,
   upload,
-  dop_sog
+  dop_sog,
+  values,
+  handleDelete
 }) => {
   switch (step) {
     case 0:
@@ -57,10 +60,12 @@ const getStepContent = ({
           disableKpp={disableKpp}
           dop_sog={dop_sog}
           upload={upload}
+          values={values}
+          handleDelete={handleDelete}
         />
       );
     case 1:
-      return <SecondStep operators={operators} />;
+      return <SecondStep operators={operators} values={values}/>;
     case 2:
       return (
         <Summary
@@ -73,14 +78,43 @@ const getStepContent = ({
   }
 };
 
+const calculator = createDecorator(
+  // {
+  //   field: 'inn',
+  //   updates: {
+  //     kpp: (value, allValues) => {
+  //       allValues.kpp = allValues.inn.length === 12 ? '' : allValues.kpp
+  //     }
+  //   }
+  // },
+  // {
+  //   field: 'lastname', // when maximum changes...
+  //   updates: {
+  //     name: (value, allValues) => {
+  //       allValues.name = value !== '' ? '' : allValues.name
+  //     }
+  //   }
+  // },
+  // {
+  //   field: 'name', // when maximum changes...
+  //   updates: {
+  //     lastname: (value, allValues) => {
+  //       allValues.lastname = value !== '' ? '' : allValues.lastname
+  //       allValues.firstname = value !== '' ? '' : allValues.firstname
+  //       allValues.patronymic = value !== '' ? '' : allValues.patronymic
+  //     }
+  //   }
+  // }
+)
+
 class Checkout extends Component {
   state = {
-    activeStep: 0,    
+    activeStep: 0,
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
     dop_sog: {
-      name: "Файл не выбран",
+      name: '',
       file: ""
     },
     errorText: "",
@@ -88,6 +122,10 @@ class Checkout extends Component {
   };
 
   upload = file => {
+    if (file.target.files[0].type !== 'application/pdf') {
+      this.setState({ errorText: 'Загрузить можно только .pdf', open: true })
+      return 0
+    }
     this.setState({
       dop_sog: {
         name: file.target.files[0].name,
@@ -109,6 +147,12 @@ class Checkout extends Component {
       activeStep: state.activeStep - 1
     }));
   };
+
+  handleDelete = () => {
+    this.setState({
+      dop_sog: { name: '', file: "" }
+    });
+  }
 
   handleReset = () => {
     this.setState({
@@ -136,32 +180,33 @@ class Checkout extends Component {
       operators: activeStep === 1 ? dataSort(ffJson) : operators,
       activeStep: activeStep < 2 ? activeStep + 1 : activeStep
     });
-    if (activeStep === 2) {
+    if (activeStep === 2 ) {
+      this.setState({ modal: true })
       let data = {
         sender: [dataMyOrganisation],
         receiver: operators
-      };
+      }
+
+      var dataForm = new FormData();
+
+      dataForm.set('data', JSON.stringify(data) );
+      dataForm.append(' agreement', dop_sog.file);
 
       axios({
-        method: "post",
+        method: 'post',
         url: `http://roaming.api.staging.keydisk.ru/abonent`,
         headers: {
-          Accept: "application/json",
-          "Content-Type":
-            "multipart/form-data; boundary=---------------------------5273914420626"
-        },
-        data: `-----------------------------18467633426500\r\nContent-Disposition: form-data; name="agreement"\r\n\r\n${JSON.stringify(
-          dop_sog
-        )}
------------------------------5273914420626\r\nContent-Disposition: form-data; name="data"\r\n\r\n${JSON.stringify(
-          data
-        )}\r\n-----------------------------5273914420626--`
-      }).then(res => {
+          'Accept': 'application/json',
+          'Content-Type': 'multipart/form-data',
+         },
+        data: dataForm
+      })
+      .then(res => {
         // console.log(res);
-        if (res.data.status === 0)
-          this.setState({ activeStep: activeStep + 1 });
-        else this.setState({ errorText: res.data.code, open: true });
-      });
+        if (res.data.status === 0) this.setState({ activeStep: activeStep + 1, modal: false })
+        else this.setState({ errorText: res.data.code, open: true, modal: false })
+      })
+
     }
   };
 
@@ -183,6 +228,7 @@ class Checkout extends Component {
       <Form 
         onSubmit={this.onSubmit}
         validate={validate(this.state.dataMyOrganisation.radioValue)}
+        decorators={[calculator]}
         render={({ handleSubmit, reset, submitting, pristine, values }) => {
           return (
             <form onSubmit={handleSubmit}>
@@ -213,7 +259,9 @@ class Checkout extends Component {
                           handleChangeRadio: this.handleChangeRadio,
                           disableKpp,
                           upload: this.upload,
-                          dop_sog
+                          dop_sog,
+                          values,
+                          handleDelete: this.handleDelete
                         })}
 
                         <Grid
