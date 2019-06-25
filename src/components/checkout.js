@@ -28,6 +28,7 @@ import {
 import { validate } from "../utils/validate";
 import { Form } from "react-final-form";
 import createDecorator from 'final-form-calculate'
+
 import axios from "axios";
 
 function getSteps() {
@@ -82,9 +83,7 @@ const calculator = createDecorator(
   // {
   //   field: 'inn',
   //   updates: {
-  //     kpp: (value, allValues) => {
-  //       allValues.kpp = allValues.inn.length === 12 ? '' : allValues.kpp
-  //     }
+  //
   //   }
   // },
   // {
@@ -160,21 +159,10 @@ class Checkout extends Component {
     });
   };
 
-  handleChangeRadio = event => {
-    const { value } = event.target;
-    let dataMyOrganisation = this.state.dataMyOrganisation;
-    dataMyOrganisation["radioValue"] = value;
-    this.setState({
-      dataMyOrganisation,
-      disableKpp: value === "UL" ? false : true
-    });
-  };
-
   onSubmit = ffJson => {
     // final form json
     const { activeStep, dataMyOrganisation, operators, dop_sog } = this.state;
     let dataMy = activeStep === 0 ? ffJson : dataMyOrganisation;
-    dataMy.radioValue = dataMyOrganisation.radioValue;
     this.setState({
       dataMyOrganisation: dataMy,
       operators: activeStep === 1 ? dataSort(ffJson) : operators,
@@ -225,7 +213,7 @@ class Checkout extends Component {
     const steps = getSteps();
 
     return (
-      <Form 
+      <Form
         onSubmit={this.onSubmit}
         validate={validate(this.state.dataMyOrganisation.radioValue)}
         decorators={[calculator]}

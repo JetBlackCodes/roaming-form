@@ -41,15 +41,18 @@ const OperatorBlock = (props) => {
     const { value } = props;
     const innK = `innKontr${props.index}`
     let nameF = false
+    let disable = true
 
     if (value[innK]) {
       nameF = value[innK].length === 12 ? true : false
+      disable = value[innK].length === 10 ? false : true
     }
 
     if (nameF === false) {
       return (
         <Field
-          required
+          required={!disable}
+          disabled={disable}
           name={nameField.name}
           label="Название организации"
           fullWidth

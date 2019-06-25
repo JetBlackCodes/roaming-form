@@ -4,7 +4,6 @@ import { Typography } from "@material-ui/core";
 const CompleteStep = props => { //предполагается передавать номер заявки
   return (
     <>
-      <Typography variant="h8">Заявка №04029</Typography>
       <Typography variant="h5" gutterBottom>
         Ваш запрос на установку связи направлен оператору абонента.
       </Typography>
