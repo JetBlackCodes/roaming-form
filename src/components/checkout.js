@@ -27,7 +27,7 @@ import {
 
 import { validate } from "../utils/validate";
 import { Form } from "react-final-form";
-import createDecorator from 'final-form-calculate'
+import readXlsxFile from 'read-excel-file'
 
 import axios from "axios";
 
@@ -50,7 +50,13 @@ const getStepContent = ({
   upload,
   dop_sog,
   values,
-  handleDelete
+  handleDelete,
+  uploadReceiverfile,
+  chipReceiverFileName,
+  objReceiverList,
+  disableReceiverFileUpload,
+  handleDeleteReceiverList,
+  receiverList
 }) => {
   switch (step) {
     case 0:
@@ -66,12 +72,26 @@ const getStepContent = ({
         />
       );
     case 1:
-      return <SecondStep operators={operators} values={values}/>;
+      return (
+        <SecondStep
+          operators={operators}
+          values={values}
+          uploadReceiverfile={uploadReceiverfile}
+          chipFileName={chipReceiverFileName}
+          objReceiverList={objReceiverList}
+          disableFileUpload={disableReceiverFileUpload}
+          handleDeleteReceiverList={handleDeleteReceiverList}
+        />
+      );
     case 2:
       return (
         <Summary
           operators={operators}
           dataMyOrganisation={dataMyOrganisation}
+          receiverList={receiverList}
+          fileReceiver={disableReceiverFileUpload}
+          chipReceiverFileName={chipReceiverFileName}
+          objReceiverList={objReceiverList}
         />
       );
     default:
@@ -79,36 +99,9 @@ const getStepContent = ({
   }
 };
 
-const calculator = createDecorator(
-  // {
-  //   field: 'inn',
-  //   updates: {
-  //
-  //   }
-  // },
-  // {
-  //   field: 'lastname', // when maximum changes...
-  //   updates: {
-  //     name: (value, allValues) => {
-  //       allValues.name = value !== '' ? '' : allValues.name
-  //     }
-  //   }
-  // },
-  // {
-  //   field: 'name', // when maximum changes...
-  //   updates: {
-  //     lastname: (value, allValues) => {
-  //       allValues.lastname = value !== '' ? '' : allValues.lastname
-  //       allValues.firstname = value !== '' ? '' : allValues.firstname
-  //       allValues.patronymic = value !== '' ? '' : allValues.patronymic
-  //     }
-  //   }
-  // }
-)
-
 class Checkout extends Component {
   state = {
-    activeStep: 0,
+    activeStep: 1,
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
@@ -117,7 +110,12 @@ class Checkout extends Component {
       file: ""
     },
     errorText: "",
-    open: false
+    open: false,
+    chipReceiverFileName: '',
+    objReceiverList: { all: 0, ip: 0, ul: 0, error: 0 },
+    disableReceiverFileUpload: false,
+    receiverList: '',
+
   };
 
   upload = file => {
@@ -159,9 +157,56 @@ class Checkout extends Component {
     });
   };
 
+  uploadReceiverfile = (event) => {
+    const true_type = [ 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel' ]
+    const file = event.target.files[0]
+    if (file) {
+      let fileName = '' // имя в chip
+      let objReceiverList = { all: 0, ip: 0, ul: 0, error: 0 } // объект для анализа
+      if (event.target.files[0].type !== true_type[0] && event.target.files[0].type !== true_type[1])
+        this.setState({ openSnackbar: true, textSnackbar: 'Файл должен иметь расширение .xls или .xlsx' })
+      else {
+        readXlsxFile(event.target.files[0]).then((rows) => {
+          objReceiverList['all'] = rows.length - 1
+          rows.map((item, index) => {
+            if (index > 0) {
+              if (item[1].length === 10)
+                objReceiverList['ul'] ++
+              else if (item[1].length === 12)
+                objReceiverList['ip'] ++
+              else
+                objReceiverList['error'] ++
+            }
+          })
+          this.setState({ objReceiverList })
+        })
+        if (file.name.length > 20) {
+          if (file.type === true_type[0])
+            fileName = `${file.name.substr(0,13)}...xlsx`
+          else
+            fileName = `${file.name.substr(0,14)}...xls`
+        }
+
+        this.setState({
+          receiverList: file,
+          disableReceiverFileUpload: true,
+          chipReceiverFileName: fileName,
+        })
+      }
+    }
+  }
+
+  handleDeleteReceiverList = () => {
+    this.setState({
+      disableReceiverFileUpload: false,
+      receiverList: '' ,
+      chipReceiverFileName: '',
+    })
+  }
+
   onSubmit = ffJson => {
     // final form json
-    const { activeStep, dataMyOrganisation, operators, dop_sog } = this.state;
+    const { activeStep, dataMyOrganisation, operators, dop_sog, receiverList } = this.state;
     let dataMy = activeStep === 0 ? ffJson : dataMyOrganisation;
     this.setState({
       dataMyOrganisation: dataMy,
@@ -170,15 +215,20 @@ class Checkout extends Component {
     });
     if (activeStep === 2 ) {
       this.setState({ modal: true })
-      let data = {
-        sender: [dataMyOrganisation],
-        receiver: operators
-      }
+
+      let data = {}
+      if (receiverList === '')
+        data = { sender: [dataMyOrganisation], receiver: operators }
+      else
+        data = { sender: [dataMyOrganisation] }
 
       var dataForm = new FormData();
-
       dataForm.set('data', JSON.stringify(data) );
-      dataForm.append(' agreement', dop_sog.file);
+
+      if (dop_sog.file)
+        dataForm.append('agreement', dop_sog.file);
+      if (receiverList !== '')
+        dataForm.append('receiver_list', receiverList);
 
       axios({
         method: 'post',
@@ -207,7 +257,11 @@ class Checkout extends Component {
       errorText,
       disableKpp,
       dop_sog,
-      open
+      open,
+      chipReceiverFileName,
+      objReceiverList,
+      disableReceiverFileUpload,
+      receiverList
     } = this.state;
 
     const steps = getSteps();
@@ -216,7 +270,6 @@ class Checkout extends Component {
       <Form
         onSubmit={this.onSubmit}
         validate={validate(this.state.dataMyOrganisation.radioValue)}
-        decorators={[calculator]}
         render={({ handleSubmit, reset, submitting, pristine, values }) => {
           return (
             <form onSubmit={handleSubmit}>
@@ -249,7 +302,13 @@ class Checkout extends Component {
                           upload: this.upload,
                           dop_sog,
                           values,
-                          handleDelete: this.handleDelete
+                          handleDelete: this.handleDelete,
+                          uploadReceiverfile: this.uploadReceiverfile,
+                          chipReceiverFileName,
+                          objReceiverList,
+                          disableReceiverFileUpload,
+                          handleDeleteReceiverList: this.handleDeleteReceiverList,
+                          receiverList
                         })}
 
                         <Grid
@@ -391,6 +450,11 @@ const dataSort = obj => {
       newArr[arrIndex][arrKey] = value; // заносим данные
     }
   }, obj);
+
+  if (newArr.length === 0)
+    newArr.push({ ...DEFAULT_OPERATOR })
+  // есть баг с возрващением на 2 шаг, если прикреплен файл, строки inn и тд нет, так как массив operator пустой
+  // а таким образом мы убиваем баг
 
   return newArr; // возвращаем переработанный массив
 };

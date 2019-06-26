@@ -38,7 +38,7 @@ const OperatorBlock = (props) => {
   };
 
   const getNameComponent = () => {
-    const { value } = props;
+    const { value, uploadReceiverList } = props;
     const innK = `innKontr${props.index}`
     let nameF = false
     let disable = true
@@ -65,7 +65,8 @@ const OperatorBlock = (props) => {
         <Grid container spacing={1}>
           <Grid item xs={12} sm={4}>
             <Field
-              required
+              required={!uploadReceiverList}
+              disabled={uploadReceiverList}
               name={nameField.lastname}
               label="Фамилия"
               fullWidth
@@ -75,7 +76,8 @@ const OperatorBlock = (props) => {
           </Grid>
           <Grid item xs={12} sm={4}>
             <Field
-              required
+              required={!uploadReceiverList}
+              disabled={uploadReceiverList}
               name={nameField.firstname}
               label="Имя"
               fullWidth
@@ -85,6 +87,7 @@ const OperatorBlock = (props) => {
           </Grid>
           <Grid item xs={12} sm={4}>
             <Field
+              disabled={uploadReceiverList}
               name={nameField.patronymic}
               label="Отчество"
               fullWidth
@@ -99,7 +102,7 @@ const OperatorBlock = (props) => {
 
   const classes = useStyles(); // глав. комп
   // начало инициализации
-  const { value } = props;
+  const { value, uploadReceiverList } = props;
   const innK = `innKontr${props.index}`
   let disable = true // для КПП
   // подготовка завершена
@@ -107,11 +110,12 @@ const OperatorBlock = (props) => {
       disable = false
 
   return (
-    <form container autoComplete="off" >
+    <Grid container autoComplete="off" >
       <Grid container className={classes.grid} spacing={1}>
         <Grid item xs={12} sm={6}>
           <Field
-            required
+            required={!uploadReceiverList}
+            disabled={uploadReceiverList}
             name={nameField.inn}
             label="ИНН"
             fullWidth
@@ -148,6 +152,8 @@ const OperatorBlock = (props) => {
       <Grid item xs={12}>
         <Field
           fullWidth
+          required={!uploadReceiverList}
+          disabled={uploadReceiverList}
           name={nameField.oper}
           label="Выберете оператора"
           component={Select}
@@ -162,7 +168,7 @@ const OperatorBlock = (props) => {
         </Field>
       </Grid>
       <Divider className={classes.divider} />
-    </form>
+    </Grid>
   );
 }
 
