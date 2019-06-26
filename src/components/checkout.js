@@ -101,7 +101,7 @@ const getStepContent = ({
 
 class Checkout extends Component {
   state = {
-    activeStep: 1,
+    activeStep: 0,
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
