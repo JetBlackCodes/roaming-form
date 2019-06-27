@@ -24,6 +24,8 @@ import {
 } from "../../constants/customer-form";
 import { AttachFile, Equalizer } from "@material-ui/icons";
 import OperatorBlock from "../operator-block";
+import { UploadButton } from "../upload-button";
+
 class SecondStep extends React.Component {
   state = {
     operators: this.props.operators,
@@ -35,7 +37,7 @@ class SecondStep extends React.Component {
     },
     openSnackbar: false,
     textSnackbar: '',
-    openAnalyzReceiverList: false
+    openAnalyzReceiverList: false,
   };
 
   handleChange = index => name => e => {
@@ -97,12 +99,16 @@ class SecondStep extends React.Component {
       disableFileUpload,
       objReceiverList,
       chipFileName,
+      upload,
+      chipDopSog,
+      handleDelete
     } = this.props
     const { open,
       modalStyle,
       openSnackbar,
       textSnackbar,
-      openAnalyzReceiverList
+      openAnalyzReceiverList,
+      operators
     } = this.state
     const vertical = 'top'
     const horizontal = 'center'
@@ -114,7 +120,7 @@ class SecondStep extends React.Component {
         </Typography>
         <Divider className={styles.divider} mb={1}/>
         <div style={{position: "relative"}}>
-          {this.state.operators.map((item, index) => (
+          {operators.map((item, index) => (
             <OperatorBlock
               actions={{ delOperator: this.DelOperator(index) }}
               index={index}
@@ -122,6 +128,24 @@ class SecondStep extends React.Component {
               uploadReceiverList={disableFileUpload}
             />
           ))}
+
+          {/*
+            ТУТ НАЧИНАЕТСЯ ТЕПЕРЬ ЗАГРУЗКА ДОП СОГЛАШЕНИЯ
+          */}
+
+          <UploadDopSoglash
+            operators={operators}
+            upload={upload}
+            classes={classes}
+            chipDopSog={chipDopSog}
+            handleDelete={handleDelete}
+            values={values}
+          />
+
+          {/*
+            ТУТ ЗАКАНЧИВАЕТСЯ ТЕПЕРЬ ЗАГРУЗКА ДОП СОГЛАШЕНИЯ
+          */}
+
         </div>
 
         <CheckTypeUploadReceiver
@@ -212,6 +236,48 @@ class SecondStep extends React.Component {
         </>
     );
   }
+}
+
+const UploadDopSoglash = (props) => {
+  const { upload, classes, chipDopSog, handleDelete, operators, values } = props
+  let checkNeedDopSog = 0
+
+  Object.keys(values).forEach(function(key) {
+    // пройдемся по объекту values rff
+    let value = this[key]; // key - имя артрибута, value - значение артрибута
+
+    if (key.indexOf('operatorKontr') !== -1) {// просмотреть все "операторы" контрагентов введеных
+      if (value === '2BM' || value === '2AL' || value === '2BE') // если контур или такском или тензор
+        checkNeedDopSog = 1
+    }
+  }, values);
+
+  if (checkNeedDopSog === 1) {
+    return (
+      <>
+        <Grid item xs={12}>
+          <UploadButton upload={upload}/>
+        </Grid>
+        <Files name={chipDopSog} classes={classes} handleDelete={handleDelete}/>
+      </>
+    )
+  } else
+    return null
+}
+
+const Files = (props) => {
+  const { name, handleDelete, classes } = props
+  if (name)
+    return (
+      <Chip
+        avatar={ <Avatar> <AttachFile /> </Avatar> }
+        label={name}
+        className={classes.chip}
+        onDelete={handleDelete}
+      />
+    )
+  else
+    return null
 }
 
 const CheckTypeUploadReceiver = (props) => {

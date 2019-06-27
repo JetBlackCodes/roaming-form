@@ -13,7 +13,7 @@ import {
   FormHelperText
 } from "@material-ui/core";
 import { Help, AttachFile } from "@material-ui/icons";
-import { UploadButton } from "../upload-button";
+
 import { TextField } from "final-form-material-ui";
 import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
@@ -41,6 +41,7 @@ class FirstStep extends Component {
       dataMyOrganisation,
       disableKpp,
       dop_sog,
+      chipDopSog,
       upload,
       values,
       handleDelete
@@ -154,30 +155,10 @@ class FirstStep extends Component {
               label="E-mail"
             />
           </Grid>
-          <Grid item xs={12}>
-            <UploadButton upload={upload}/>
-          </Grid>
-          <Files name={dop_sog.name} classes={classes} handleDelete={handleDelete}/>
         </Grid>
       </>
     );
   }
-}
-
-
-const Files = (props) => {
-  const { name, handleDelete, classes } = props
-  if (name)
-    return (
-      <Chip
-        avatar={ <Avatar> <AttachFile /> </Avatar> }
-        label={name}
-        className={classes.chip}
-        onDelete={handleDelete}
-      />
-    )
-  else
-    return null
 }
 
 const parse = value => {
