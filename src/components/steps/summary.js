@@ -156,7 +156,7 @@ const OperatorList = props => {
   if (receiverList === "") {
     return (
       <Grid container item xs={12}>
-        
+
           <List key={index} className={classes.root}>
 
             <ListItem className={classes.listItem}>
@@ -228,9 +228,9 @@ const Kname = props => {
   let name = "";
   if (operators[index].inn.length === 10) name = operators[index].name;
   else {
-    name = `ИП ${operators[index].lastname}  ${operators[index].firstname} ${
-      operators[index].patronymic
-    }`;
+    name = `ИП ${operators[index].lastname}  ${operators[index].firstname} `;
+    if (operators[index].patronymic)
+      name += operators[index].patronymic
   }
   return (
     // <ListItem className={classes.onlyForName}>
