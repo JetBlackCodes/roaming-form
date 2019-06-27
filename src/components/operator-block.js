@@ -105,6 +105,16 @@ const OperatorBlock = (props) => {
 
   return (
     <form container autoComplete="off" >
+      <div style={{position: "absolute", right: "10px", top: "5px"}}>
+          <IconButton
+            // className={classes.delButton}
+            color="primary"
+            onClick={props.actions.delOperator}
+            title="Удалить оператора"
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+      </div>
       <Grid container className={classes.grid} spacing={1}>
         <Grid item xs={12} sm={6}>
           <Field
@@ -116,7 +126,7 @@ const OperatorBlock = (props) => {
             parse={formatStringByPattern("999999999999")}
           />
         </Grid>
-        <Grid item xs={12} sm={5}>
+        <Grid item xs={12} sm={6}>
           <Field
             required
             name={nameField.kpp}
@@ -127,16 +137,6 @@ const OperatorBlock = (props) => {
             component={TextField}
             parse={formatStringByPattern("999999999")}
           />
-        </Grid>
-        <Grid item xs={12} sm={1}>
-          <IconButton
-            // className={classes.delButton}
-            color="primary"
-            onClick={props.actions.delOperator}
-            title="Удалить оператора"
-          >
-            <DeleteIcon fontSize="small" />
-          </IconButton>
         </Grid>
       </Grid>
 
