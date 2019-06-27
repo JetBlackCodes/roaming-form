@@ -8,8 +8,8 @@ import {
   Grid,
   ExpansionPanel,
   ExpansionPanelSummary,
-  ExpansionPanelDetails
-  Divider,
+  ExpansionPanelDetails,
+  Divider
 } from "@material-ui/core";
 import { OPERATORS } from "../../constants/customer-form";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -21,7 +21,13 @@ class Summary extends React.Component {
   };
 
   render() {
-    const { classes, receiverList, fileReceiver, chipReceiverFileName, objReceiverList } = this.props;
+    const {
+      classes,
+      receiverList,
+      fileReceiver,
+      chipReceiverFileName,
+      objReceiverList
+    } = this.props;
     const { dataMyOrganisation, operators } = this.state;
 
     let name = "";
@@ -74,20 +80,20 @@ class Summary extends React.Component {
           </ListItem>
         </List>
 
-        {!fileReceiver &&
+        {!fileReceiver && (
           <Typography variant="h6" gutterBottom className={classes.title}>
             Проверьте данные контрагентов
           </Typography>
-        }
-        {fileReceiver &&
+        )}
+        {fileReceiver && (
           <Typography variant="h6" gutterBottom className={classes.title}>
             Вы загрузили список контрагентов файлом
           </Typography>
-        }
+        )}
 
-        <Grid>
+        <Grid xs={12}>
           {operators.map((item, index) => (
-            <div className={classes.root}>
+            <div>
               <ExpansionPanel>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                   <Kname
@@ -97,37 +103,16 @@ class Summary extends React.Component {
                   />
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
-                  <List key={index}>
-                    <ListItem className={classes.listItem}>
-                      <ListItemText primary="ИНН" />
-                      <Typography variant="body2">{item.inn}</Typography>
-                    </ListItem>
-
-                    <Kpp
-                      disable={false}
-                      kpp={item.kpp}
-                      classes={classes}
+                  <List className={classes.root} fullWidth>
+                    <OperatorList
+                      {...item}
                       operators={operators}
                       index={index}
-                      kontr={true}
+                      classes={classes}
+                      receiverList={receiverList}
+                      chipReceiverFileName={chipReceiverFileName}
+                      objReceiverList={objReceiverList}
                     />
-        <OperatorList
-          operators={operators}
-          classes={classes}
-          receiverList={receiverList}
-          chipReceiverFileName={chipReceiverFileName}
-          objReceiverList={objReceiverList}
-        />
-
-                    <ListItem className={classes.listItem}>
-                      <ListItemText primary="Оператор" />
-
-                      {OPERATORS.map(value => (
-                        <Typography variant="body2">
-                          {item.operator === value.value ? value.label : ""}
-                        </Typography>
-                      ))}
-                    </ListItem>
                   </List>
                 </ExpansionPanelDetails>
               </ExpansionPanel>
@@ -141,44 +126,72 @@ class Summary extends React.Component {
 
 const Kpp = props => {
   // попробуем сделать universal
-const OperatorList = (props) => {
-  const { operators, classes, receiverList, chipReceiverFileName, objReceiverList } = props
-  if (receiverList === '') {
+  let { disable, kpp, classes, operators, index, kontr } = props;
+  if (kontr)
+    // инициализация КПП для операторов
+    disable = operators[index].inn.length === 12 ? true : false;
+  if (disable === false)
     return (
-      <Grid>
-        {operators.map((item, index) => (
-          <List key={index}>
-
-            <Kname operators={operators} index={index} classes={classes} />
+      <ListItem className={classes.listItem}>
+        <ListItemText primary="КПП" />
+        <Typography variant="body2">{kpp}</Typography>
+      </ListItem>
+    );
+  else return null;
+};
+// попробуем сделать universal
+const OperatorList = props => {
+  const {
+    classes,
+    receiverList,
+    chipReceiverFileName,
+    objReceiverList,
+    operators,
+    kpp,
+    index,
+    inn,
+    operator,
+    ...other
+  } = props;
+  if (receiverList === "") {
+    return (
+      <Grid container item xs={12}>
+        
+          <List key={index} className={classes.root}>
 
             <ListItem className={classes.listItem}>
               <ListItemText primary="ИНН" />
-              <Typography variant="body2">{item.inn}</Typography>
+              <Typography variant="body2">{inn}</Typography>
             </ListItem>
 
-            <Kpp disable={false} kpp={item.kpp} classes={classes} operators={operators} index={index} kontr={true} />
+            <Kpp
+              disable={false}
+              kpp={kpp}
+              classes={classes}
+              operators={operators}
+              index={index}
+              kontr={true}
+            />
 
             <ListItem className={classes.listItem}>
               <ListItemText primary="Оператор" />
               <Typography variant="body2">
                 {OPERATORS.map(value => (
                   <Typography variant="body2">
-                    {item.operator === value.value ? value.label : ""}
+                    {operator === value.value ? value.label : ""}
                   </Typography>
                 ))}
               </Typography>
             </ListItem>
-            <Divider />
           </List>
-        ))}
       </Grid>
-    )
+    );
   } else {
-    let size = 0
+    let size = 0;
     if (receiverList.size > 1048575)
-      size = `${~~(receiverList.size / 1048576)}.${receiverList.size % 1048576}мб`
-    else
-      size = `${~~(receiverList.size / 1024)}.${receiverList.size % 1024}кб`
+      size = `${~~(receiverList.size / 1048576)}.${receiverList.size %
+        1048576}мб`;
+    else size = `${~~(receiverList.size / 1024)}.${receiverList.size % 1024}кб`;
     return (
       <>
         <ListItem className={classes.listItem}>
@@ -206,23 +219,8 @@ const OperatorList = (props) => {
           <Typography variant="body2">{objReceiverList.error}</Typography>
         </ListItem>
       </>
-    )
-  }
-}
-
-const Kpp = (props) => { // попробуем сделать universal
-  let { disable, kpp, classes, operators, index, kontr } = props;
-  if (kontr)
-    // инициализация КПП для операторов
-    disable = operators[index].inn.length === 12 ? true : false;
-  if (disable === false)
-    return (
-      <ListItem className={classes.listItem}>
-        <ListItemText primary="КПП" />
-        <Typography variant="body2">{kpp}</Typography>
-      </ListItem>
     );
-  else return null;
+  }
 };
 
 const Kname = props => {
@@ -274,10 +272,10 @@ const styles = theme => ({
   //   height: '10px'
   // },
   root: {
-    width: '100%',
-    padding: '0px',
-    display: 'block'
-  },
+    width: "100%",
+    padding: "0px",
+    display: "block"
+  }
 });
 
 export default withStyles(styles)(Summary);

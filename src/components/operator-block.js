@@ -110,7 +110,7 @@ const OperatorBlock = (props) => {
       disable = false
 
   return (
-    <form container autoComplete="off" >
+    <Grid container autoComplete="off" >
       <div style={{position: "absolute", right: "10px", top: "5px"}}>
           <IconButton
             // className={classes.delButton}

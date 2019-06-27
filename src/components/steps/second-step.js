@@ -112,7 +112,7 @@ class SecondStep extends React.Component {
         <Typography variant="h6" gutterBottom>
           Введите данные операторов
         </Typography>
-        <Divider className={useStyles.divider} mb={1}/>
+        <Divider className={styles.divider} mb={1}/>
         <div style={{position: "relative"}}>
           {this.state.operators.map((item, index) => (
             <OperatorBlock
