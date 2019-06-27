@@ -157,14 +157,13 @@ class SecondStep extends React.Component {
           handleOpen={this.handleOpen}
         />
 
-        <IconButton
+          <Button
             className="addButton"
-            size="small"
             onClick={this.handleOpen}
           >
             <AttachFile fontSize="small" />
               Загрузить
-          </IconButton>
+          </Button>
 
           <Modal
             aria-labelledby="simple-modal-title"
