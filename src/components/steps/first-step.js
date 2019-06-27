@@ -3,9 +3,6 @@ import {
   withStyles,
   Grid,
   Typography,
-  RadioGroup,
-  FormControlLabel,
-  Radio,
   IconButton,
   Popover,
   Paper,
@@ -15,7 +12,7 @@ import {
   FormControl,
   FormHelperText
 } from "@material-ui/core";
-import { Help, Done, AttachFile, Clear } from "@material-ui/icons";
+import { Help, AttachFile } from "@material-ui/icons";
 import { UploadButton } from "../upload-button";
 import { TextField } from "final-form-material-ui";
 import { Field } from "react-final-form";
