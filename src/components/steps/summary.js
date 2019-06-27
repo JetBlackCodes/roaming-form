@@ -9,6 +9,7 @@ import {
   ExpansionPanel,
   ExpansionPanelSummary,
   ExpansionPanelDetails
+  Divider,
 } from "@material-ui/core";
 import { OPERATORS } from "../../constants/customer-form";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -20,7 +21,7 @@ class Summary extends React.Component {
   };
 
   render() {
-    const classes = this.props;
+    const { classes, receiverList, fileReceiver, chipReceiverFileName, objReceiverList } = this.props;
     const { dataMyOrganisation, operators } = this.state;
 
     let name = "";
@@ -73,9 +74,16 @@ class Summary extends React.Component {
           </ListItem>
         </List>
 
-        <Typography variant="h6" gutterBottom className={classes.title}>
-          Проверьте данные операторов
-        </Typography>
+        {!fileReceiver &&
+          <Typography variant="h6" gutterBottom className={classes.title}>
+            Проверьте данные контрагентов
+          </Typography>
+        }
+        {fileReceiver &&
+          <Typography variant="h6" gutterBottom className={classes.title}>
+            Вы загрузили список контрагентов файлом
+          </Typography>
+        }
 
         <Grid>
           {operators.map((item, index) => (
@@ -103,6 +111,13 @@ class Summary extends React.Component {
                       index={index}
                       kontr={true}
                     />
+        <OperatorList
+          operators={operators}
+          classes={classes}
+          receiverList={receiverList}
+          chipReceiverFileName={chipReceiverFileName}
+          objReceiverList={objReceiverList}
+        />
 
                     <ListItem className={classes.listItem}>
                       <ListItemText primary="Оператор" />
@@ -126,6 +141,76 @@ class Summary extends React.Component {
 
 const Kpp = props => {
   // попробуем сделать universal
+const OperatorList = (props) => {
+  const { operators, classes, receiverList, chipReceiverFileName, objReceiverList } = props
+  if (receiverList === '') {
+    return (
+      <Grid>
+        {operators.map((item, index) => (
+          <List key={index}>
+
+            <Kname operators={operators} index={index} classes={classes} />
+
+            <ListItem className={classes.listItem}>
+              <ListItemText primary="ИНН" />
+              <Typography variant="body2">{item.inn}</Typography>
+            </ListItem>
+
+            <Kpp disable={false} kpp={item.kpp} classes={classes} operators={operators} index={index} kontr={true} />
+
+            <ListItem className={classes.listItem}>
+              <ListItemText primary="Оператор" />
+              <Typography variant="body2">
+                {OPERATORS.map(value => (
+                  <Typography variant="body2">
+                    {item.operator === value.value ? value.label : ""}
+                  </Typography>
+                ))}
+              </Typography>
+            </ListItem>
+            <Divider />
+          </List>
+        ))}
+      </Grid>
+    )
+  } else {
+    let size = 0
+    if (receiverList.size > 1048575)
+      size = `${~~(receiverList.size / 1048576)}.${receiverList.size % 1048576}мб`
+    else
+      size = `${~~(receiverList.size / 1024)}.${receiverList.size % 1024}кб`
+    return (
+      <>
+        <ListItem className={classes.listItem}>
+          <ListItemText primary="Название файла" />
+          <Typography variant="body2">{chipReceiverFileName}</Typography>
+        </ListItem>
+        <ListItem className={classes.listItem}>
+          <ListItemText primary="Размер файла" />
+          <Typography variant="body2">{size}</Typography>
+        </ListItem>
+        <ListItem className={classes.listItem}>
+          <ListItemText primary="Всего контрагентов в файле" />
+          <Typography variant="body2">{objReceiverList.all}</Typography>
+        </ListItem>
+        <ListItem className={classes.listItem}>
+          <ListItemText primary="Контрагентов ЮЛ в файле" />
+          <Typography variant="body2">{objReceiverList.ul}</Typography>
+        </ListItem>
+        <ListItem className={classes.listItem}>
+          <ListItemText primary="Контрагентов ИП в файле" />
+          <Typography variant="body2">{objReceiverList.ip}</Typography>
+        </ListItem>
+        <ListItem className={classes.listItem}>
+          <ListItemText primary="Некорректные строки в файле" />
+          <Typography variant="body2">{objReceiverList.error}</Typography>
+        </ListItem>
+      </>
+    )
+  }
+}
+
+const Kpp = (props) => { // попробуем сделать universal
   let { disable, kpp, classes, operators, index, kontr } = props;
   if (kontr)
     // инициализация КПП для операторов
