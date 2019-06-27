@@ -48,7 +48,7 @@ class SecondStep extends React.Component {
           Введите данные операторов
         </Typography>
         <Divider className={useStyles.divider} mb={1}/>
-        <div>
+        <div style={{position: "relative"}}>
           {this.state.operators.map((item, index) => (
             <OperatorBlock
               actions={{ delOperator: this.DelOperator(index) }}
