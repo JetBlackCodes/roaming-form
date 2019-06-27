@@ -96,16 +96,18 @@ class FirstStep extends Component {
             open={open}
             anchorEl={anchorEl}
             anchorOrigin={{
-              vertical: "center",
+              vertical: "bottom",
               horizontal: "right"
             }}
             transformOrigin={{
-              vertical: "center",
-              horizontal: "left"
+              vertical: "top",
+              horizontal: "right"
             }}
           >
             <Paper className={classes.paperPopper}>
               <Typography>
+                <b>Идентификатор - уникальный номер участника ЭДО</b>
+                <hr />
                 <b>Астрал отчет:</b> Документооборот - Адресная книга - Данные
                 пользователя - Идентификатор
                 <br />
