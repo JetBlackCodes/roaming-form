@@ -40,7 +40,6 @@ function getSteps() {
 }
 
 const getStepContent = ({
-  updateData,
   step,
   operators,
   dataMyOrganisation,
@@ -49,6 +48,7 @@ const getStepContent = ({
   disableKpp,
   upload,
   dop_sog,
+  chipDopSog,
   values,
   handleDelete,
   uploadReceiverfile,
@@ -65,10 +65,7 @@ const getStepContent = ({
           dataMyOrganisation={dataMyOrganisation}
           handleChangeRadio={handleChangeRadio}
           disableKpp={disableKpp}
-          dop_sog={dop_sog}
-          upload={upload}
           values={values}
-          handleDelete={handleDelete}
         />
       );
     case 1:
@@ -81,6 +78,9 @@ const getStepContent = ({
           objReceiverList={objReceiverList}
           disableFileUpload={disableReceiverFileUpload}
           handleDeleteReceiverList={handleDeleteReceiverList}
+          upload={upload}
+          chipDopSog={chipDopSog}
+          handleDelete={handleDelete}
         />
       );
     case 2:
@@ -101,7 +101,7 @@ const getStepContent = ({
 
 class Checkout extends Component {
   state = {
-    activeStep: 0,
+    activeStep: 1,
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
@@ -109,6 +109,7 @@ class Checkout extends Component {
       name: '',
       file: ""
     },
+    chipDopSog: '',
     errorText: "",
     open: false,
     chipReceiverFileName: '',
@@ -118,46 +119,44 @@ class Checkout extends Component {
 
   };
 
-  upload = file => {
+  upload = file => { // загрузка доп соглашения
     if (file.target.files[0].type !== 'application/pdf') {
       this.setState({ errorText: 'Загрузить можно только .pdf', open: true })
       return 0
     }
+    let filename = ''
+    if (file.target.files[0].name.length > 20)
+      filename = `${file.target.files[0].name.substr(0,14)}...pdf`
+    else
+      filename = file.target.files[0].name
+
     this.setState({
       dop_sog: {
         name: file.target.files[0].name,
         file: file.target.files[0]
-      }
+      },
+      chipDopSog: filename
     });
   };
 
-  updateData = value => {
-    this.setState({ operators: value });
-  };
-
-  handleClose = event => {
+  handleClose = event => { // закрытие сообщений
     this.setState({ open: false });
   };
 
-  handleBack = () => {
+  handleBack = () => { // прыдыдущий этап
     this.setState(state => ({
       activeStep: state.activeStep - 1
     }));
   };
 
-  handleDelete = () => {
+  handleDelete = () => { // удаление файла доп. соглашения
     this.setState({
-      dop_sog: { name: '', file: "" }
-    });
+      dop_sog: { name: '', file: '' },
+      chipDopSog: '',
+    })
   }
 
-  handleReset = () => {
-    this.setState({
-      activeStep: 0
-    });
-  };
-
-  uploadReceiverfile = (event) => {
+  uploadReceiverfile = (event) => { // загрузка списка контрагентов
     const true_type = [ 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel' ]
     const file = event.target.files[0]
     if (file) {
@@ -196,7 +195,7 @@ class Checkout extends Component {
     }
   }
 
-  handleDeleteReceiverList = () => {
+  handleDeleteReceiverList = () => { // удаление списка контрагентов
     this.setState({
       disableReceiverFileUpload: false,
       receiverList: '' ,
@@ -204,8 +203,7 @@ class Checkout extends Component {
     })
   }
 
-  onSubmit = ffJson => {
-    // final form json
+  onSubmit = ffJson => { // final form json
     const { activeStep, dataMyOrganisation, operators, dop_sog, receiverList } = this.state;
     let dataMy = activeStep === 0 ? ffJson : dataMyOrganisation;
     this.setState({
@@ -257,13 +255,13 @@ class Checkout extends Component {
       errorText,
       disableKpp,
       dop_sog,
+      chipDopSog,
       open,
       chipReceiverFileName,
       objReceiverList,
       disableReceiverFileUpload,
       receiverList
     } = this.state;
-
     const steps = getSteps();
 
     return (
@@ -293,7 +291,6 @@ class Checkout extends Component {
                     ) : (
                       <>
                         {getStepContent({
-                          updateData: updateData,
                           step: activeStep,
                           operators,
                           dataMyOrganisation,
@@ -301,6 +298,7 @@ class Checkout extends Component {
                           disableKpp,
                           upload: this.upload,
                           dop_sog,
+                          chipDopSog,
                           values,
                           handleDelete: this.handleDelete,
                           uploadReceiverfile: this.uploadReceiverfile,

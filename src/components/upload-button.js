@@ -19,15 +19,16 @@ const styles = theme => ({
 });
 
 const UploadButton = props => {
-  const { classes } = props;
+  const { classes, upload } = props;
   return (
     <>
       <input
         accept="application/pdf"
         className={classes.input}
         id="contained-button-file"
-        onChange={props.upload}
+        onChange={upload}
         type="file"
+        value=''
       />
       <label htmlFor="contained-button-file">
         <Button

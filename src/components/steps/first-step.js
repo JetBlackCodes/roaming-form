@@ -6,14 +6,11 @@ import {
   IconButton,
   Popover,
   Paper,
-  Chip,
-  Avatar,
   InputAdornment,
   FormControl,
   FormHelperText
 } from "@material-ui/core";
 import { Help, AttachFile } from "@material-ui/icons";
-import { UploadButton } from "../upload-button";
 import { TextField } from "final-form-material-ui";
 import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
@@ -41,6 +38,7 @@ class FirstStep extends Component {
       dataMyOrganisation,
       disableKpp,
       dop_sog,
+      chipDopSog,
       upload,
       values,
       handleDelete
@@ -96,16 +94,18 @@ class FirstStep extends Component {
             open={open}
             anchorEl={anchorEl}
             anchorOrigin={{
-              vertical: "center",
+              vertical: "bottom",
               horizontal: "right"
             }}
             transformOrigin={{
-              vertical: "center",
-              horizontal: "left"
+              vertical: "top",
+              horizontal: "right"
             }}
           >
             <Paper className={classes.paperPopper}>
               <Typography>
+                <b>Идентификатор - уникальный номер участника ЭДО</b>
+                <hr />
                 <b>Астрал отчет:</b> Документооборот - Адресная книга - Данные
                 пользователя - Идентификатор
                 <br />
@@ -152,30 +152,10 @@ class FirstStep extends Component {
               label="E-mail"
             />
           </Grid>
-          <Grid item xs={12}>
-            <UploadButton upload={upload}/>
-          </Grid>
-          <Files name={dop_sog.name} classes={classes} handleDelete={handleDelete}/>
         </Grid>
       </>
     );
   }
-}
-
-
-const Files = (props) => {
-  const { name, handleDelete, classes } = props
-  if (name)
-    return (
-      <Chip
-        avatar={ <Avatar> <AttachFile /> </Avatar> }
-        label={name}
-        className={classes.chip}
-        onDelete={handleDelete}
-      />
-    )
-  else
-    return null
 }
 
 const parse = value => {

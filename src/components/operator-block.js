@@ -7,20 +7,18 @@ import { TextField, Select } from "final-form-material-ui";
 import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
 import MenuItem from "@material-ui/core/MenuItem";
+import Box from "@material-ui/core/Box";
+import { zIndex } from "material-ui/styles";
 
-const OperatorBlock = (props) => {
-
+const OperatorBlock = props => {
   const useStyles = makeStyles(theme => ({
     divider: {
       margin: theme.spacing(1, 0, 2, 0)
     },
     delButton: {
       position: "absolute",
-      bottom: "32px",
-      right: "1px"
-    },
-    grid: {
-      position: "relative"
+      // bottom: "1px",
+      // right:"2px"
     },
     select: {
       marginBottom: theme.spacing(2)
@@ -39,13 +37,13 @@ const OperatorBlock = (props) => {
 
   const getNameComponent = () => {
     const { value, uploadReceiverList } = props;
-    const innK = `innKontr${props.index}`
-    let nameF = false
-    let disable = true
+    const innK = `innKontr${props.index}`;
+    let nameF = false;
+    let disable = true;
 
     if (value[innK]) {
-      nameF = value[innK].length === 12 ? true : false
-      disable = value[innK].length === 10 ? false : true
+      nameF = value[innK].length === 12 ? true : false;
+      disable = value[innK].length === 10 ? false : true;
     }
 
     if (nameF === false) {
@@ -59,10 +57,10 @@ const OperatorBlock = (props) => {
           autoComplete="off"
           component={TextField}
         />
-      )
+      );
     } else {
       return (
-        <Grid container spacing={1}>
+        <Grid container autoComplete="off" spacing={1}>
           <Grid item xs={12} sm={4}>
             <Field
               required={!uploadReceiverList}
@@ -70,7 +68,6 @@ const OperatorBlock = (props) => {
               name={nameField.lastname}
               label="Фамилия"
               fullWidth
-              autoComplete="off"
               component={TextField}
             />
           </Grid>
@@ -81,7 +78,6 @@ const OperatorBlock = (props) => {
               name={nameField.firstname}
               label="Имя"
               fullWidth
-              autoComplete="off"
               component={TextField}
             />
           </Grid>
@@ -91,85 +87,93 @@ const OperatorBlock = (props) => {
               name={nameField.patronymic}
               label="Отчество"
               fullWidth
-              autoComplete="off"
               component={TextField}
             />
           </Grid>
         </Grid>
-      )
+      );
     }
   };
 
   const classes = useStyles(); // глав. комп
   // начало инициализации
   const { value, uploadReceiverList } = props;
-  const innK = `innKontr${props.index}`
-  let disable = true // для КПП
+  const innK = `innKontr${props.index}`;
+  let disable = true; // для КПП
   // подготовка завершена
-  if (value[innK] && value[innK].length === 10)
-      disable = false
+  if (value[innK] && value[innK].length === 10) disable = false;
 
   return (
-    <Grid container autoComplete="off" >
-      <div style={{position: "absolute", right: "10px", top: "5px"}}>
+    <Box
+      border={0.5}
+      borderRadius={16}
+      borderColor="grey.300"
+      marginTop="8px"
+      marginBottom="10px"
+      padding="8px"
+      style={{ position: "relative"}}
+    >      
+      <Grid container autoComplete="off" >
+        <div style={{ position: "absolute", right: "-5px", top: "-4px", zIndex: "1"}}>
           <IconButton
             // className={classes.delButton}
             color="primary"
             onClick={props.actions.delOperator}
             title="Удалить оператора"
+            disableRipple
           >
             <DeleteIcon fontSize="small" />
           </IconButton>
-      </div>
-      <Grid container className={classes.grid} spacing={1}>
-        <Grid item xs={12} sm={6}>
+        </div>
+        <Grid container className={classes.grid} spacing={1}>
+          <Grid item xs={12} sm={6}>
+            <Field
+              required={!uploadReceiverList}
+              disabled={uploadReceiverList}
+              name={nameField.inn}
+              label="ИНН"
+              fullWidth
+              component={TextField}
+              parse={formatStringByPattern("999999999999")}
+            />
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Field
+              required
+              name={nameField.kpp}
+              label="КПП"
+              disabled={disable}
+              required={!disable}
+              fullWidth
+              component={TextField}
+              parse={formatStringByPattern("999999999")}
+            />
+          </Grid>
+        </Grid>
+
+        {getNameComponent()}
+
+        <Grid item xs={12}>
           <Field
+            fullWidth
             required={!uploadReceiverList}
             disabled={uploadReceiverList}
-            name={nameField.inn}
-            label="ИНН"
-            fullWidth
-            component={TextField}
-            parse={formatStringByPattern("999999999999")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Field
-            required
-            name={nameField.kpp}
-            label="КПП"
-            disabled={disable}
-            required={!disable}
-            fullWidth
-            component={TextField}
-            parse={formatStringByPattern("999999999")}
-          />
+            name={nameField.oper}
+            label="Выберете оператора"
+            component={Select}
+            formControlProps={{ fullWidth: true }}
+            className={classes.select}
+          >
+            {OPERATORS.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Field>
         </Grid>
       </Grid>
-
-      { getNameComponent() }
-
-      <Grid item xs={12}>
-        <Field
-          fullWidth
-          required={!uploadReceiverList}
-          disabled={uploadReceiverList}
-          name={nameField.oper}
-          label="Выберете оператора"
-          component={Select}
-          formControlProps={{ fullWidth: true }}
-          className={classes.select}
-        >
-          {OPERATORS.map(option => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </Field>
-      </Grid>
-      <Divider className={classes.divider} />
-    </Grid>
+    </Box>
   );
-}
+};
 
 export default OperatorBlock;

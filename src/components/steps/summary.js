@@ -8,8 +8,7 @@ import {
   Grid,
   ExpansionPanel,
   ExpansionPanelSummary,
-  ExpansionPanelDetails,
-  Divider
+  ExpansionPanelDetails
 } from "@material-ui/core";
 import { OPERATORS } from "../../constants/customer-form";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -92,8 +91,7 @@ class Summary extends React.Component {
         )}
 
         <Grid xs={12}>
-          {operators.map((item, index) => (
-            <div>
+          {operators.map((item, index) => (            
               <ExpansionPanel>
                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                   <Kname
@@ -103,7 +101,7 @@ class Summary extends React.Component {
                   />
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
-                  <List className={classes.root} fullWidth>
+                  <List className={classes.root}>
                     <OperatorList
                       {...item}
                       operators={operators}
@@ -115,8 +113,7 @@ class Summary extends React.Component {
                     />
                   </List>
                 </ExpansionPanelDetails>
-              </ExpansionPanel>
-            </div>
+              </ExpansionPanel>            
           ))}
         </Grid>
       </React.Fragment>
@@ -156,7 +153,7 @@ const OperatorList = props => {
   if (receiverList === "") {
     return (
       <Grid container item xs={12}>
-        
+
           <List key={index} className={classes.root}>
 
             <ListItem className={classes.listItem}>
@@ -228,49 +225,18 @@ const Kname = props => {
   let name = "";
   if (operators[index].inn.length === 10) name = operators[index].name;
   else {
-    name = `ИП ${operators[index].lastname}  ${operators[index].firstname} ${
-      operators[index].patronymic
-    }`;
+    name = `ИП ${operators[index].lastname}  ${operators[index].firstname} `;
+    if (operators[index].patronymic)
+      name += operators[index].patronymic
   }
   return (
-    // <ListItem className={classes.onlyForName}>
-    //   {/* <ListItemText primary="Наименование организации" /> */}
-    //   <div className={classes.typ}>
     <Typography align="right" className={classes.heading}>
       {name}
     </Typography>
-    //   </div>
-    // </ListItem>
   );
 };
 
 const styles = theme => ({
-  // onlyForName: {
-  //   padding: theme.spacing(0),
-  //   height: "auto"
-  // },
-  // typ: {
-  //   maxWidth: 270
-  // },
-  // listItem: {
-  //   padding: '0px',
-  //   height: '10px'
-  // },
-  // title: {
-  //   marginTop: theme.spacing.unit * 2
-  // },
-  // disable: {
-  //   color: "#333"
-  // },
-  // heading: {
-  //   // fontSize: theme.typography.pxToRem(12),
-  //   // padding: theme.spacing(0),
-  //   // margin: theme.spacing(0),
-  //   // minHeight: 20
-  //   // fontWeight: theme.typography.fontWeightRegular,
-  //   padding: '0px',
-  //   height: '10px'
-  // },
   root: {
     width: "100%",
     padding: "0px",
