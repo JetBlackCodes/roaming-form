@@ -6,9 +6,7 @@ import {
   IconButton,
   Popover,
   Paper,
-  InputAdornment,
-  FormControl,
-  FormHelperText
+  InputAdornment
 } from "@material-ui/core";
 import { Help, AttachFile } from "@material-ui/icons";
 import { TextField } from "final-form-material-ui";
@@ -44,9 +42,8 @@ class FirstStep extends Component {
       handleDelete
     } = this.props;
 
-    let disable = true
-    if (values && values.inn)
-      disable = values.inn.length === 10 ? false : true
+    let disable = true;
+    if (values && values.inn) disable = values.inn.length === 10 ? false : true;
 
     return (
       <>
@@ -56,35 +53,29 @@ class FirstStep extends Component {
 
         <Grid container spacing={1}>
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <Field
-                fullWidth
-                required
-                name="inn"
-                component={TextField}
-                type="text"
-                parse={formatStringByPattern("999999999999")}
-                label="ИНН"
-                aria-describedby="inn-helper-text"
-              />
-              <FormHelperText id="inn-helper-text"></FormHelperText>
-            </FormControl>
+            <Field
+              fullWidth
+              required
+              name="inn"
+              component={TextField}
+              type="text"
+              parse={formatStringByPattern("999999999999")}
+              label="ИНН"
+              style={{ minHeight: "70px" }}
+            />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <Field
-                fullWidth
-                disabled={disable}
-                required={!disable}
-                name="kpp"
-                component={TextField}
-                type="text"
-                parse={formatStringByPattern("999999999")}
-                label="КПП"
-                aria-describedby="kpp-helper-text"
-              />
-              <FormHelperText id="kpp-helper-text"></FormHelperText>
-            </FormControl>
+            <Field
+              fullWidth
+              disabled={disable}
+              required={!disable}
+              name="kpp"
+              component={TextField}
+              type="text"
+              parse={formatStringByPattern("999999999")}
+              label="КПП"
+              style={{ minHeight: "70px" }}
+            />
           </Grid>
 
           <NameAndFIO values={values} classes={classes} />
@@ -119,28 +110,25 @@ class FirstStep extends Component {
           </Popover>
 
           <Grid item xs={12}>
-            <FormControl fullWidth>
-              <Field
-                fullWidth
-                required
-                name="id"
-                component={TextField}
-                type="text"
-                label="Идентификатор"
-                parse={parse}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={this.handlePopoverOpen}>
-                        <Help fontSize="small" />
-                      </IconButton>
-                    </InputAdornment>
-                  )
-                }}
-                aria-describedby="guid-helper-text"
-              />
-            <FormHelperText id="guid-helper-text"></FormHelperText>
-            </FormControl>
+            <Field
+              fullWidth
+              required
+              name="id"
+              component={TextField}
+              type="text"
+              label="Идентификатор"
+              parse={parse}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={this.handlePopoverOpen}>
+                      <Help fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+              style={{ minHeight: "70px" }}
+            />
           </Grid>
           <Grid item xs={12}>
             <Field
@@ -150,6 +138,7 @@ class FirstStep extends Component {
               component={TextField}
               type="email"
               label="E-mail"
+              style={{ minHeight: "70px" }}
             />
           </Grid>
         </Grid>
@@ -169,7 +158,7 @@ const parse = value => {
 const styles = theme => ({
   space: {
     display: "flex",
-    justifyContent: "space-around",
+    justifyContent: "space-around"
   },
   paperPopper: {
     padding: 10,
@@ -183,8 +172,8 @@ const styles = theme => ({
     width: 200
   },
   chip: {
-    margin: theme.spacing(1),
-  },
+    margin: theme.spacing(1)
+  }
 });
 
 export default withStyles(styles)(FirstStep);

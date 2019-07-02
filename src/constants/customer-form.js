@@ -9,7 +9,7 @@ export const OPERATORS = [
   },
   {
     value: "2BM",
-    label: "СКБ Контур – 2BM"
+    label: "СКБ Контур.Диадок – 2BM"
   },
   {
     value: "2AL",
@@ -21,7 +21,7 @@ export const OPERATORS = [
   },
   {
     value: "2BE",
-    label: "Тензор – 2BE"
+    label: "Тензор СБиС – 2BE"
   },
   {
     value: "2IG",

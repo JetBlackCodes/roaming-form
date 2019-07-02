@@ -131,9 +131,7 @@ class SecondStep extends React.Component {
           </Grid>
 
           <Grid item xs={12} sm={3} align="right">
-            <Button
-              onClick={this.handleOpen}              
-            >
+            <Button onClick={this.handleOpen}>
               <AttachFile fontSize="small" />
               Загрузить
             </Button>
@@ -337,7 +335,7 @@ const CheckTypeUploadReceiver = props => {
         onClick={AddNewOperator}
         variant="contained"
         color="primary"
-        style={{ position: "absolute", bottom: "25px"}}
+        style={{ position: "absolute", bottom: "25px" }}
       >
         Добавить оператора
       </Button>

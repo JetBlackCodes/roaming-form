@@ -15,11 +15,6 @@ const OperatorBlock = props => {
     divider: {
       margin: theme.spacing(1, 0, 2, 0)
     },
-    delButton: {
-      position: "absolute",
-      // bottom: "1px",
-      // right:"2px"
-    },
     select: {
       marginBottom: theme.spacing(2)
     }
@@ -56,11 +51,12 @@ const OperatorBlock = props => {
           fullWidth
           autoComplete="off"
           component={TextField}
+          style={{minHeight: "70px"}} 
         />
       );
     } else {
       return (
-        <Grid container autoComplete="off" spacing={1}>
+        <Grid container spacing={1}>
           <Grid item xs={12} sm={4}>
             <Field
               required={!uploadReceiverList}
@@ -69,6 +65,8 @@ const OperatorBlock = props => {
               label="Фамилия"
               fullWidth
               component={TextField}
+              style={{minHeight: "70px"}}
+              autoComplete="off"
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -79,6 +77,8 @@ const OperatorBlock = props => {
               label="Имя"
               fullWidth
               component={TextField}
+              style={{minHeight: "70px"}}
+              autoComplete="off"
             />
           </Grid>
           <Grid item xs={12} sm={4}>
@@ -88,6 +88,8 @@ const OperatorBlock = props => {
               label="Отчество"
               fullWidth
               component={TextField}
+              style={{minHeight: "70px"}}
+              autoComplete="off"
             />
           </Grid>
         </Grid>
@@ -113,10 +115,9 @@ const OperatorBlock = props => {
       padding="8px"
       style={{ position: "relative"}}
     >      
-      <Grid container autoComplete="off" >
+      <Grid container>
         <div style={{ position: "absolute", right: "-5px", top: "-4px", zIndex: "1"}}>
           <IconButton
-            // className={classes.delButton}
             color="primary"
             onClick={props.actions.delOperator}
             title="Удалить оператора"
@@ -135,6 +136,8 @@ const OperatorBlock = props => {
               fullWidth
               component={TextField}
               parse={formatStringByPattern("999999999999")}
+              style={{minHeight: "70px"}}
+              autoComplete="off"
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -147,6 +150,8 @@ const OperatorBlock = props => {
               fullWidth
               component={TextField}
               parse={formatStringByPattern("999999999")}
+              style={{minHeight: "70px"}}
+              autoComplete="off"
             />
           </Grid>
         </Grid>
