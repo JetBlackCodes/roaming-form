@@ -37,7 +37,6 @@ class FirstStep extends Component {
     const open = Boolean(anchorEl);
     const {
       classes,
-      handleChangeRadio,
       dataMyOrganisation,
       disableKpp,
       dop_sog,
@@ -59,35 +58,31 @@ class FirstStep extends Component {
 
         <Grid container spacing={1}>
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <Field
-                fullWidth
-                required
-                name="inn"
-                component={TextField}
-                type="text"
-                parse={formatStringByPattern("999999999999")}
-                label="ИНН"
-                aria-describedby="inn-helper-text"
-              />
-              <FormHelperText id="inn-helper-text"></FormHelperText>
-            </FormControl>
+            <Field
+              fullWidth
+              required
+              name="inn"
+              component={TextField}
+              type="text"
+              parse={formatStringByPattern("999999999999")}
+              label="ИНН"
+              aria-describedby="inn-helper-text"
+              className={classes.field}
+            />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <FormControl fullWidth>
-              <Field
-                fullWidth
-                disabled={disable}
-                required={!disable}
-                name="kpp"
-                component={TextField}
-                type="text"
-                parse={formatStringByPattern("999999999")}
-                label="КПП"
-                aria-describedby="kpp-helper-text"
-              />
-              <FormHelperText id="kpp-helper-text"></FormHelperText>
-            </FormControl>
+            <Field
+              fullWidth
+              disabled={disable}
+              required={!disable}
+              name="kpp"
+              component={TextField}
+              type="text"
+              parse={formatStringByPattern("999999999")}
+              label="КПП"
+              aria-describedby="kpp-helper-text"
+              className={classes.field}
+            />
           </Grid>
 
           <NameAndFIO values={values} classes={classes} />
@@ -120,30 +115,27 @@ class FirstStep extends Component {
               </Typography>
             </Paper>
           </Popover>
-
           <Grid item xs={12}>
-            <FormControl fullWidth>
-              <Field
-                fullWidth
-                required
-                name="id"
-                component={TextField}
-                type="text"
-                label="Идентификатор"
-                parse={parse}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={this.handlePopoverOpen}>
-                        <Help fontSize="small" />
-                      </IconButton>
-                    </InputAdornment>
-                  )
-                }}
-                aria-describedby="guid-helper-text"
-              />
-            <FormHelperText id="guid-helper-text"></FormHelperText>
-            </FormControl>
+            <Field
+              fullWidth
+              required
+              name="id"
+              component={TextField}
+              type="text"
+              label="Идентификатор"
+              parse={parse}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={this.handlePopoverOpen}>
+                      <Help fontSize="small" />
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+              aria-describedby="guid-helper-text"
+              className={classes.field}
+            />
           </Grid>
           <Grid item xs={12}>
             <Field
@@ -153,6 +145,7 @@ class FirstStep extends Component {
               component={TextField}
               type="email"
               label="E-mail"
+              className={classes.field}
             />
           </Grid>
         </Grid>
@@ -188,6 +181,9 @@ const styles = theme => ({
   chip: {
     margin: theme.spacing(1),
   },
+  field: {
+    minHeight: '70px'
+  }
 });
 
 export default withStyles(styles)(FirstStep);

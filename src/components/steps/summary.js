@@ -100,6 +100,7 @@ class Summary extends React.Component {
                     operators={operators}
                     index={index}
                     classes={classes}
+                    fileReceiver={fileReceiver}
                   />
                 </ExpansionPanelSummary>
                 <ExpansionPanelDetails>
@@ -224,13 +225,17 @@ const OperatorList = props => {
 };
 
 const Kname = props => {
-  const { operators, index, classes } = props;
+  const { operators, index, classes, fileReceiver } = props;
   let name = "";
   if (operators[index].inn.length === 10) name = operators[index].name;
   else {
-    name = `ИП ${operators[index].lastname}  ${operators[index].firstname} `;
-    if (operators[index].patronymic)
-      name += operators[index].patronymic
+    if (fileReceiver)
+      name = "Список контрагентов файлом"
+    else {
+      name = `ИП ${operators[index].lastname}  ${operators[index].firstname} `;
+      if (operators[index].patronymic)
+        name += operators[index].patronymic
+    }
   }
   return (
     // <ListItem className={classes.onlyForName}>

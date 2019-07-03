@@ -44,7 +44,6 @@ const getStepContent = ({
   operators,
   dataMyOrganisation,
   error,
-  handleChangeRadio,
   disableKpp,
   upload,
   dop_sog,
@@ -56,14 +55,14 @@ const getStepContent = ({
   objReceiverList,
   disableReceiverFileUpload,
   handleDeleteReceiverList,
-  receiverList
+  receiverList,
+  changeFinalForm
 }) => {
   switch (step) {
     case 0:
       return (
         <FirstStep
           dataMyOrganisation={dataMyOrganisation}
-          handleChangeRadio={handleChangeRadio}
           disableKpp={disableKpp}
           values={values}
         />
@@ -81,6 +80,7 @@ const getStepContent = ({
           upload={upload}
           chipDopSog={chipDopSog}
           handleDelete={handleDelete}
+          changeFinalForm={changeFinalForm}
         />
       );
     case 2:
@@ -101,7 +101,7 @@ const getStepContent = ({
 
 class Checkout extends Component {
   state = {
-    activeStep: 0,
+    activeStep: 1,
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
@@ -156,43 +156,44 @@ class Checkout extends Component {
     })
   }
 
-  uploadReceiverfile = (event) => { // загрузка списка контрагентов
+  uploadReceiverfile = (values, changeFinalForm, file) => { // загрузка списка контрагентов
     const true_type = [ 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel' ]
-    const file = event.target.files[0]
-    if (file) {
-      let fileName = '' // имя в chip
-      let objReceiverList = { all: 0, ip: 0, ul: 0, error: 0 } // объект для анализа
-      if (event.target.files[0].type !== true_type[0] && event.target.files[0].type !== true_type[1])
-        this.setState({ openSnackbar: true, textSnackbar: 'Файл должен иметь расширение .xls или .xlsx' })
-      else {
-        readXlsxFile(event.target.files[0]).then((rows) => {
-          objReceiverList['all'] = rows.length - 1
-          rows.map((item, index) => {
-            if (index > 0) {
-              if (item[1].length === 10)
-                objReceiverList['ul'] ++
-              else if (item[1].length === 12)
-                objReceiverList['ip'] ++
-              else
-                objReceiverList['error'] ++
-            }
-          })
-          this.setState({ objReceiverList })
-        })
-        if (file.name.length > 20) {
-          if (file.type === true_type[0])
-            fileName = `${file.name.substr(0,13)}...xlsx`
+    let fileName = '' // имя в chip
+    let objReceiverList = { all: 0, ip: 0, ul: 0, error: 0 } // объект для анализа
+    console.log(values, changeFinalForm, file)
+    readXlsxFile(file).then((rows) => {
+      objReceiverList['all'] = rows.length - 1
+      rows.map((item, index) => {
+        if (index > 0) {
+          if (item[1].length === 10)
+            objReceiverList['ul'] ++
+          else if (item[1].length === 12)
+            objReceiverList['ip'] ++
           else
-            fileName = `${file.name.substr(0,14)}...xls`
+            objReceiverList['error'] ++
         }
-
-        this.setState({
-          receiverList: file,
-          disableReceiverFileUpload: true,
-          chipReceiverFileName: fileName,
-        })
-      }
+      })
+      this.setState({ objReceiverList })
+    })
+    if (file.name.length > 20) {
+      if (file.type === true_type[0])
+        fileName = `${file.name.substr(0,13)}...xlsx`
+      else
+        fileName = `${file.name.substr(0,14)}...xls`
     }
+
+    this.setState({
+      receiverList: file,
+      disableReceiverFileUpload: true,
+      chipReceiverFileName: fileName,
+    })
+
+    Object.keys(values).forEach(function(key) {
+      let value = this[key];
+      if (key.indexOf('Kontr') !== -1)
+        changeFinalForm(key, undefined)
+
+    }, values);
   }
 
   handleDeleteReceiverList = () => { // удаление списка контрагентов
@@ -246,14 +247,20 @@ class Checkout extends Component {
     }
   };
 
+  bindFormApi = formApi => {
+    this.formApi = formApi;
+    const unsubscribe = () => {};
+    return unsubscribe;
+  };
+
   render() {
     const { classes, updateData } = this.props;
     const {
-      activeStep,
-      operators,
-      dataMyOrganisation,
-      errorText,
-      disableKpp,
+      activeStep, // текущий шаг
+      operators, // контрагенты
+      dataMyOrganisation, // данные организации
+      errorText, // текст ошибки
+      disableKpp, // выкл кпп
       dop_sog,
       chipDopSog,
       open,
@@ -266,9 +273,11 @@ class Checkout extends Component {
 
     return (
       <Form
+        decorators={[this.bindFormApi]}
         onSubmit={this.onSubmit}
         validate={validate(this.state.dataMyOrganisation.radioValue)}
-        render={({ handleSubmit, reset, submitting, pristine, values }) => {
+        render={({ handleSubmit, reset, submitting, pristine, values, form }) => {
+          const { change } = form
           return (
             <form onSubmit={handleSubmit}>
               <main className={classes.layout}>
@@ -294,7 +303,6 @@ class Checkout extends Component {
                           step: activeStep,
                           operators,
                           dataMyOrganisation,
-                          handleChangeRadio: this.handleChangeRadio,
                           disableKpp,
                           upload: this.upload,
                           dop_sog,
@@ -306,7 +314,8 @@ class Checkout extends Component {
                           objReceiverList,
                           disableReceiverFileUpload,
                           handleDeleteReceiverList: this.handleDeleteReceiverList,
-                          receiverList
+                          receiverList,
+                          changeFinalForm: change
                         })}
 
                         <Grid

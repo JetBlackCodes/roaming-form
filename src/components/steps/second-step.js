@@ -25,6 +25,7 @@ import {
 import { AttachFile, Equalizer } from "@material-ui/icons";
 import OperatorBlock from "../operator-block";
 import { UploadButton } from "../upload-button";
+import { Field } from "react-final-form";
 
 class SecondStep extends React.Component {
   state = {
@@ -66,12 +67,32 @@ class SecondStep extends React.Component {
   };
 
   DelOperator = index => () => { // удаление оператора
-    let { operators } = this.state;
+    let operators = [ ...this.state.operators ] // клонируем operators
+    const { changeFinalForm, values } = this.props; // мутатор rff + values rff
+    let clearObj = objRff(index) // делаем запрос на чистый value с index'ом удаленного
+    const newObj = {} // новый allValues rff для замены
     if (operators.length > 1) {
-      operators.splice(index, 1);
-      this.setState({ operators });
-    } else
-      this.setState({ openSnackbar: true, textSnackbar: 'Вы не можете удалить всех операторов!' })
+      operators.splice(index, 1); // удаляем из массива обработанных данных
+      this.setState({ operators }); // обновляем state operators
+      clearObj.map(item => changeFinalForm(item, undefined) ) // очищаем
+      let newIndex = 0 // новый index
+      Object.keys(values).forEach(key => { // проходим по allValues rff
+        const value = this[key]; // value keys rff
+        let defIndex = key.split("Kontr") // nameField rff + indexField rff. Example: defIndex['inn', 0]
+        if (defIndex[1] > index) { // если больше искомого index
+          newIndex = defIndex[1] - 1 // new index
+          let newKey = `${defIndex[0]}Kontr${newIndex}` // новое название ключа, для сдвига
+          newObj[newKey] = values[key] // задаем новый ключ
+        } else if (defIndex[1] < index) // если меньше нужного index - без изменений
+          newObj[key] = values[key]
+      }, values);
+      newIndex++ // Index на 1 выше
+      clearObj = objRff(newIndex) // делаем запрос на чистый rff Values нужного index
+      clearObj.map(item => newObj[item] = undefined ) // добавляем чтоб удалить лишние
+      // в newObj новый массив с нужными ключами и значениями
+      Object.keys(newObj).forEach(key => { changeFinalForm(key, newObj[key]) }, newObj) // перезаписываем allValues rff
+    } else // иначе ошибка (контрагент остался 1)
+      this.setState({ openSnackbar: true, textSnackbar: 'Вы не можете удалить всех контрагентов!' })
   };
 
   handleCloseSnackbar = () => { // закрытие уведомления
@@ -91,6 +112,20 @@ class SecondStep extends React.Component {
     this.setState({ openAnalyzReceiverList: !openAnalyzReceiverList })
   }
 
+  preloadReceiverList = (event) => {
+    const true_type = [ 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel' ]
+    const file = event.target.files[0]
+    const { uploadReceiverfile, values, changeFinalForm } = this.props
+    if (file) {
+      if (file.type === true_type[0] || file.type === true_type[1]) {
+        this.setState({ operators: [{ ...DEFAULT_OPERATOR }] })
+        this.props.uploadReceiverfile(values, changeFinalForm, file)
+      } else {
+        this.setState({ openSnackbar: true, textSnackbar: 'Файл должен быть .xls или .xlsx' })
+      }
+    }
+  }
+
   render() {
     const {
       values,
@@ -101,7 +136,8 @@ class SecondStep extends React.Component {
       chipFileName,
       upload,
       chipDopSog,
-      handleDelete
+      handleDelete,
+      changeFinalForm
     } = this.props
     const { open,
       modalStyle,
@@ -112,11 +148,19 @@ class SecondStep extends React.Component {
     } = this.state
     const vertical = 'top'
     const horizontal = 'center'
-
     return (
       <>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="h6" gutterBottom className={classes.uploadReceiverList}>
           Введите данные операторов
+          { !disableFileUpload &&
+            <Button
+              onClick={this.handleOpen}
+            >
+              <AttachFile fontSize="small" />
+                Загрузить список
+            </Button>
+          }
+
         </Typography>
         <Divider className={styles.divider} mb={1}/>
         <div style={{position: "relative"}}>
@@ -140,6 +184,7 @@ class SecondStep extends React.Component {
             chipDopSog={chipDopSog}
             handleDelete={handleDelete}
             values={values}
+            uploadReceiverList={disableFileUpload}
           />
 
           {/*
@@ -156,14 +201,6 @@ class SecondStep extends React.Component {
           classes={classes}
           handleOpen={this.handleOpen}
         />
-
-          <Button
-            className="addButton"
-            onClick={this.handleOpen}
-          >
-            <AttachFile fontSize="small" />
-              Загрузить
-          </Button>
 
           <Modal
             aria-labelledby="simple-modal-title"
@@ -191,7 +228,7 @@ class SecondStep extends React.Component {
                 className={classes.input}
                 id="contained-button-file"
                 type="file"
-                onChange={uploadReceiverfile}
+                onChange={this.preloadReceiverList}
                 disabled={disableFileUpload}
               />
               <label htmlFor="contained-button-file">
@@ -238,7 +275,7 @@ class SecondStep extends React.Component {
 }
 
 const UploadDopSoglash = (props) => {
-  const { upload, classes, chipDopSog, handleDelete, operators, values } = props
+  const { upload, classes, chipDopSog, handleDelete, operators, values, uploadReceiverList } = props
   let checkNeedDopSog = 0
 
   Object.keys(values).forEach(function(key) {
@@ -250,6 +287,9 @@ const UploadDopSoglash = (props) => {
         checkNeedDopSog = 1
     }
   }, values);
+
+  if (uploadReceiverList === true)
+    checkNeedDopSog = 1
 
   if (checkNeedDopSog === 1) {
     return (
@@ -299,14 +339,16 @@ const CheckTypeUploadReceiver = (props) => {
     )
   } else {
     return (
-      <Button
-        onClick={AddNewOperator}
-        variant="contained"
-        color="primary"
-        className="addButton"
-      >
-        Добавить оператора
-      </Button>
+      <>
+        <Button
+          onClick={AddNewOperator}
+          variant="contained"
+          color="primary"
+          className="addButton"
+        >
+          Добавить оператора
+        </Button>
+      </>
     )
   }
 }
@@ -375,6 +417,16 @@ const InfoReceiverListChip = (props) => {
     return null
 }
 
+const objRff = (index ) => {
+  return [`innKontr${index}`,
+    `kppKontr${index}`,
+    `nameKontr${index}`,
+    `lastnameKontr${index}`,
+    `firstnameKontr${index}`,
+    `patronymicKontr${index}`
+  ]
+}
+
 const styles = theme => ({
   divider: {
     margin: theme.spacing(1, 0, 2, 0)
@@ -410,14 +462,18 @@ const styles = theme => ({
   fileReceiverListMain: {
     maxWidth: '250px',
     position: 'absolute',
-    bottom: '25px',
-    left: '140px'
+    top: '207px',
+    right: '20px'
   },
   fileReceiverList: {
     maxWidth: '250px',
   },
   buttonStatusReceiverList: {
     maxHeight: '32px'
+  },
+  uploadReceiverList: {
+    display: 'flex',
+    justifyContent: 'space-between',
   }
 });
 

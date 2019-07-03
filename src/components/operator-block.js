@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, Divider, IconButton } from "@material-ui/core";
+import { Grid, Divider, IconButton, Card } from "@material-ui/core";
 import { OPERATORS } from "../constants/customer-form";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -24,6 +24,19 @@ const OperatorBlock = (props) => {
     },
     select: {
       marginBottom: theme.spacing(2)
+    },
+    paper: {
+      marginTop: '8px',
+      marginBottom: '8px',
+      maxWidth: '550px',
+      padding: '10px',
+      position: 'relative'
+    },
+    delOperator: {
+      position: "absolute",
+      right: "-5px",
+      top: "-4px",
+      zIndex: "1"
     }
   }));
 
@@ -40,12 +53,16 @@ const OperatorBlock = (props) => {
   const getNameComponent = () => {
     const { value, uploadReceiverList } = props;
     const innK = `innKontr${props.index}`
-    let nameF = false
+    let nameF = false // FIO
     let disable = true
 
     if (value[innK]) {
-      nameF = value[innK].length === 12 ? true : false
-      disable = value[innK].length === 10 ? false : true
+      let length = value[innK].length
+      nameF = length === 12 ? true : false
+      if (length === 10 || length === 12)
+        disable = uploadReceiverList
+      else
+        disable = true
     }
 
     if (nameF === false) {
@@ -65,8 +82,8 @@ const OperatorBlock = (props) => {
         <Grid container spacing={1}>
           <Grid item xs={12} sm={4}>
             <Field
-              required={!uploadReceiverList}
-              disabled={uploadReceiverList}
+              required={!disable}
+              disabled={disable}
               name={nameField.lastname}
               label="Фамилия"
               fullWidth
@@ -76,8 +93,8 @@ const OperatorBlock = (props) => {
           </Grid>
           <Grid item xs={12} sm={4}>
             <Field
-              required={!uploadReceiverList}
-              disabled={uploadReceiverList}
+              required={!disable}
+              disabled={disable}
               name={nameField.firstname}
               label="Имя"
               fullWidth
@@ -87,7 +104,7 @@ const OperatorBlock = (props) => {
           </Grid>
           <Grid item xs={12} sm={4}>
             <Field
-              disabled={uploadReceiverList}
+              disabled={disable}
               name={nameField.patronymic}
               label="Отчество"
               fullWidth
@@ -104,14 +121,17 @@ const OperatorBlock = (props) => {
   // начало инициализации
   const { value, uploadReceiverList } = props;
   const innK = `innKontr${props.index}`
-  let disable = true // для КПП
-  // подготовка завершена
-  if (value[innK] && value[innK].length === 10)
-      disable = false
+  let disable = true // для общий
+  let disableKpp = true // для КПП так как еще 1 проверка
 
+  if (value[innK] && value[innK].length === 10)
+      disableKpp = uploadReceiverList === true ? true : false
+  disable = uploadReceiverList
+  // подготовка завершена
   return (
-    <Grid container autoComplete="off" >
-      <div style={{position: "absolute", right: "10px", top: "5px"}}>
+    <Card className={classes.paper}>
+    <Grid container autoComplete="off">
+      <div className={classes.delOperator}>
           <IconButton
             // className={classes.delButton}
             color="primary"
@@ -124,8 +144,8 @@ const OperatorBlock = (props) => {
       <Grid container className={classes.grid} spacing={1}>
         <Grid item xs={12} sm={6}>
           <Field
-            required={!uploadReceiverList}
-            disabled={uploadReceiverList}
+            required={!disable}
+            disabled={disable}
             name={nameField.inn}
             label="ИНН"
             fullWidth
@@ -138,8 +158,8 @@ const OperatorBlock = (props) => {
             required
             name={nameField.kpp}
             label="КПП"
-            disabled={disable}
-            required={!disable}
+            disabled={disableKpp}
+            required={!disableKpp}
             fullWidth
             component={TextField}
             parse={formatStringByPattern("999999999")}
@@ -152,8 +172,8 @@ const OperatorBlock = (props) => {
       <Grid item xs={12}>
         <Field
           fullWidth
-          required={!uploadReceiverList}
-          disabled={uploadReceiverList}
+          required={!disable}
+          disabled={disable}
           name={nameField.oper}
           label="Выберете оператора"
           component={Select}
@@ -169,6 +189,7 @@ const OperatorBlock = (props) => {
       </Grid>
       <Divider className={classes.divider} />
     </Grid>
+    </Card>
   );
 }
 

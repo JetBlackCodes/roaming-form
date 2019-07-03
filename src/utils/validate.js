@@ -40,13 +40,13 @@ const validationEmail = ({ value }) => {
 };
 
 const validationGuid = ({ value }) => {
-  let guid = "";
-  if (!value) guid = "Обязательное поле";
-  if (value && value.length < 39) guid = "Некорректный идентификатор";
+  let id = "";
+  if (!value) id = "Обязательное поле";
+  if (value && value.length < 39) id = "Некорректный идентификатор";
   if (value && value.length > 3) {
-    if (value.substr(0, 3) !== "2AE") guid = "Некорректный идентификатор";
+    if (value.substr(0, 3) !== "2AE") id = "Некорректный идентификатор";
   }
-  return guid;
+  return id;
 };
 
 const validationName = ({ value }) => {
@@ -59,6 +59,6 @@ const distributor = {
   inn: validationInn,
   kpp: validationKpp,
   email: validationEmail,
-  guid: validationGuid,
+  id: validationGuid,
   name: validationName
 };
