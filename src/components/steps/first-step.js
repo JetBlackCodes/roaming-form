@@ -9,10 +9,10 @@ import {
   InputAdornment
 } from "@material-ui/core";
 import { Help, AttachFile } from "@material-ui/icons";
-import { TextField } from "final-form-material-ui";
-import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
 import { NameAndFIO } from "../name-and-fio";
+
+import { StyledTextField } from "../styled-text-field";
 
 class FirstStep extends Component {
   state = {
@@ -53,32 +53,25 @@ class FirstStep extends Component {
 
         <Grid container spacing={1}>
           <Grid item xs={12} sm={6}>
-            <Field
-              fullWidth
-              required
+            <StyledTextField
               name="inn"
-              component={TextField}
-              type="text"
-              parse={formatStringByPattern("999999999999")}
               label="ИНН"
-              style={{ minHeight: "70px" }}
+              parse={formatStringByPattern("999999999999")}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Field
-              fullWidth
+            <StyledTextField
+              name="kpp"
+              label="КПП"
+              parse={formatStringByPattern("999999999")}
               disabled={disable}
               required={!disable}
-              name="kpp"
-              component={TextField}
-              type="text"
-              parse={formatStringByPattern("999999999")}
-              label="КПП"
-              style={{ minHeight: "70px" }}
             />
           </Grid>
 
-          <NameAndFIO values={values} classes={classes} />
+          <Grid item xs={12}>
+            <NameAndFIO inn={values.inn} />
+          </Grid>
 
           <Popover
             onClose={this.handlePopoverClose}
@@ -110,12 +103,8 @@ class FirstStep extends Component {
           </Popover>
 
           <Grid item xs={12}>
-            <Field
-              fullWidth
-              required
+            <StyledTextField
               name="id"
-              component={TextField}
-              type="text"
               label="Идентификатор"
               parse={parse}
               InputProps={{
@@ -127,19 +116,10 @@ class FirstStep extends Component {
                   </InputAdornment>
                 )
               }}
-              style={{ minHeight: "70px" }}
             />
           </Grid>
           <Grid item xs={12}>
-            <Field
-              fullWidth
-              required
-              name="email"
-              component={TextField}
-              type="email"
-              label="E-mail"
-              style={{ minHeight: "70px" }}
-            />
+            <StyledTextField name="email" label="E-mail" type="email" />
           </Grid>
         </Grid>
       </>

@@ -1,71 +1,57 @@
-import React, { Component } from "react";
-import { TextField } from "final-form-material-ui";
-import { Field } from "react-final-form";
-import { Grid, FormControl, FormHelperText } from "@material-ui/core";
+import React from "react";
+import { Grid } from "@material-ui/core";
+import { StyledTextField } from "./styled-text-field";
 
 export const NameAndFIO = props => {
-  const { values, classes } = props;
-  let named = 0;
-  let disable = true;
+  const { inn, nameOfField, autoComplete } = props;
 
-  if (values && values.inn) {
-    named = values.inn.length === 12 ? 1 : 0;
-    disable = values.inn.length === 10 ? false : true;
+  if (nameOfField === undefined) {
+    var name = "name";
+    var lastname = "lastname";
+    var firstname = "firstname";
+    var patronymic = "patronymic";
+  } else ({ name, lastname, firstname, patronymic } = nameOfField);
+
+  if (inn) {
+    var isName = inn.length === 10 ? true : false;
+    var isFIO = inn.length === 12 ? true : false;
   }
 
-  if (named === 0) {
+  if (isName) {
     return (
-      <>
-        <Grid item xs={12}>
-          <Field
-            fullWidth
-            required={!disable}
-            disabled={disable}
-            name="name"
-            component={TextField}
-            type="text"
-            label="Наименование"
-            style={{ minHeight: "70px" }}
+      <StyledTextField
+        name={name}
+        label="Название организации"
+        autoComplete={autoComplete}
+      />
+    );
+  } else if (isFIO) {
+    return (
+      <Grid container spacing={1}>
+        <Grid item xs={12} sm={4}>
+          <StyledTextField name={lastname} label="Фамилия" autoComplete={autoComplete} />
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <StyledTextField name={firstname} label="Имя" autoComplete={autoComplete} />
+        </Grid>
+        <Grid item xs={12} sm={4}>
+          <StyledTextField
+            name={patronymic}
+            label="Отчество"            
+            required={false}
+            autoComplete={autoComplete}
           />
         </Grid>
-      </>
+      </Grid>
     );
   } else {
     return (
-      <>
-        <Grid item xs={4}>
-          <Field
-            fullWidth
-            required
-            name="lastname"
-            component={TextField}
-            type="text"
-            label="Фамилия"
-            style={{ minHeight: "70px" }}
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <Field
-            fullWidth
-            required
-            name="firstname"
-            component={TextField}
-            type="text"
-            label="Имя"
-            style={{ minHeight: "70px" }}
-          />
-        </Grid>
-        <Grid item xs={4}>
-          <Field
-            fullWidth
-            name="patronymic"
-            component={TextField}
-            type="text"
-            label="Отчетство"
-            style={{ minHeight: "70px" }}
-          />
-        </Grid>
-      </>
+      <StyledTextField
+        name="randName"
+        label="Название организации"
+        disabled={true}
+        required={false}
+      />
     );
   }
 };

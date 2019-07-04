@@ -1,14 +1,16 @@
 import React from "react";
-import { Grid, Divider, IconButton } from "@material-ui/core";
+import { Grid, IconButton } from "@material-ui/core";
 import { OPERATORS } from "../constants/customer-form";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { TextField, Select } from "final-form-material-ui";
+import { Select } from "final-form-material-ui";
 import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
 import MenuItem from "@material-ui/core/MenuItem";
 import Box from "@material-ui/core/Box";
-import { zIndex } from "material-ui/styles";
+
+import { StyledTextField } from "./styled-text-field";
+import { NameAndFIO } from "./name-and-fio";
 
 const OperatorBlock = props => {
   const useStyles = makeStyles(theme => ({
@@ -31,70 +33,7 @@ const OperatorBlock = props => {
   };
 
   const getNameComponent = () => {
-    const { value, uploadReceiverList } = props;
-    const innK = `innKontr${props.index}`;
-    let nameF = false;
-    let disable = true;
-
-    if (value[innK]) {
-      nameF = value[innK].length === 12 ? true : false;
-      disable = value[innK].length === 10 ? false : true;
-    }
-
-    if (nameF === false) {
-      return (
-        <Field
-          required={!disable}
-          disabled={disable}
-          name={nameField.name}
-          label="Название организации"
-          fullWidth
-          autoComplete="off"
-          component={TextField}
-          style={{minHeight: "70px"}} 
-        />
-      );
-    } else {
-      return (
-        <Grid container spacing={1}>
-          <Grid item xs={12} sm={4}>
-            <Field
-              required={!uploadReceiverList}
-              disabled={uploadReceiverList}
-              name={nameField.lastname}
-              label="Фамилия"
-              fullWidth
-              component={TextField}
-              style={{minHeight: "70px"}}
-              autoComplete="off"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Field
-              required={!uploadReceiverList}
-              disabled={uploadReceiverList}
-              name={nameField.firstname}
-              label="Имя"
-              fullWidth
-              component={TextField}
-              style={{minHeight: "70px"}}
-              autoComplete="off"
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Field
-              disabled={uploadReceiverList}
-              name={nameField.patronymic}
-              label="Отчество"
-              fullWidth
-              component={TextField}
-              style={{minHeight: "70px"}}
-              autoComplete="off"
-            />
-          </Grid>
-        </Grid>
-      );
-    }
+    return <NameAndFIO inn={props.value[`innKontr${props.index}`]} nameOfField={nameField} autoComplete="off"/>;
   };
 
   const classes = useStyles(); // глав. комп
@@ -113,10 +52,17 @@ const OperatorBlock = props => {
       marginTop="8px"
       marginBottom="10px"
       padding="8px"
-      style={{ position: "relative"}}
-    >      
+      style={{ position: "relative" }}
+    >
       <Grid container>
-        <div style={{ position: "absolute", right: "-5px", top: "-4px", zIndex: "1"}}>
+        <div
+          style={{
+            position: "absolute",
+            right: "-5px",
+            top: "-4px",
+            zIndex: "1"
+          }}
+        >
           <IconButton
             color="primary"
             onClick={props.actions.delOperator}
@@ -128,29 +74,22 @@ const OperatorBlock = props => {
         </div>
         <Grid container className={classes.grid} spacing={1}>
           <Grid item xs={12} sm={6}>
-            <Field
-              required={!uploadReceiverList}
-              disabled={uploadReceiverList}
+            <StyledTextField              
               name={nameField.inn}
               label="ИНН"
-              fullWidth
-              component={TextField}
               parse={formatStringByPattern("999999999999")}
-              style={{minHeight: "70px"}}
+              required={!uploadReceiverList}
+              disabled={uploadReceiverList}
               autoComplete="off"
             />
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Field
-              required
+            <StyledTextField
               name={nameField.kpp}
-              label="КПП"
+              label="КПП"              
+              parse={formatStringByPattern("999999999")}
               disabled={disable}
               required={!disable}
-              fullWidth
-              component={TextField}
-              parse={formatStringByPattern("999999999")}
-              style={{minHeight: "70px"}}
               autoComplete="off"
             />
           </Grid>
