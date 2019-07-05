@@ -27,7 +27,7 @@ import {
 
 import { validate } from "../utils/validate";
 import { Form } from "react-final-form";
-import readXlsxFile from 'read-excel-file'
+import readXlsxFile from "read-excel-file";
 
 import axios from "axios";
 
@@ -40,7 +40,6 @@ function getSteps() {
 }
 
 const getStepContent = ({
-  updateData,
   step,
   operators,
   dataMyOrganisation,
@@ -49,6 +48,7 @@ const getStepContent = ({
   disableKpp,
   upload,
   dop_sog,
+  chipDopSog,
   values,
   handleDelete,
   uploadReceiverfile,
@@ -65,10 +65,7 @@ const getStepContent = ({
           dataMyOrganisation={dataMyOrganisation}
           handleChangeRadio={handleChangeRadio}
           disableKpp={disableKpp}
-          dop_sog={dop_sog}
-          upload={upload}
           values={values}
-          handleDelete={handleDelete}
         />
       );
     case 1:
@@ -81,6 +78,9 @@ const getStepContent = ({
           objReceiverList={objReceiverList}
           disableFileUpload={disableReceiverFileUpload}
           handleDeleteReceiverList={handleDeleteReceiverList}
+          upload={upload}
+          chipDopSog={chipDopSog}
+          handleDelete={handleDelete}
         />
       );
     case 2:
@@ -106,145 +106,156 @@ class Checkout extends Component {
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
     dop_sog: {
-      name: '',
+      name: "",
       file: ""
     },
+    chipDopSog: "",
     errorText: "",
     open: false,
-    chipReceiverFileName: '',
+    chipReceiverFileName: "",
     objReceiverList: { all: 0, ip: 0, ul: 0, error: 0 },
     disableReceiverFileUpload: false,
-    receiverList: '',
-
+    receiverList: ""
   };
 
   upload = file => {
-    if (file.target.files[0].type !== 'application/pdf') {
-      this.setState({ errorText: 'Загрузить можно только .pdf', open: true })
-      return 0
+    // загрузка доп соглашения
+    if (file.target.files[0].type !== "application/pdf") {
+      this.setState({ errorText: "Загрузить можно только .pdf", open: true });
+      return 0;
     }
+    let filename = "";
+    if (file.target.files[0].name.length > 20)
+      filename = `${file.target.files[0].name.substr(0, 14)}...pdf`;
+    else filename = file.target.files[0].name;
+
     this.setState({
       dop_sog: {
         name: file.target.files[0].name,
         file: file.target.files[0]
-      }
+      },
+      chipDopSog: filename
     });
   };
 
-  updateData = value => {
-    this.setState({ operators: value });
-  };
-
   handleClose = event => {
+    // закрытие сообщений
     this.setState({ open: false });
   };
 
   handleBack = () => {
+    // прыдыдущий этап
     this.setState(state => ({
       activeStep: state.activeStep - 1
     }));
   };
 
   handleDelete = () => {
+    // удаление файла доп. соглашения
     this.setState({
-      dop_sog: { name: '', file: "" }
-    });
-  }
-
-  handleReset = () => {
-    this.setState({
-      activeStep: 0
+      dop_sog: { name: "", file: "" },
+      chipDopSog: ""
     });
   };
 
-  uploadReceiverfile = (event) => {
-    const true_type = [ 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel' ]
-    const file = event.target.files[0]
+  uploadReceiverfile = event => {
+    // загрузка списка контрагентов
+    const true_type = [
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.ms-excel"
+    ];
+    const file = event.target.files[0];
     if (file) {
-      let fileName = '' // имя в chip
-      let objReceiverList = { all: 0, ip: 0, ul: 0, error: 0 } // объект для анализа
-      if (event.target.files[0].type !== true_type[0] && event.target.files[0].type !== true_type[1])
-        this.setState({ openSnackbar: true, textSnackbar: 'Файл должен иметь расширение .xls или .xlsx' })
+      let fileName = ""; // имя в chip
+      let objReceiverList = { all: 0, ip: 0, ul: 0, error: 0 }; // объект для анализа
+      if (
+        event.target.files[0].type !== true_type[0] &&
+        event.target.files[0].type !== true_type[1]
+      )
+        this.setState({
+          openSnackbar: true,
+          textSnackbar: "Файл должен иметь расширение .xls или .xlsx"
+        });
       else {
-        readXlsxFile(event.target.files[0]).then((rows) => {
-          objReceiverList['all'] = rows.length - 1
+        readXlsxFile(event.target.files[0]).then(rows => {
+          objReceiverList["all"] = rows.length - 1;
           rows.map((item, index) => {
             if (index > 0) {
-              if (item[1].length === 10)
-                objReceiverList['ul'] ++
-              else if (item[1].length === 12)
-                objReceiverList['ip'] ++
-              else
-                objReceiverList['error'] ++
+              if (item[1].length === 10) objReceiverList["ul"]++;
+              else if (item[1].length === 12) objReceiverList["ip"]++;
+              else objReceiverList["error"]++;
             }
-          })
-          this.setState({ objReceiverList })
-        })
+          });
+          this.setState({ objReceiverList });
+        });
         if (file.name.length > 20) {
           if (file.type === true_type[0])
-            fileName = `${file.name.substr(0,13)}...xlsx`
-          else
-            fileName = `${file.name.substr(0,14)}...xls`
+            fileName = `${file.name.substr(0, 13)}...xlsx`;
+          else fileName = `${file.name.substr(0, 14)}...xls`;
         }
 
         this.setState({
           receiverList: file,
           disableReceiverFileUpload: true,
-          chipReceiverFileName: fileName,
-        })
+          chipReceiverFileName: fileName
+        });
       }
     }
-  }
+  };
 
   handleDeleteReceiverList = () => {
+    // удаление списка контрагентов
     this.setState({
       disableReceiverFileUpload: false,
-      receiverList: '' ,
-      chipReceiverFileName: '',
-    })
-  }
+      receiverList: "",
+      chipReceiverFileName: ""
+    });
+  };
 
   onSubmit = ffJson => {
     // final form json
-    const { activeStep, dataMyOrganisation, operators, dop_sog, receiverList } = this.state;
+    const {
+      activeStep,
+      dataMyOrganisation,
+      operators,
+      dop_sog,
+      receiverList
+    } = this.state;
     let dataMy = activeStep === 0 ? ffJson : dataMyOrganisation;
     this.setState({
       dataMyOrganisation: dataMy,
       operators: activeStep === 1 ? dataSort(ffJson) : operators,
       activeStep: activeStep < 2 ? activeStep + 1 : activeStep
     });
-    if (activeStep === 2 ) {
-      this.setState({ modal: true })
+    if (activeStep === 2) {
+      this.setState({ modal: true });
 
-      let data = {}
-      if (receiverList === '')
-        data = { sender: [dataMyOrganisation], receiver: operators }
-      else
-        data = { sender: [dataMyOrganisation] }
+      let data = {};
+      if (receiverList === "")
+        data = { sender: [dataMyOrganisation], receiver: operators };
+      else data = { sender: [dataMyOrganisation] };
 
       var dataForm = new FormData();
-      dataForm.set('data', JSON.stringify(data) );
+      dataForm.set("data", JSON.stringify(data));
 
-      if (dop_sog.file)
-        dataForm.append('agreement', dop_sog.file);
-      if (receiverList !== '')
-        dataForm.append('receiver_list', receiverList);
+      if (dop_sog.file) dataForm.append("agreement", dop_sog.file);
+      if (receiverList !== "") dataForm.append("receiver_list", receiverList);
 
       axios({
-        method: 'post',
+        method: "post",
         url: `http://roaming.api.staging.keydisk.ru/abonent`,
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data',
-         },
+          Accept: "application/json",
+          "Content-Type": "multipart/form-data"
+        },
         data: dataForm
-      })
-      .then(res => {
+      }).then(res => {
         // console.log(res);
-        if (res.data.status === 0) this.setState({ activeStep: activeStep + 1, modal: false })
-        else this.setState({ errorText: res.data.code, open: true, modal: false })
-      })
-
+        if (res.data.status === 0)
+          this.setState({ activeStep: activeStep + 1, modal: false });
+        else
+          this.setState({ errorText: res.data.code, open: true, modal: false });
+      });
     }
   };
 
@@ -257,13 +268,13 @@ class Checkout extends Component {
       errorText,
       disableKpp,
       dop_sog,
+      chipDopSog,
       open,
       chipReceiverFileName,
       objReceiverList,
       disableReceiverFileUpload,
       receiverList
     } = this.state;
-
     const steps = getSteps();
 
     return (
@@ -293,7 +304,6 @@ class Checkout extends Component {
                     ) : (
                       <>
                         {getStepContent({
-                          updateData: updateData,
                           step: activeStep,
                           operators,
                           dataMyOrganisation,
@@ -301,13 +311,15 @@ class Checkout extends Component {
                           disableKpp,
                           upload: this.upload,
                           dop_sog,
+                          chipDopSog,
                           values,
                           handleDelete: this.handleDelete,
                           uploadReceiverfile: this.uploadReceiverfile,
                           chipReceiverFileName,
                           objReceiverList,
                           disableReceiverFileUpload,
-                          handleDeleteReceiverList: this.handleDeleteReceiverList,
+                          handleDeleteReceiverList: this
+                            .handleDeleteReceiverList,
                           receiverList
                         })}
 
@@ -451,8 +463,7 @@ const dataSort = obj => {
     }
   }, obj);
 
-  if (newArr.length === 0)
-    newArr.push({ ...DEFAULT_OPERATOR })
+  if (newArr.length === 0) newArr.push({ ...DEFAULT_OPERATOR });
   // есть баг с возрващением на 2 шаг, если прикреплен файл, строки inn и тд нет, так как массив operator пустой
   // а таким образом мы убиваем баг
 

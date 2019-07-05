@@ -1,12 +1,8 @@
 import React from "react";
 import {
   Typography,
-  Divider,
   Button,
-  IconButton,
   Modal,
-  Fab,
-  TextField,
   Snackbar,
   Grid,
   Chip,
@@ -24,17 +20,19 @@ import {
 } from "../../constants/customer-form";
 import { AttachFile, Equalizer } from "@material-ui/icons";
 import OperatorBlock from "../operator-block";
+import { UploadButton } from "../upload-button";
+
 class SecondStep extends React.Component {
   state = {
     operators: this.props.operators,
     open: false,
     modalStyle: {
-      top: '50%',
-      left: '50%',
-      transform: 'translate(-50%, -50%)'
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)"
     },
     openSnackbar: false,
-    textSnackbar: '',
+    textSnackbar: "",
     openAnalyzReceiverList: false
   };
 
@@ -46,48 +44,59 @@ class SecondStep extends React.Component {
     });
   };
 
-  handleClose = () => { // modal
-    this.setState({ open: false })
-  }
+  handleClose = () => {
+    // modal
+    this.setState({ open: false });
+  };
 
-  handleOpen = () => { // modal
-    this.setState({ open: true })
-  }
+  handleOpen = () => {
+    // modal
+    this.setState({ open: true });
+  };
 
-  AddNewOperator = () => { // Добавление нового пользователя
+  AddNewOperator = () => {
+    // Добавление нового пользователя
     const { operators } = this.state;
     if (operators.length <= MAX_OPERATORS_COUNT) {
       operators.push({ ...DEFAULT_OPERATOR });
       this.setState({ operators });
     } else
-      this.setState({ openSnackbar: true, textSnackbar: 'Вы можете добавить только 100 операторов' })
+      this.setState({
+        openSnackbar: true,
+        textSnackbar: "Вы можете добавить только 100 операторов"
+      });
   };
 
-  DelOperator = index => () => { // удаление оператора
+  DelOperator = index => () => {
+    // удаление оператора
     let { operators } = this.state;
     if (operators.length > 1) {
       operators.splice(index, 1);
       this.setState({ operators });
     } else
-      this.setState({ openSnackbar: true, textSnackbar: 'Вы не можете удалить всех операторов!' })
+      this.setState({
+        openSnackbar: true,
+        textSnackbar: "Вы не можете удалить всех операторов!"
+      });
   };
 
-  handleCloseSnackbar = () => { // закрытие уведомления
+  handleCloseSnackbar = () => {
+    // закрытие уведомления
     this.setState({ openSnackbar: false });
-  }
+  };
 
   closeModalReceiverList = () => {
     this.setState({
       open: false,
       openAnalyzReceiverList: false
-    })
-    this.props.handleDeleteReceiverList()
-  }
+    });
+    this.props.handleDeleteReceiverList();
+  };
 
   openAnalyzReceiverList = () => {
-    const { openAnalyzReceiverList } = this.state
-    this.setState({ openAnalyzReceiverList: !openAnalyzReceiverList })
-  }
+    const { openAnalyzReceiverList } = this.state;
+    this.setState({ openAnalyzReceiverList: !openAnalyzReceiverList });
+  };
 
   render() {
     const {
@@ -97,24 +106,40 @@ class SecondStep extends React.Component {
       disableFileUpload,
       objReceiverList,
       chipFileName,
-    } = this.props
-    const { open,
+      upload,
+      chipDopSog,
+      handleDelete
+    } = this.props;
+    const {
+      open,
       modalStyle,
       openSnackbar,
       textSnackbar,
-      openAnalyzReceiverList
-    } = this.state
-    const vertical = 'top'
-    const horizontal = 'center'
+      openAnalyzReceiverList,
+      operators
+    } = this.state;
+    const vertical = "top";
+    const horizontal = "center";
 
     return (
       <>
-        <Typography variant="h6" gutterBottom>
-          Введите данные операторов
-        </Typography>
-        <Divider className={styles.divider} mb={1}/>
-        <div style={{position: "relative"}}>
-          {this.state.operators.map((item, index) => (
+        <Grid container>
+          <Grid item xs={12} sm={9}>
+            <Typography variant="h6" gutterBottom>
+              Введите данные операторов
+            </Typography>
+          </Grid>
+
+          <Grid item xs={12} sm={3} align="right">
+            <Button onClick={this.handleOpen}>
+              <AttachFile fontSize="small" />
+              Загрузить
+            </Button>
+          </Grid>
+        </Grid>
+
+        <div style={{ position: "relative" }}>
+          {operators.map((item, index) => (
             <OperatorBlock
               actions={{ delOperator: this.DelOperator(index) }}
               index={index}
@@ -122,6 +147,15 @@ class SecondStep extends React.Component {
               uploadReceiverList={disableFileUpload}
             />
           ))}
+
+          <UploadDopSoglash
+            operators={operators}
+            upload={upload}
+            classes={classes}
+            chipDopSog={chipDopSog}
+            handleDelete={handleDelete}
+            values={values}
+          />
         </div>
 
         <CheckTypeUploadReceiver
@@ -133,89 +167,152 @@ class SecondStep extends React.Component {
           handleOpen={this.handleOpen}
         />
 
-        <IconButton
-            className="addButton"
-            size="small"
-            onClick={this.handleOpen}
-          >
-            <AttachFile fontSize="small" />
-              Загрузить
-          </IconButton>
+        <Modal
+          aria-labelledby="simple-modal-title"
+          aria-describedby="simple-modal-description"
+          open={open}
+          onClose={this.handleClose}
+        >
+          <div style={modalStyle} className={classes.paper}>
+            <Typography variant="h6" id="modal-title">
+              Вы можете загрузить список контрагентов
+            </Typography>
+            <Typography variant="subtitle1" id="simple-modal-description">
+              Вы можете загрузить файл в формате .xls и xlsx если он сапостовим
+              с шаблоном
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              id="simple-modal-description"
+              align="center"
+            >
+              <a href="https://astral.ru/roaming/tempalates/abonent-receiver.xlsx">
+                Загрузить шаблон
+              </a>
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              id="simple-modal-description"
+              className={classes.error}
+            >
+              <em>
+                Обращаем Ваше внимание, что загрузка из файла удалит все
+                введеные данные контрагентов вручную
+              </em>
+            </Typography>
 
-          <Modal
-            aria-labelledby="simple-modal-title"
-            aria-describedby="simple-modal-description"
-            open={open}
-            onClose={this.handleClose}
-          >
-            <div style={modalStyle} className={classes.paper}>
-              <Typography variant="h6" id="modal-title">
-                Вы можете загрузить список контрагентов
-              </Typography>
-              <Typography variant="subtitle1" id="simple-modal-description">
-                Вы можете загрузить файл в формате .xls и xlsx если он сапостовим с шаблоном
-              </Typography>
-              <Typography variant="subtitle1" id="simple-modal-description" align='center'>
-                <a href="https://astral.ru/roaming/tempalates/abonent-receiver.xlsx">Загрузить шаблон</a>
-              </Typography>
-              <Typography variant="subtitle1" id="simple-modal-description" className={classes.error}>
-                <em>Обращаем Ваше внимание, что загрузка из файла
-                удалит все введеные данные контрагентов вручную</em>
-              </Typography>
+            <input
+              accept=".xls, .xlsx"
+              className={classes.input}
+              id="contained-button-file"
+              type="file"
+              onChange={uploadReceiverfile}
+              disabled={disableFileUpload}
+            />
+            <label htmlFor="contained-button-file">
+              <Button fullWidth component="span" disabled={disableFileUpload}>
+                <AttachFile className={classes.extendedIcon} />
+                Выбрать файл
+              </Button>
+            </label>
 
-              <input
-                accept=".xls, .xlsx"
-                className={classes.input}
-                id="contained-button-file"
-                type="file"
-                onChange={uploadReceiverfile}
-                disabled={disableFileUpload}
-              />
-              <label htmlFor="contained-button-file">
-                <Button
-                  fullWidth
-                  component="span"
-                  disabled={disableFileUpload}
-                >
-                  <AttachFile className={classes.extendedIcon} />
-                  Выбрать файл
-                </Button>
-              </label>
+            <InfoReceiverListChip // chip + button
+              open={disableFileUpload}
+              classes={classes}
+              handleDeleteReceiverList={this.closeModalReceiverList}
+              chipFileName={chipFileName}
+              openAnalyzReceiverList={this.openAnalyzReceiverList}
+            />
 
-              <InfoReceiverListChip // chip + button
-                open={disableFileUpload}
-                classes={classes}
-                handleDeleteReceiverList={this.closeModalReceiverList}
-                chipFileName={chipFileName}
-                openAnalyzReceiverList={this.openAnalyzReceiverList}
-              />
+            <AnalyzReceiverList // table analyz xls + xlsx
+              open={openAnalyzReceiverList}
+              objReceiverList={objReceiverList}
+            />
+          </div>
+        </Modal>
 
-              <AnalyzReceiverList // table analyz xls + xlsx
-                open={openAnalyzReceiverList}
-                objReceiverList={objReceiverList}
-              />
-
-            </div>
-          </Modal>
-
-          <Snackbar
-            anchorOrigin={{ vertical, horizontal }}
-            open={openSnackbar}
-            onClose={this.handleCloseSnackbar}
-            autoHideDuration={4000}
-            ContentProps={{
-              'aria-describedby': 'message-id',
-            }}
-            message={<span id="message-id">{textSnackbar}</span>}
-          />
-
-        </>
+        <Snackbar
+          anchorOrigin={{ vertical, horizontal }}
+          open={openSnackbar}
+          onClose={this.handleCloseSnackbar}
+          autoHideDuration={4000}
+          ContentProps={{
+            "aria-describedby": "message-id"
+          }}
+          message={<span id="message-id">{textSnackbar}</span>}
+        />
+      </>
     );
   }
 }
 
-const CheckTypeUploadReceiver = (props) => {
-  const { open, AddNewOperator, handleDeleteReceiverList, chipFileName, classes, handleOpen } = props
+const UploadDopSoglash = props => {
+  const {
+    upload,
+    classes,
+    chipDopSog,
+    handleDelete,
+    operators,
+    values
+  } = props;
+  let checkNeedDopSog = 0;
+
+  Object.keys(values).forEach(function(key) {
+    // пройдемся по объекту values rff
+    let value = this[key]; // key - имя артрибута, value - значение артрибута
+
+    if (key.indexOf("operatorKontr") !== -1) {
+      // просмотреть все "операторы" контрагентов введеных
+      if (value === "2BM" || value === "2AL" || value === "2BE")
+        // если контур или такском или тензор
+        checkNeedDopSog = 1;
+    }
+  }, values);
+
+  if (checkNeedDopSog === 1) {
+    return (
+      <>
+        <Grid item xs={12}>
+          <UploadButton upload={upload} />
+        </Grid>
+        <Files
+          name={chipDopSog}
+          classes={classes}
+          handleDelete={handleDelete}
+        />
+      </>
+    );
+  } else return null;
+};
+
+const Files = props => {
+  const { name, handleDelete, classes } = props;
+  if (name)
+    return (
+      <Chip
+        avatar={
+          <Avatar>
+            {" "}
+            <AttachFile />{" "}
+          </Avatar>
+        }
+        label={name}
+        className={classes.chip}
+        onDelete={handleDelete}
+      />
+    );
+  else return null;
+};
+
+const CheckTypeUploadReceiver = props => {
+  const {
+    open,
+    AddNewOperator,
+    handleDeleteReceiverList,
+    chipFileName,
+    classes,
+    handleOpen
+  } = props;
   if (open) {
     return (
       <Chip
@@ -231,23 +328,23 @@ const CheckTypeUploadReceiver = (props) => {
         className={classes.fileReceiverListMain}
         onClick={handleOpen}
       />
-    )
+    );
   } else {
     return (
       <Button
         onClick={AddNewOperator}
         variant="contained"
         color="primary"
-        className="addButton"
+        style={{ position: "absolute", bottom: "25px" }}
       >
         Добавить оператора
       </Button>
-    )
+    );
   }
-}
+};
 
-const AnalyzReceiverList = (props) => {
-  const { open, objReceiverList } = props
+const AnalyzReceiverList = props => {
+  const { open, objReceiverList } = props;
   if (open) {
     return (
       <Paper>
@@ -255,31 +352,35 @@ const AnalyzReceiverList = (props) => {
           <TableBody>
             <TableRow>
               <TableCell>Всего контрагентов</TableCell>
-              <TableCell align='right'>{objReceiverList.all}</TableCell>
+              <TableCell align="right">{objReceiverList.all}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Из них ЮЛ</TableCell>
-              <TableCell align='right'>{objReceiverList.ul}</TableCell>
+              <TableCell align="right">{objReceiverList.ul}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Из них ИП</TableCell>
-              <TableCell align='right'>{objReceiverList.ip}</TableCell>
+              <TableCell align="right">{objReceiverList.ip}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Из них некорректные</TableCell>
-              <TableCell align='right'>{objReceiverList.error}</TableCell>
+              <TableCell align="right">{objReceiverList.error}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </Paper>
-    )
-  }
-  else
-    return null
-}
+    );
+  } else return null;
+};
 
-const InfoReceiverListChip = (props) => {
-  const { open, classes, handleDeleteReceiverList, chipFileName, openAnalyzReceiverList } = props
+const InfoReceiverListChip = props => {
+  const {
+    open,
+    classes,
+    handleDeleteReceiverList,
+    chipFileName,
+    openAnalyzReceiverList
+  } = props;
   if (open) {
     return (
       <div className={classes.infoReceiverList}>
@@ -304,55 +405,47 @@ const InfoReceiverListChip = (props) => {
           <Equalizer />
         </Button>
       </div>
-    )
-  }
-  else
-    return null
-}
+    );
+  } else return null;
+};
 
 const styles = theme => ({
-  divider: {
-    margin: theme.spacing(1, 0, 2, 0)
-  },
-  button: {
-    margin: theme.spacing.unit
-  },
   paper: {
-    position: 'absolute',
+    position: "absolute",
     width: 400,
     backgroundColor: theme.palette.background.paper,
     boxShadow: theme.shadows[5],
     padding: theme.spacing(4),
-    outline: 'none',
-    display: 'flex',
-    justifyContent: 'center',
-    flexDirection: 'column'
+    outline: "none",
+    display: "flex",
+    justifyContent: "center",
+    flexDirection: "column"
   },
   error: {
-    color: '#9b111e'
+    color: "#9b111e"
   },
   extendedIcon: {
-    marginRight: theme.spacing(1),
+    marginRight: theme.spacing(1)
   },
   input: {
     display: "none"
   },
   infoReceiverList: {
-    marginTop: '5px',
-    display: 'flex',
-    justifyContent: 'space-around'
+    marginTop: "5px",
+    display: "flex",
+    justifyContent: "space-around"
   },
   fileReceiverListMain: {
-    maxWidth: '250px',
-    position: 'absolute',
-    bottom: '25px',
-    left: '140px'
+    maxWidth: "250px",
+    position: "absolute",
+    bottom: "25px",
+    left: "140px"
   },
   fileReceiverList: {
-    maxWidth: '250px',
+    maxWidth: "50px"
   },
   buttonStatusReceiverList: {
-    maxHeight: '32px'
+    maxHeight: "32px"
   }
 });
 
