@@ -21,6 +21,7 @@ import {
 import { AttachFile, Equalizer } from "@material-ui/icons";
 import OperatorBlock from "../operator-block";
 import { UploadButton } from "../upload-button";
+import { Field } from "react-final-form";
 
 class SecondStep extends React.Component {
   state = {
@@ -67,17 +68,33 @@ class SecondStep extends React.Component {
       });
   };
 
-  DelOperator = index => () => {
-    // удаление оператора
-    let { operators } = this.state;
+  DelOperator = index => () => { // удаление оператора
+    let operators = [ ...this.state.operators ] // клонируем operators
+    const { changeFinalForm, values } = this.props; // мутатор rff + values rff
+    let clearObj = objRff(index) // делаем запрос на чистый value с index'ом удаленного
+    const newObj = {} // новый allValues rff для замены
     if (operators.length > 1) {
-      operators.splice(index, 1);
-      this.setState({ operators });
-    } else
-      this.setState({
-        openSnackbar: true,
-        textSnackbar: "Вы не можете удалить всех операторов!"
-      });
+      operators.splice(index, 1); // удаляем из массива обработанных данных
+      this.setState({ operators }); // обновляем state operators
+      clearObj.map(item => changeFinalForm(item, undefined) ) // очищаем
+      let newIndex = 0 // новый index
+      Object.keys(values).forEach(key => { // проходим по allValues rff
+        const value = this[key]; // value keys rff
+        let defIndex = key.split("Kontr") // nameField rff + indexField rff. Example: defIndex['inn', 0]
+        if (defIndex[1] > index) { // если больше искомого index
+          newIndex = defIndex[1] - 1 // new index
+          let newKey = `${defIndex[0]}Kontr${newIndex}` // новое название ключа, для сдвига
+          newObj[newKey] = values[key] // задаем новый ключ
+        } else if (defIndex[1] < index) // если меньше нужного index - без изменений
+          newObj[key] = values[key]
+      }, values);
+      newIndex++ // Index на 1 выше
+      clearObj = objRff(newIndex) // делаем запрос на чистый rff Values нужного index
+      clearObj.map(item => newObj[item] = undefined ) // добавляем чтоб удалить лишние
+      // в newObj новый массив с нужными ключами и значениями
+      Object.keys(newObj).forEach(key => { changeFinalForm(key, newObj[key]) }, newObj) // перезаписываем allValues rff
+    } else // иначе ошибка (контрагент остался 1)
+      this.setState({ openSnackbar: true, textSnackbar: 'Вы не можете удалить всех контрагентов!' })
   };
 
   handleCloseSnackbar = () => {
@@ -98,6 +115,20 @@ class SecondStep extends React.Component {
     this.setState({ openAnalyzReceiverList: !openAnalyzReceiverList });
   };
 
+  preloadReceiverList = (event) => {
+    const true_type = [ 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel' ]
+    const file = event.target.files[0]
+    const { uploadReceiverfile, values, changeFinalForm } = this.props
+    if (file) {
+      if (file.type === true_type[0] || file.type === true_type[1]) {
+        this.setState({ operators: [{ ...DEFAULT_OPERATOR }] })
+        this.props.uploadReceiverfile(values, changeFinalForm, file)
+      } else {
+        this.setState({ openSnackbar: true, textSnackbar: 'Файл должен быть .xls или .xlsx' })
+      }
+    }
+  }
+
   render() {
     const {
       values,
@@ -108,10 +139,10 @@ class SecondStep extends React.Component {
       chipFileName,
       upload,
       chipDopSog,
-      handleDelete
-    } = this.props;
-    const {
-      open,
+      handleDelete,
+      changeFinalForm
+    } = this.props
+    const { open,
       modalStyle,
       openSnackbar,
       textSnackbar,
@@ -123,22 +154,20 @@ class SecondStep extends React.Component {
 
     return (
       <>
-        <Grid container>
-          <Grid item xs={12} sm={9}>
-            <Typography variant="h6" gutterBottom>
-              Введите данные операторов
-            </Typography>
-          </Grid>
-
-          <Grid item xs={12} sm={3} align="right">
-            <Button onClick={this.handleOpen}>
+        <Typography variant="h6" gutterBottom className={classes.uploadReceiverList}>
+          Введите данные операторов
+          { !disableFileUpload &&
+            <Button
+              onClick={this.handleOpen}
+            >
               <AttachFile fontSize="small" />
-              Загрузить
+                Загрузить список
             </Button>
-          </Grid>
-        </Grid>
+          }
 
+        </Typography>
         <div style={{ position: "relative" }}>
+        <Divider className={styles.divider} mb={1}/>
           {operators.map((item, index) => (
             <OperatorBlock
               actions={{ delOperator: this.DelOperator(index) }}
@@ -155,6 +184,7 @@ class SecondStep extends React.Component {
             chipDopSog={chipDopSog}
             handleDelete={handleDelete}
             values={values}
+            uploadReceiverList={disableFileUpload}
           />
         </div>
 
@@ -167,62 +197,45 @@ class SecondStep extends React.Component {
           handleOpen={this.handleOpen}
         />
 
-        <Modal
-          aria-labelledby="simple-modal-title"
-          aria-describedby="simple-modal-description"
-          open={open}
-          onClose={this.handleClose}
-        >
-          <div style={modalStyle} className={classes.paper}>
-            <Typography variant="h6" id="modal-title">
-              Вы можете загрузить список контрагентов
-            </Typography>
-            <Typography variant="subtitle1" id="simple-modal-description">
-              Вы можете загрузить файл в формате .xls и xlsx если он сапостовим
-              с шаблоном
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              id="simple-modal-description"
-              align="center"
-            >
-              <a href="https://astral.ru/roaming/tempalates/abonent-receiver.xlsx">
-                Загрузить шаблон
-              </a>
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              id="simple-modal-description"
-              className={classes.error}
-            >
-              <em>
-                Обращаем Ваше внимание, что загрузка из файла удалит все
-                введеные данные контрагентов вручную
-              </em>
-            </Typography>
+          <Modal
+            aria-labelledby="simple-modal-title"
+            aria-describedby="simple-modal-description"
+            open={open}
+            onClose={this.handleClose}
+          >
+            <div style={modalStyle} className={classes.paper}>
+              <Typography variant="h6" id="modal-title">
+                Вы можете загрузить список контрагентов
+              </Typography>
+              <Typography variant="subtitle1" id="simple-modal-description">
+                Вы можете загрузить файл в формате .xls и xlsx если он сапостовим с шаблоном
+              </Typography>
+              <Typography variant="subtitle1" id="simple-modal-description" align='center'>
+                <a href="https://astral.ru/roaming/tempalates/abonent-receiver.xlsx">Загрузить шаблон</a>
+              </Typography>
+              <Typography variant="subtitle1" id="simple-modal-description" className={classes.error}>
+                <em>Обращаем Ваше внимание, что загрузка из файла
+                удалит все введеные данные контрагентов вручную</em>
+              </Typography>
 
-            <input
-              accept=".xls, .xlsx"
-              className={classes.input}
-              id="contained-button-file"
-              type="file"
-              onChange={uploadReceiverfile}
-              disabled={disableFileUpload}
-            />
-            <label htmlFor="contained-button-file">
-              <Button fullWidth component="span" disabled={disableFileUpload}>
-                <AttachFile className={classes.extendedIcon} />
-                Выбрать файл
-              </Button>
-            </label>
-
-            <InfoReceiverListChip // chip + button
-              open={disableFileUpload}
-              classes={classes}
-              handleDeleteReceiverList={this.closeModalReceiverList}
-              chipFileName={chipFileName}
-              openAnalyzReceiverList={this.openAnalyzReceiverList}
-            />
+              <input
+                accept=".xls, .xlsx"
+                className={classes.input}
+                id="contained-button-file"
+                type="file"
+                onChange={this.preloadReceiverList}
+                disabled={disableFileUpload}
+              />
+              <label htmlFor="contained-button-file">
+                <Button
+                  fullWidth
+                  component="span"
+                  disabled={disableFileUpload}
+                >
+                  <AttachFile className={classes.extendedIcon} />
+                  Выбрать файл
+                </Button>
+              </label>
 
             <AnalyzReceiverList // table analyz xls + xlsx
               open={openAnalyzReceiverList}
@@ -246,16 +259,9 @@ class SecondStep extends React.Component {
   }
 }
 
-const UploadDopSoglash = props => {
-  const {
-    upload,
-    classes,
-    chipDopSog,
-    handleDelete,
-    operators,
-    values
-  } = props;
-  let checkNeedDopSog = 0;
+const UploadDopSoglash = (props) => {
+  const { upload, classes, chipDopSog, handleDelete, operators, values, uploadReceiverList } = props
+  let checkNeedDopSog = 0
 
   Object.keys(values).forEach(function(key) {
     // пройдемся по объекту values rff
@@ -268,6 +274,9 @@ const UploadDopSoglash = props => {
         checkNeedDopSog = 1;
     }
   }, values);
+
+  if (uploadReceiverList === true)
+    checkNeedDopSog = 1
 
   if (checkNeedDopSog === 1) {
     return (
@@ -409,6 +418,16 @@ const InfoReceiverListChip = props => {
   } else return null;
 };
 
+const objRff = (index ) => {
+  return [`innKontr${index}`,
+    `kppKontr${index}`,
+    `nameKontr${index}`,
+    `lastnameKontr${index}`,
+    `firstnameKontr${index}`,
+    `patronymicKontr${index}`
+  ]
+}
+
 const styles = theme => ({
   paper: {
     position: "absolute",
@@ -436,16 +455,20 @@ const styles = theme => ({
     justifyContent: "space-around"
   },
   fileReceiverListMain: {
-    maxWidth: "250px",
-    position: "absolute",
-    bottom: "25px",
-    left: "140px"
+    maxWidth: '250px',
+    position: 'absolute',
+    top: '207px',
+    right: '20px'
   },
   fileReceiverList: {
     maxWidth: "50px"
   },
   buttonStatusReceiverList: {
     maxHeight: "32px"
+  },
+  uploadReceiverList: {
+    display: 'flex',
+    justifyContent: 'space-between',
   }
 });
 
