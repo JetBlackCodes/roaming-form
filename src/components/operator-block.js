@@ -21,11 +21,11 @@ const OperatorBlock = props => {
       marginBottom: theme.spacing(2)
     },
     paper: {
-      marginTop: '8px',
-      marginBottom: '8px',
-      maxWidth: '550px',
-      padding: '10px',
-      position: 'relative'
+      marginTop: "8px",
+      marginBottom: "8px",
+      maxWidth: "550px",
+      padding: "10px",
+      position: "relative"
     },
     delOperator: {
       position: "absolute",
@@ -46,30 +46,33 @@ const OperatorBlock = props => {
   };
 
   const getNameComponent = () => {
-    return <NameAndFIO inn={props.value[`innKontr${props.index}`]} nameOfField={nameField} autoComplete="off"/>;
+    return (
+      <NameAndFIO
+        inn={props.value[`innKontr${props.index}`]}
+        nameOfField={nameField}
+        autoComplete="off"
+      />
+    );
   };
 
   const classes = useStyles(); // глав. комп
   // начало инициализации
   const { value, uploadReceiverList } = props;
-  const innK = `innKontr${props.index}`
-  let disable = true // для общий
-  let disableKpp = true // для КПП так как еще 1 проверка
+  const innK = `innKontr${props.index}`;
+  let disable = true; // для общий
+  let disableKpp = true; // для КПП так как еще 1 проверка
 
   if (value[innK] && value[innK].length === 10)
-      disableKpp = uploadReceiverList === true ? true : false
-  disable = uploadReceiverList
+    disableKpp = uploadReceiverList === true ? true : false;
+  disable = uploadReceiverList;
   // подготовка завершена
-<<<<<<<
+
   if (value[innK] && value[innK].length === 10) disable = false;
 
-=======
-
->>>>>>>
   return (
     <Card className={classes.paper}>
-    <Grid container autoComplete="off">
-      <div className={classes.delOperator}>
+      <Grid container autoComplete="off">
+        <div className={classes.delOperator}>
           <IconButton
             color="primary"
             onClick={props.actions.delOperator}
@@ -81,7 +84,7 @@ const OperatorBlock = props => {
         </div>
         <Grid container className={classes.grid} spacing={1}>
           <Grid item xs={12} sm={6}>
-            <StyledTextField              
+            <StyledTextField
               name={nameField.inn}
               label="ИНН"
               parse={formatStringByPattern("999999999999")}
@@ -93,7 +96,7 @@ const OperatorBlock = props => {
           <Grid item xs={12} sm={6}>
             <StyledTextField
               name={nameField.kpp}
-              label="КПП"              
+              label="КПП"
               parse={formatStringByPattern("999999999")}
               disabled={disable}
               required={!disable}
@@ -106,51 +109,23 @@ const OperatorBlock = props => {
 
         <Grid item xs={12}>
           <Field
+            fullWidth
             required={!disable}
             disabled={disable}
-            name={nameField.inn}
-            label="ИНН"
-            fullWidth
-            component={TextField}
-            parse={formatStringByPattern("999999999999")}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <Field
-            required
-            name={nameField.kpp}
-            label="КПП"
-            disabled={disableKpp}
-            required={!disableKpp}
-            fullWidth
-            component={TextField}
-            parse={formatStringByPattern("999999999")}
-          />
+            name={nameField.oper}
+            label="Выберете оператора"
+            component={Select}
+            formControlProps={{ fullWidth: true }}
+            className={classes.select}
+          >
+            {OPERATORS.map(option => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </Field>
         </Grid>
       </Grid>
-
-      { getNameComponent() }
-
-      <Grid item xs={12}>
-        <Field
-          fullWidth
-          required={!disable}
-          disabled={disable}
-          name={nameField.oper}
-          label="Выберете оператора"
-          component={Select}
-          formControlProps={{ fullWidth: true }}
-          className={classes.select}
-        >
-          {OPERATORS.map(option => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </Field>
-      </Grid>
-      <Divider className={classes.divider} />
-    </Grid>
     </Card>
   );
 };

@@ -167,7 +167,7 @@ class SecondStep extends React.Component {
 
         </Typography>
         <div style={{ position: "relative" }}>
-        <Divider className={styles.divider} mb={1}/>
+        {/* <Divider className={styles.divider} mb={1}/> */}
           {operators.map((item, index) => (
             <OperatorBlock
               actions={{ delOperator: this.DelOperator(index) }}
