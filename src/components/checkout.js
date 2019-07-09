@@ -282,7 +282,11 @@ class Checkout extends Component {
       <Form
         decorators={[this.bindFormApi]}
         onSubmit={this.onSubmit}
-        validate={validate(this.state.dataMyOrganisation.radioValue)}
+        initialValues={{
+          sender: [{}],
+          receiver: [{}]
+        }}
+        validate={validate}
         render={({ handleSubmit, reset, submitting, pristine, values, form }) => {
           const { change } = form
           return (
