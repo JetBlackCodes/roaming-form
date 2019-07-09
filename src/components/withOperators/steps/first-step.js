@@ -189,7 +189,7 @@ class FirstStep extends Component {
                     variant='contained'
                     color='primary'
                     size='small'
-                    onClick={() => fields.push()}
+                    onClick={() => { if (fields.length <= 100) fields.push() }}
                   >
                     Добавить контрагента
                   </Button>

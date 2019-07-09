@@ -140,7 +140,7 @@ const styles = theme => ({
   },
   paperPopper: {
     padding: 10,
-    background: theme.palette.primary.light,
+    background: theme.palette.primary.white,
     color: "#000",
     maxWidth: 800
   },
