@@ -32,7 +32,6 @@ class FirstStep extends Component {
     const open = Boolean(anchorEl);
     const {
       classes,
-      handleChangeRadio,
       dataMyOrganisation,
       disableKpp,
       dop_sog,
@@ -101,7 +100,6 @@ class FirstStep extends Component {
               </Typography>
             </Paper>
           </Popover>
-
           <Grid item xs={12}>
             <StyledTextField
               name="id"

@@ -1,5 +1,5 @@
 import React from "react";
-import { Grid, IconButton } from "@material-ui/core";
+import { Grid, IconButton, Card } from "@material-ui/core";
 import { OPERATORS } from "../constants/customer-form";
 import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -19,6 +19,19 @@ const OperatorBlock = props => {
     },
     select: {
       marginBottom: theme.spacing(2)
+    },
+    paper: {
+      marginTop: "8px",
+      marginBottom: "8px",
+      maxWidth: "550px",
+      padding: "10px",
+      position: "relative"
+    },
+    delOperator: {
+      position: "absolute",
+      right: "-5px",
+      top: "-4px",
+      zIndex: "1"
     }
   }));
 
@@ -33,36 +46,33 @@ const OperatorBlock = props => {
   };
 
   const getNameComponent = () => {
-    return <NameAndFIO inn={props.value[`innKontr${props.index}`]} nameOfField={nameField} autoComplete="off"/>;
+    return (
+      <NameAndFIO
+        inn={props.value[`innKontr${props.index}`]}
+        nameOfField={nameField}
+        autoComplete="off"
+      />
+    );
   };
 
   const classes = useStyles(); // глав. комп
   // начало инициализации
   const { value, uploadReceiverList } = props;
   const innK = `innKontr${props.index}`;
-  let disable = true; // для КПП
+  let disable = true; // для общий
+  let disableKpp = true; // для КПП так как еще 1 проверка
+
+  if (value[innK] && value[innK].length === 10)
+    disableKpp = uploadReceiverList === true ? true : false;
+  disable = uploadReceiverList;
   // подготовка завершена
+
   if (value[innK] && value[innK].length === 10) disable = false;
 
   return (
-    <Box
-      border={0.5}
-      borderRadius={16}
-      borderColor="grey.300"
-      marginTop="8px"
-      marginBottom="10px"
-      padding="8px"
-      style={{ position: "relative" }}
-    >
-      <Grid container>
-        <div
-          style={{
-            position: "absolute",
-            right: "-5px",
-            top: "-4px",
-            zIndex: "1"
-          }}
-        >
+    <Card className={classes.paper}>
+      <Grid container autoComplete="off">
+        <div className={classes.delOperator}>
           <IconButton
             color="primary"
             onClick={props.actions.delOperator}
@@ -74,7 +84,7 @@ const OperatorBlock = props => {
         </div>
         <Grid container className={classes.grid} spacing={1}>
           <Grid item xs={12} sm={6}>
-            <StyledTextField              
+            <StyledTextField
               name={nameField.inn}
               label="ИНН"
               parse={formatStringByPattern("999999999999")}
@@ -86,7 +96,7 @@ const OperatorBlock = props => {
           <Grid item xs={12} sm={6}>
             <StyledTextField
               name={nameField.kpp}
-              label="КПП"              
+              label="КПП"
               parse={formatStringByPattern("999999999")}
               disabled={disable}
               required={!disable}
@@ -100,8 +110,8 @@ const OperatorBlock = props => {
         <Grid item xs={12}>
           <Field
             fullWidth
-            required={!uploadReceiverList}
-            disabled={uploadReceiverList}
+            required={!disable}
+            disabled={disable}
             name={nameField.oper}
             label="Выберете оператора"
             component={Select}
@@ -116,7 +126,7 @@ const OperatorBlock = props => {
           </Field>
         </Grid>
       </Grid>
-    </Box>
+    </Card>
   );
 };
 
