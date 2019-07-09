@@ -10,9 +10,10 @@ export const validate = values => {
         Object.keys(item).forEach(keyItem => {
           let value = values[key][index][keyItem]
           let objvalues = values[key][index]
+          let type = values[key]
 
           if (distributor[keyItem]) {
-            error = distributor[keyItem]({ value, objvalues });
+            error = distributor[keyItem]({ value, objvalues, type });
             if (error) {
               if (!errors[key])
                 errors[key] = []
@@ -31,7 +32,7 @@ export const validate = values => {
   return errors;
 };
 
-const validationInn = ({ value, objvalues }) => {
+const validationInn = ({ value, objvalues, type }) => {
   let inn = "";
   if (isNaN(value)) inn = "Некорректный ИНН";
   if (!value) inn = "Обязательное поле";
@@ -42,7 +43,7 @@ const validationInn = ({ value, objvalues }) => {
   return inn;
 };
 
-const validationKpp = ({ value, objvalues }) => {
+const validationKpp = ({ value, objvalues, type }) => {
   let kpp = "";
   if (value && objvalues.inn && objvalues.inn.length === 10) {
     if (value.length !== 9)
@@ -51,17 +52,17 @@ const validationKpp = ({ value, objvalues }) => {
   return kpp;
 };
 
-const validationGuid = ({ value, objvalues }) => {
+const validationGuid = ({ value, objvalues, type }) => {
   let id = "";
   if (!value) id = "Обязательное поле";
   if (value && value.length < 39) id = "Некорректный идентификатор";
   if (value && value.length > 3) {
-    if (value.substr(0, 3) !== "2AE") id = "Некорректный идентификатор";
+    if (value.substr(0, 3) !== "2AE" && type === 'receiver') id = "Некорректный идентификатор";
   }
   return id;
 };
 
-const validationName = ({ value, objvalues }) => {
+const validationName = ({ value, objvalues, type }) => {
   let name = "";
   if (objvalues.inn && objvalues.inn.length === 10) {
     if (!value)
@@ -70,7 +71,7 @@ const validationName = ({ value, objvalues }) => {
   return name;
 };
 
-const validationLastName = ({ value, objvalues }) => {
+const validationLastName = ({ value, objvalues, type }) => {
   let lastname = "";
   if (objvalues.inn && objvalues.inn.length === 12) {
     if (!value)
@@ -79,7 +80,7 @@ const validationLastName = ({ value, objvalues }) => {
   return lastname;
 };
 
-const validationFirstName = ({ value, objvalues }) => {
+const validationFirstName = ({ value, objvalues, type }) => {
   let firstname = "";
   if (objvalues.inn && objvalues.inn.length === 12) {
     if (!value)
