@@ -27,7 +27,7 @@ import {
 
 import { validate } from "../utils/validate";
 import { Form } from "react-final-form";
-import readXlsxFile from 'read-excel-file'
+import readXlsxFile from "read-excel-file";
 
 import axios from "axios";
 
@@ -101,34 +101,33 @@ const getStepContent = ({
 
 class Checkout extends Component {
   state = {
-    activeStep: 1,
+    activeStep: 0,
     operators: [{ ...DEFAULT_OPERATOR }],
     dataMyOrganisation: { ...MY_ORGANISATION_DEFAULT_DATA },
     disableKpp: false,
     dop_sog: {
-      name: '',
+      name: "",
       file: ""
     },
-    chipDopSog: '',
+    chipDopSog: "",
     errorText: "",
     open: false,
-    chipReceiverFileName: '',
+    chipReceiverFileName: "",
     objReceiverList: { all: 0, ip: 0, ul: 0, error: 0 },
     disableReceiverFileUpload: false,
-    receiverList: '',
-
+    receiverList: ""
   };
 
-  upload = file => { // загрузка доп соглашения
-    if (file.target.files[0].type !== 'application/pdf') {
-      this.setState({ errorText: 'Загрузить можно только .pdf', open: true })
-      return 0
+  upload = file => {
+    // загрузка доп соглашения
+    if (file.target.files[0].type !== "application/pdf") {
+      this.setState({ errorText: "Загрузить можно только .pdf", open: true });
+      return 0;
     }
-    let filename = ''
+    let filename = "";
     if (file.target.files[0].name.length > 20)
-      filename = `${file.target.files[0].name.substr(0,14)}...pdf`
-    else
-      filename = file.target.files[0].name
+      filename = `${file.target.files[0].name.substr(0, 14)}...pdf`;
+    else filename = file.target.files[0].name;
 
     this.setState({
       dop_sog: {
@@ -139,22 +138,25 @@ class Checkout extends Component {
     });
   };
 
-  handleClose = event => { // закрытие сообщений
+  handleClose = event => {
+    // закрытие сообщений
     this.setState({ open: false });
   };
 
-  handleBack = () => { // прыдыдущий этап
+  handleBack = () => {
+    // прыдыдущий этап
     this.setState(state => ({
       activeStep: state.activeStep - 1
     }));
   };
 
-  handleDelete = () => { // удаление файла доп. соглашения
+  handleDelete = () => {
+    // удаление файла доп. соглашения
     this.setState({
-      dop_sog: { name: '', file: '' },
-      chipDopSog: '',
-    })
-  }
+      dop_sog: { name: "", file: "" },
+      chipDopSog: ""
+    });
+  };
 
   uploadReceiverfile = (values, changeFinalForm, file) => { // загрузка списка контрагентов
     const true_type = [ 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel' ]
@@ -196,54 +198,59 @@ class Checkout extends Component {
     }, values);
   }
 
-  handleDeleteReceiverList = () => { // удаление списка контрагентов
+  handleDeleteReceiverList = () => {
+    // удаление списка контрагентов
     this.setState({
       disableReceiverFileUpload: false,
-      receiverList: '' ,
-      chipReceiverFileName: '',
-    })
-  }
+      receiverList: "",
+      chipReceiverFileName: ""
+    });
+  };
 
-  onSubmit = ffJson => { // final form json
-    const { activeStep, dataMyOrganisation, operators, dop_sog, receiverList } = this.state;
+  onSubmit = ffJson => {
+    // final form json
+    const {
+      activeStep,
+      dataMyOrganisation,
+      operators,
+      dop_sog,
+      receiverList
+    } = this.state;
     let dataMy = activeStep === 0 ? ffJson : dataMyOrganisation;
     this.setState({
       dataMyOrganisation: dataMy,
       operators: activeStep === 1 ? dataSort(ffJson) : operators,
       activeStep: activeStep < 2 ? activeStep + 1 : activeStep
     });
-    if (activeStep === 2 ) {
-      this.setState({ modal: true })
+    if (activeStep === 2) {
+      this.setState({ modal: true });
 
-      let data = {}
-      if (receiverList === '')
-        data = { sender: [dataMyOrganisation], receiver: operators }
-      else
-        data = { sender: [dataMyOrganisation] }
+      let data = {};
+      if (receiverList === "")
+        data = { sender: [dataMyOrganisation], receiver: operators };
+      else data = { sender: [dataMyOrganisation] };
 
       var dataForm = new FormData();
-      dataForm.set('data', JSON.stringify(data) );
+      dataForm.set("data", JSON.stringify(data));
 
-      if (dop_sog.file)
-        dataForm.append('agreement', dop_sog.file);
-      if (receiverList !== '')
-        dataForm.append('receiver_list', receiverList);
+      if (dop_sog.file) dataForm.append("agreement", dop_sog.file);
+      if (receiverList !== "") dataForm.append("receiver_list", receiverList);
 
       axios({
-        method: 'post',
+        method: "post",
         url: `http://roaming.api.staging.keydisk.ru/abonent`,
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data',
-         },
+          Accept: "application/json",
+          "Content-Type": "multipart/form-data"
+        },
         data: dataForm
-      })
-      .then(res => {
+      }).then(res => {
         // console.log(res);
-        if (res.data.status === 0) this.setState({ activeStep: activeStep + 1, modal: false })
-        else this.setState({ errorText: res.data.code, open: true, modal: false })
-      })
-
+        if (res.data.status === 0)
+          this.setState({ activeStep: activeStep + 1, modal: false });
+        else
+          this.setState({ errorText: res.data.code, open: true, modal: false });
+      });
     }
   };
 
@@ -421,8 +428,8 @@ const styles = theme => ({
     marginBottom: theme.spacing.unit * 3,
     padding: theme.spacing.unit * 2,
     [theme.breakpoints.up(600 + theme.spacing.unit * 3 * 2)]: {
-      marginTop: theme.spacing.unit * 6,
-      marginBottom: theme.spacing.unit * 6,
+      marginTop: "30px",
+      marginBottom: "35px",
       padding: theme.spacing.unit * 3
     },
     position: "relative"
@@ -462,8 +469,7 @@ const dataSort = obj => {
     }
   }, obj);
 
-  if (newArr.length === 0)
-    newArr.push({ ...DEFAULT_OPERATOR })
+  if (newArr.length === 0) newArr.push({ ...DEFAULT_OPERATOR });
   // есть баг с возрващением на 2 шаг, если прикреплен файл, строки inn и тд нет, так как массив operator пустой
   // а таким образом мы убиваем баг
 
