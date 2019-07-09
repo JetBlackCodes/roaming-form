@@ -53,7 +53,7 @@ class WithOperators extends Component {
          },
         data: dataForm
       })
-      .then(res => {
+      .then((res, errors) => {
         let text = res.data.status === 0 ? 'Успешная авторизация' : res.data.text
         let error = res.data.status === 0 ? false : true
 
@@ -62,8 +62,19 @@ class WithOperators extends Component {
           open: true,
           textSnackbar: text,
           error: error,
-          activeStep: 0,
+          activeStep: error === true ? -1 : 0,
           nameKontr: res.data.status === 0 ? res.data.text : undefined
+        })
+      })
+      .catch(errors => {
+        let text = 'Сервер временно не отвечает'
+        let error = true
+
+        this.setState({
+          disabled: false,
+          open: true,
+          textSnackbar: text,
+          error: error,
         })
       })
     } else if (activeStep === 2) {
@@ -125,6 +136,29 @@ class WithOperators extends Component {
         withCredentials: true
       })
       .then(res => {
+        const errorTemplate = {
+           inn: 'ИНН',
+           kpp: 'КПП',
+           name: 'Название организации',
+           lastname: 'Имя',
+           firstname: 'Фамилия',
+           patronymic: 'Отчество',
+           id: 'Идентификатор',
+           number: 'Номер заявки',
+        }
+        let lastError = {id: '', text: '', step: ''}
+        Object.keys(res).forEach(item => {
+          if ((typeof res[item]) === 'object') {
+           res[item].map((itemIndex, index) => {
+             Object.keys(res[item][index]).forEach(key => {
+               lastError = {id: key, text: itemIndex[key], step: item === 'receiver' ? 2 : 1}
+             })
+           })
+          }
+        })
+        if (lastError.id)
+          this.setState({ open: true, textSnackbar: `Допущена ошибка на ${lastError.step} шаге. ${errorTemplate[lastError.id]}: ${lastError.text}`, error: true })
+        // console.log(lastError)
         console.log(res)
       })
     }
@@ -221,7 +255,7 @@ class WithOperators extends Component {
           mutators={{
             ...arrayMutators
           }}
-
+          validate={validate}
           decorators={[this.bindFormApi]}
           render={({
             handleSubmit,
@@ -234,7 +268,7 @@ class WithOperators extends Component {
             touched
           }) => {
             const { change, submit } = form
-            console.log(errors)
+
             return (
               <form onSubmit={handleSubmit}>
 
