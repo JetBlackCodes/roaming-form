@@ -24,7 +24,6 @@ const validationInn = ({ value, radioValue }) => {
 
 const validationKpp = ({ value, radioValue }) => {
   let kpp = "";
-  if (!value && radioValue === "UL") kpp = "Обязательное поле";
   if (value && value.length !== 9) kpp = "Некорректный КПП";
   return kpp;
 };
