@@ -1,17 +1,18 @@
-export const validate = radioValue => values => {
+export const validate = values => {
   let errors = {};
   let error = "";
+  console.log(values)
   Object.keys(values).forEach(function(key) {
     let value = this[key];
     if (distributor[key]) {
-      error = distributor[key]({ value, radioValue });
+      error = distributor[key]( value );
       if (error) errors[key] = error;
     }
   }, values);
   return errors;
 };
 
-const validationInn = ({ value, radioValue }) => {
+const validationInn = ( value ) => {
   let inn = "";
   if (isNaN(value)) inn = "Некорректный ИНН";
   if (!value) inn = "Обязательное поле";
@@ -22,13 +23,13 @@ const validationInn = ({ value, radioValue }) => {
   return inn;
 };
 
-const validationKpp = ({ value, radioValue }) => {
+const validationKpp = ( value ) => {
   let kpp = "";
   if (value && value.length !== 9) kpp = "Некорректный КПП";
   return kpp;
 };
 
-const validationEmail = ({ value }) => {
+const validationEmail = ( value ) => {
   let email = "";
   if (!value) email = "Обязательное поле";
   if (value) {
@@ -38,17 +39,14 @@ const validationEmail = ({ value }) => {
   return email;
 };
 
-const validationGuid = ({ value }) => {
+const validationGuid = ( value ) => {
   let id = "";
   if (!value) id = "Обязательное поле";
-  if (value && value.length < 39) id = "Некорректный идентификатор";
-  if (value && value.length > 3) {
-    if (value.substr(0, 3) !== "2AE") id = "Некорректный идентификатор";
-  }
+  if (value && value.length < 36) id = "Некорректный идентификатор";
   return id;
 };
 
-const validationName = ({ value }) => {
+const validationName = ( value ) => {
   let name = "";
   if (!value) name = "Обязательное поле";
   return name;

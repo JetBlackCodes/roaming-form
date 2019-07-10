@@ -10,7 +10,8 @@ import {
   Card,
   Typography,
   Avatar,
-  Chip
+  Chip,
+  InputAdornment
 } from "@material-ui/core";
 import { Delete, AttachFile } from "@material-ui/icons";
 
@@ -152,7 +153,6 @@ class SecondStep extends Component {
                       <Grid item xs={12} sm={12}>
                         <Field
                           fullWidth
-                          required={!disable}
                           disabled={disable}
                           component={TextField}
                           name={`${key}.id`}
@@ -160,6 +160,9 @@ class SecondStep extends Component {
                           label='Идентификатор'
                           className={classes.field}
                           parse={parse}
+                          InputProps={{
+                            startAdornment: <InputAdornment position="start">2AE</InputAdornment>,
+                          }}
                         />
                       </Grid>
                     </Card>
@@ -188,7 +191,7 @@ class SecondStep extends Component {
 
 const parse = value => {
   const someFormat = formatStringByPattern(
-    "XXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+    "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
   );
   let newValue = someFormat(value.toUpperCase());
   return newValue;

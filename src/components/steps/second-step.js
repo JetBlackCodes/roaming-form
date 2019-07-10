@@ -221,12 +221,12 @@ class SecondStep extends React.Component {
               <input
                 accept=".xls, .xlsx"
                 className={classes.input}
-                id="contained-button-file"
+                id="contained-button-file-receiver-list"
                 type="file"
                 onChange={this.preloadReceiverList}
                 disabled={disableFileUpload}
               />
-              <label htmlFor="contained-button-file">
+              <label htmlFor="contained-button-file-receiver-list">
                 <Button
                   fullWidth
                   component="span"

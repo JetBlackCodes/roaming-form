@@ -207,7 +207,7 @@ class Checkout extends Component {
     });
   };
 
-  onSubmit = ffJson => {
+  handleSubmit = ffJson => {
     // final form json
     const {
       activeStep,
@@ -281,11 +281,7 @@ class Checkout extends Component {
     return (
       <Form
         decorators={[this.bindFormApi]}
-        onSubmit={this.onSubmit}
-        initialValues={{
-          sender: [{}],
-          receiver: [{}]
-        }}
+        onSubmit={this.handleSubmit}
         validate={validate}
         render={({ handleSubmit, reset, submitting, pristine, values, form }) => {
           const { change } = form

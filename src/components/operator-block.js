@@ -58,16 +58,17 @@ const OperatorBlock = props => {
   const classes = useStyles(); // глав. комп
   // начало инициализации
   const { value, uploadReceiverList } = props;
+
   const innK = `innKontr${props.index}`;
   let disable = true; // для общий
   let disableKpp = true; // для КПП так как еще 1 проверка
 
-  if (value[innK] && value[innK].length === 10)
-    disableKpp = uploadReceiverList === true ? true : false;
-  disable = uploadReceiverList;
+  if (value && value[innK]) {
+    disableKpp = value[innK].length === 10 ? false : true;
+    if (value[innK].length === 10 || value[innK].length === 12) disable = false;
+  }
+  if (uploadReceiverList) { disable = true; disableKpp = true; }
   // подготовка завершена
-
-  if (value[innK] && value[innK].length === 10) disable = false;
 
   return (
     <Card className={classes.paper}>
@@ -98,8 +99,8 @@ const OperatorBlock = props => {
               name={nameField.kpp}
               label="КПП"
               parse={formatStringByPattern("999999999")}
-              disabled={disable}
-              required={!disable}
+              disabled={disableKpp}
+              required={!disableKpp}
               autoComplete="off"
             />
           </Grid>

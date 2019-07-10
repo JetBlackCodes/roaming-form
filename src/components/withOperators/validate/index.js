@@ -3,29 +3,31 @@ export const validate = values => {
   let error = "";
   Object.keys(values).forEach(function(key) {
     // sender + receiver
-
-    if ((typeof values[key]) === 'object') {
+    if (key === 'sender' || key === 'receiver') {
+      // if object value from operators
       values[key].map((item, index) => { // цикл sender or receiver
 
-        Object.keys(item).forEach(keyItem => {
-          let value = values[key][index][keyItem]
-          let objvalues = values[key][index]
-          let type = values[key]
+        if ((typeof values[key][index]) === 'object') {
+          // easy check
+          Object.keys(values[key][index]).forEach(keyItem => {
+            // need object
+            let value = values[key][index][keyItem] // value
+            let objvalues = values[key][index] // object
+            let type = values[key] // name global object example: sender, receiver
 
-          if (distributor[keyItem]) {
-            error = distributor[keyItem]({ value, objvalues, type });
-            if (error) {
-              if (!errors[key])
-                errors[key] = []
-              if (!errors[key][index])
-                errors[key][index] = {}
-              errors[key][index][keyItem] = error;
+            if (distributor[keyItem]) {
+              error = distributor[keyItem]({ value, objvalues, type }); //
+              if (error) { // if error value
+                if (!errors[key]) errors[key] = []
+                if (!errors[key][index]) errors[key][index] = {}
+                errors[key][index][keyItem] = error;
+              }
             }
-          }
-
-        })
+          })
+        }
 
       })
+
     }
 
   }, values);
@@ -55,7 +57,7 @@ const validationKpp = ({ value, objvalues, type }) => {
 const validationGuid = ({ value, objvalues, type }) => {
   let id = "";
   if (!value) id = "Обязательное поле";
-  if (value && value.length < 39) id = "Некорректный идентификатор";
+  if (value && value.length < 36) id = "Некорректный идентификатор";
   if (value && value.length > 3) {
     if (value.substr(0, 3) !== "2AE" && type === 'receiver') id = "Некорректный идентификатор";
   }

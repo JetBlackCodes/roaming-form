@@ -257,6 +257,10 @@ class WithOperators extends Component {
           }}
           validate={validate}
           decorators={[this.bindFormApi]}
+          initialValues={{
+            sender: [{}],
+            receiver: [{}]
+          }}
           render={({
             handleSubmit,
             reset,
@@ -271,7 +275,6 @@ class WithOperators extends Component {
 
             return (
               <form onSubmit={handleSubmit}>
-
                 {componentWithStep({
                   activeStep,
                   nameKontr,
