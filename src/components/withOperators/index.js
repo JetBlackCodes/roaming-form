@@ -19,6 +19,7 @@ import FormOperators from './steps/form-operators'
 import { validate } from './validate/index'
 
 import axios from "axios";
+axios.defaults.withCredentials = true;
 
 class WithOperators extends Component {
   state = {
@@ -51,7 +52,7 @@ class WithOperators extends Component {
           'Accept': 'application/json',
           'Content-Type': 'multipart/form-data',
          },
-        data: dataForm
+        data: dataForm,
       })
       .then((res, errors) => {
         let text = res.data.status === 0 ? 'Успешная авторизация' : res.data.text
@@ -133,7 +134,6 @@ class WithOperators extends Component {
           'Content-Type': 'multipart/form-data',
          },
         data: checkNum === 1 ? undefined : dataForm,
-        withCredentials: true
       })
       .then(res => {
         const errorTemplate = {
