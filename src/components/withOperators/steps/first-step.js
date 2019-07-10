@@ -48,6 +48,7 @@ class FirstStep extends Component {
                 let disableKpp = true
                 let disable = true
                 let typeUL = true
+                let disableNumber = true
                 if (value && value['inn']) {
                   disableKpp = value['inn'].length === 10 ? false : true
                   typeUL = value['inn'].length === 12 ? false : true
@@ -55,6 +56,11 @@ class FirstStep extends Component {
                     disable = false
                   else
                     disable = true
+                }
+                if (value && value['id'] && value['id'].length > 3) {
+                  let subValue = value['id'].substr(0, 3)
+                  if (subValue === '2AK' || subValue === '2BE' || subValue === '2BM')
+                    disableNumber = false
                 }
 
                 return (
@@ -168,8 +174,8 @@ class FirstStep extends Component {
                         {checkNum &&
                           <Field
                             fullWidth
-                            required={!disable}
-                            disabled={disable}
+                            disabled={disableNumber}
+                            required={!disableNumber}
                             component={TextField}
                             name={`${key}.number`}
                             type='text'
