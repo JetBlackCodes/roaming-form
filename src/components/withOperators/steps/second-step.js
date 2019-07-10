@@ -47,6 +47,7 @@ class SecondStep extends Component {
                 let disableKpp = true
                 let disable = true
                 let typeUL = true
+                let disableNumber = true
                 if (value && value['inn']) {
                   disableKpp = value['inn'].length === 10 ? false : true
                   typeUL = value['inn'].length === 12 ? false : true
@@ -54,6 +55,11 @@ class SecondStep extends Component {
                     disable = false
                   else
                     disable = true
+                }
+                if (value && value['id'] && value['id'].length > 3) {
+                  let subValue = value['id'].substr(0, 3)
+                  if (subValue === '2AK' || subValue === '2BE' || subValue === '2BM')
+                    disableNumber = false
                 }
 
                 return (
@@ -153,7 +159,8 @@ class SecondStep extends Component {
                       <Grid item xs={12} sm={12}>
                         <Field
                           fullWidth
-                          disabled={disable}
+                          disabled={disableNumber}
+                          required={!disableNumber}
                           component={TextField}
                           name={`${key}.id`}
                           type='text'
