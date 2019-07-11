@@ -1,7 +1,7 @@
 export const validate = values => {
   let errors = {};
   let error = "";
-  console.log(values)
+
   Object.keys(values).forEach(function(key) {
     let value = this[key];
     if (distributor[key]) {

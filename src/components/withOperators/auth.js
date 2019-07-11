@@ -14,7 +14,7 @@ class Auth extends Component {
   };
 
   render() {
-    const { classes, disabled } = this.props
+    const { classes, disabled, ffsubmit } = this.props
     return(
       <>
         <div className={classes.root}>

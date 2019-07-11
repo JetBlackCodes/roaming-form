@@ -217,6 +217,7 @@ class Checkout extends Component {
       receiverList
     } = this.state;
     let dataMy = activeStep === 0 ? ffJson : dataMyOrganisation;
+    dataMy.id = dataMy.id.length === 36 ? `2AE${dataMy.id}` : dataMy.id
     this.setState({
       dataMyOrganisation: dataMy,
       operators: activeStep === 1 ? dataSort(ffJson) : operators,
@@ -369,17 +370,8 @@ class Checkout extends Component {
                             aria-describedby="client-snackbar"
                             className={classes.snack}
                             message={
-                              <span id="client-snackbar">
-                                <Chip
-                                  avatar={
-                                    <Avatar>
-                                      <Error />
-                                    </Avatar>
-                                  }
-                                  label={errorText}
-                                  className={classes.snack}
-                                  color="secondary"
-                                />
+                              <span id="client-snackbar" className={classes.snackbarText}>
+                                {errorText}
                               </span>
                             }
                             action={[
@@ -441,6 +433,11 @@ const styles = theme => ({
     background: "#cc3300",
     color: "#fff",
     fontSize: "12pt"
+  },
+  snackbarText: {
+    display: 'flex',
+    flexDirection: 'row',
+    fontSize: '13pt'
   }
 });
 

@@ -10,7 +10,8 @@ import {
   Typography,
   Modal,
   Chip,
-  Avatar
+  Avatar,
+  StepButton
 } from "@material-ui/core";
 import { Help, AttachFile } from "@material-ui/icons";
 
@@ -33,7 +34,7 @@ class FormOperators extends Component {
       transform: 'translate(-50%, -50%)'
     },
     openModalFile: false,
-    typeModal: undefined
+    typeModal: undefined,
   }
 
   openModal = (type) => () => {
@@ -60,15 +61,22 @@ class FormOperators extends Component {
       handleDeleteReceiverList,
       loadSenderFile,
       handleDeleteSenderList,
-      senderList
+      senderList,
+      errorsFinalForm
     } = this.props;
 
-    const { modalStyle, openModalFile, typeModal } = this.state
+    const { modalStyle, openModalFile, typeModal, errorStep } = this.state
 
     const steps = ['Данные вашего клиента', 'Контрагенты в АО Калуга Астрал', 'Проверка данных']
+
+    let emptyErrors = true
+
+    if (errorsFinalForm && (errorsFinalForm.sender || errorsFinalForm.receiver))
+      emptyErrors = false
+
     return (
       <div className={classes.root}>
-        <div className={classes.form}>
+        <Card className={classes.form}>
 
           <Typography component="h1" variant="h4" align="center">
             Заявление на подключение роуминга между контрагентами
@@ -78,13 +86,21 @@ class FormOperators extends Component {
             {steps.map((label, index) => {
               const stepProps = {};
               const labelProps = {};
+              const { errors } = this.props.submitFinalForm.getState()
+
+              let errorStep = [ false, false ]
+              if ( errors && errors.sender ) errorStep[0] = true
+              if ( errors && errors.receiver ) errorStep[1] = true
+              if (errorStep[index]) labelProps.error = true;
+
               return (
                 <Step key={label}>
                   <StepLabel
                     {...labelProps}
-                    onClick={handleStep(index)}
                   >
-                    {label}
+                    <StepButton onClick={handleStep(index)}>
+                      {label}
+                    </StepButton>
                   </StepLabel>
                 </Step>
               );
@@ -179,28 +195,32 @@ class FormOperators extends Component {
             senderList={senderList}
             handleDeleteSenderList={handleDeleteSenderList}
             handleDeleteReceiverList={handleDeleteReceiverList}
+            handleStep={handleStep}
           />
 
           <div className={classes.cardRoot}>
             <Grid item xs={12} sm={12} className={classes.buttonForm}>
-              <Button
-                variant='outlined'
-                color='primary'
-                disabled={activeStep === 0 ? true : false}
-                onClick={handleBack}
-              >
-                Назад
-              </Button>
+              {activeStep < 3 &&
+                <Button
+                  variant='outlined'
+                  color='primary'
+                  disabled={activeStep === 0 ? true : false}
+                  onClick={handleBack}
+                >
+                  Назад
+                </Button>
+              }
               {activeStep === 2 &&
                 <Button
                   variant='outlined'
                   color='primary'
                   type='submit'
+                  disabled={!emptyErrors}
                 >
                   Отправить
                 </Button>
               }
-              {activeStep !== 2 &&
+              {activeStep < 2 &&
                 <Button
                   variant='outlined'
                   color='primary'
@@ -212,7 +232,7 @@ class FormOperators extends Component {
             </Grid>
           </div>
 
-        </div>
+        </Card>
 
         <ModalUploadList
           openModal={this.openModal}
@@ -366,6 +386,7 @@ const GetStepFormOperators = props => {
     senderList,
     handleDeleteSenderList,
     handleDeleteReceiverList,
+    handleStep,
    } = props
 
   let fieldArrayName = activeStep === 0 ? 'sender' : 'receiver'
@@ -382,6 +403,7 @@ const GetStepFormOperators = props => {
           handleNext={handleNext}
           activeStep={activeStep}
           senderList={senderList}
+          submitFinalForm={submitFinalForm}
         />
     case 1:
       return <SecondStep
@@ -389,6 +411,7 @@ const GetStepFormOperators = props => {
           handleBack={handleBack}
           handleNext={handleNext}
           receiverList={receiverList}
+          submitFinalForm={submitFinalForm}
         />
     case 2:
       return <Summary
@@ -397,7 +420,19 @@ const GetStepFormOperators = props => {
         receiverList={receiverList}
         handleDeleteSenderList={handleDeleteSenderList}
         handleDeleteReceiverList={handleDeleteReceiverList}
+        handleStep={handleStep}
       />
+    case 3:
+      return (
+        <div className={classes.divLastStep}>
+          <Typography variant="h5" gutterBottom>
+            Ваша заявка принята в работу.
+          </Typography>
+          <Typography variant="subtitle1">
+            Срок ответа на заявку от 2 до 6 рабочих дней.
+          </Typography>
+        </div>
+      )
     default:
       return <Auth />
 
@@ -421,7 +456,7 @@ const styles = theme => ({
     padding: 10,
     background: theme.palette.primary.light,
     color: "#000",
-    maxWidth: 550
+    maxWidth: 500
   },
   textField: {
     marginLeft: theme.spacing(1),
@@ -436,7 +471,8 @@ const styles = theme => ({
   },
   form: {
     width: 600,
-    marginTop: 20
+    marginTop: 20,
+    paddingRight: 40
   },
   cardRoot: {
     width: 620,
@@ -495,6 +531,12 @@ const styles = theme => ({
   chipReceiverStep: {
     width: 140
   },
+  divLastStep: {
+    flexDirection: 'column',
+    textAlign: 'center',
+    display: 'flex',
+    justifyContent: 'center'
+  }
 });
 
 export default withStyles(styles)(FormOperators);

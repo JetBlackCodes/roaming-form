@@ -14,9 +14,10 @@ import {
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
+  Button,
   withStyles,
 } from "@material-ui/core";
-import { Help, AttachFile, ExpandMore } from "@material-ui/icons";
+import { Help, AttachFile, ExpandMore, Warning, Label } from "@material-ui/icons";
 
 class Summary extends Component {
 
@@ -46,22 +47,57 @@ class Summary extends Component {
       receiverList,
       handleDeleteSenderList,
       handleDeleteReceiverList,
+      handleStep
     } = this.props
+
     const { openModalFile } = this.state
     let colFiles = 0
     colFiles = senderList ? colFiles + 1 : colFiles
     colFiles = receiverList ? colFiles + 1 : colFiles
 
+    let emptySender = empty(values.sender)
+    let emptyReceiver = empty(values.receiver)
+
     return (
       <>
         <div className={classes.cardRoot}>
 
+          {emptySender && emptyReceiver &&
+            <ExpansionPanel>
+              <ExpansionPanelSummary
+                expandIcon={<ExpandMore />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Warning color='secondary' />
+                <Typography>
+                  Нет данных для отправки
+                </Typography>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                <Typography>
+                  Отстутствуют или недостаточно данных для отправки на сервер. Проверьте пожалуйста введенные данные на шагах:
+                  <div className={classes.divButtonNotData}>
+                    <Button variant="outlined" color="primary" className={classes.buttonNotData} onClick={handleStep(0)}>
+                      <Label className={classes.iconButton}/> Данные вашего клиента
+                    </Button>
+                    <Button variant="outlined" color="primary" className={classes.buttonNotData} onClick={handleStep(1)}>
+                      <Label className={classes.iconButton}/> Контрагенты в АО Калуга Астрал
+                    </Button>
+                  </div>
+                </Typography>
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+          }
+
           {!senderList &&
             <div className={classes.kontragentExplansion}>
 
-              <Typography variant="h6" id="modal-title">
-                Данные Ваших клиентов
-              </Typography>
+              {!emptySender &&
+                <Typography variant="h6" id="modal-title">
+                  Данные Ваших клиентов
+                </Typography>
+              }
 
               {values.sender.map((item, index) => {
                 let obj = {} // объект
@@ -184,9 +220,11 @@ class Summary extends Component {
 
           {!receiverList && <div className={classes.kontragentExplansion}>
 
-              <Typography variant="h6" id="modal-title">
-                Данные контрагентов Ваших клиентов
-              </Typography>
+              {!emptyReceiver &&
+                <Typography variant="h6" id="modal-title">
+                  Данные контрагентов Ваших клиентов
+                </Typography>
+              }
 
               {values.receiver.map((item, index) => {
                 let obj = {} // объект
@@ -247,6 +285,17 @@ class Summary extends Component {
   }
 }
 
+const empty = values => {
+  let checkValue = [...values]
+  let checkEmpty = true
+  checkValue.map(key => {
+    Object.keys(key).forEach(item => {
+      if (key[item]) checkEmpty = false
+    })
+  })
+  return checkEmpty
+}
+
 const styles = theme => ({
   root: {
     display: "flex",
@@ -279,6 +328,28 @@ const styles = theme => ({
   },
   chipFiles: {
     marginRight: 10
+  },
+  cardNotData: {
+    minHeight: 200,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: '22pt',
+    color: '#f00'
+  },
+  iconButton: {
+    marginRight: theme.spacing(1)
+  },
+  divButtonNotData: {
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  buttonNotData: {
+    maxWidth: 350,
+    marginTop: 5,
+    marginBottom: 5,
+    display: 'flex',
+    justifyContent: 'flex-start',
   }
 });
 

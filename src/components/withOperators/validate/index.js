@@ -13,7 +13,7 @@ export const validate = values => {
             // need object
             let value = values[key][index][keyItem] // value
             let objvalues = values[key][index] // object
-            let type = values[key] // name global object example: sender, receiver
+            let type = key // name global object example: sender, receiver
 
             if (distributor[keyItem]) {
               error = distributor[keyItem]({ value, objvalues, type }); //
@@ -47,47 +47,39 @@ const validationInn = ({ value, objvalues, type }) => {
 
 const validationKpp = ({ value, objvalues, type }) => {
   let kpp = "";
-  if (value && objvalues.inn && objvalues.inn.length === 10) {
-    if (value.length !== 9)
-      kpp = "Некорректный КПП"
+  if (objvalues.inn && objvalues.inn.length === 10) {
+    if (!value) kpp = "Обязательное поле"
+    if (value && value.length < 9) kpp = "Некорректный КПП"
   }
   return kpp;
 };
 
 const validationGuid = ({ value, objvalues, type }) => {
   let id = "";
-  if (!value) id = "Обязательное поле";
+  if (objvalues.inn && (objvalues.inn.length === 10 || objvalues.inn.length === 12) && !value)
+    id = type === 'sender' ? "Обязательное поле" : '';
   if (value && value.length < 36) id = "Некорректный идентификатор";
-  if (value && value.length > 3) {
-    if (value.substr(0, 3) !== "2AE" && type === 'receiver') id = "Некорректный идентификатор";
-  }
   return id;
 };
 
 const validationName = ({ value, objvalues, type }) => {
   let name = "";
-  if (objvalues.inn && objvalues.inn.length === 10) {
-    if (!value)
-      name = "Обязательное поле";
-  }
+  if (objvalues.inn && objvalues.inn.length === 10 && !value)
+    name = "Обязательное поле";
   return name;
 };
 
 const validationLastName = ({ value, objvalues, type }) => {
   let lastname = "";
-  if (objvalues.inn && objvalues.inn.length === 12) {
-    if (!value)
-      lastname = "Обязательное поле";
-  }
+  if (objvalues.inn && objvalues.inn.length === 12 && !value)
+    lastname = "Обязательное поле";
   return lastname;
 };
 
 const validationFirstName = ({ value, objvalues, type }) => {
   let firstname = "";
-  if (objvalues.inn && objvalues.inn.length === 12) {
-    if (!value)
-      firstname = "Обязательное поле";
-  }
+  if (objvalues.inn && objvalues.inn.length === 12 && !value)
+    firstname = "Обязательное поле";
   return firstname;
 };
 
