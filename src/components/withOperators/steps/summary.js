@@ -62,7 +62,7 @@ class Summary extends Component {
       <>
         <div className={classes.cardRoot}>
 
-          {emptySender && emptyReceiver &&
+          {emptySender && emptyReceiver && !senderList && !receiverList &&
             <ExpansionPanel>
               <ExpansionPanelSummary
                 expandIcon={<ExpandMore />}

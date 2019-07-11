@@ -36,76 +36,6 @@ class WithOperators extends Component {
     receiverList: '',
   };
 
-
-  onSubmit = rffJSON => {
-    const { activeStep, senderList, receiverList } = this.state
-
-    if (activeStep === -1) {
-
-    } else if (activeStep === 2) {
-
-      var dataForm = new FormData();
-      let check = {s: 0, r: 0}
-      let checkNum = 0
-      let data = {}
-
-      if (receiverList)
-        dataForm.set('receiver_list', receiverList )
-      else {
-        data.receiver = rffJSON.receiver
-        check.r = 1
-      }
-      if (senderList)
-        dataForm.set('sender_list', senderList )
-      else {
-        data.sender = rffJSON.sender
-        check.s = 1
-      }
-
-      if (check.s === 0 && check.r === 0)
-        checkNum = 1
-      else {
-        dataForm.set('data', JSON.stringify(data) );
-      }
-
-      axios({
-        method: 'post',
-        url: `http://roaming.api.staging.keydisk.ru/operator`,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data',
-         },
-        data: checkNum === 1 ? undefined : dataForm,
-      })
-      .then(res => {
-        const errorTemplate = {
-           inn: 'ИНН',
-           kpp: 'КПП',
-           name: 'Название организации',
-           lastname: 'Имя',
-           firstname: 'Фамилия',
-           patronymic: 'Отчество',
-           id: 'Идентификатор',
-           number: 'Номер заявки',
-        }
-        let lastError = {id: '', text: '', step: ''}
-        Object.keys(res).forEach(item => {
-          if ((typeof res[item]) === 'object') {
-           res[item].map((itemIndex, index) => {
-             Object.keys(res[item][index]).forEach(key => {
-               lastError = {id: key, text: itemIndex[key], step: item === 'receiver' ? 2 : 1}
-             })
-           })
-          }
-        })
-        if (lastError.id)
-          this.setState({ open: true, textSnackbar: `Допущена ошибка на ${lastError.step} шаге. ${errorTemplate[lastError.id]}: ${lastError.text}`, error: true })
-        // console.log(lastError)
-
-      })
-    }
-  }
-
   handleClose = () => {
     this.setState({ open: false })
   }
@@ -121,8 +51,10 @@ class WithOperators extends Component {
       data: {}
     })
     if (status === 200) {
-      this.formApi.change('sender', [{ ...FIRST_STATE_OPERATOR }]);
-      this.formApi.change('receiver', [{ ...SECOND_STATE_OPERATOR }]);
+      if (data.status !== 401) {
+        this.formApi.change('sender', [{ ...FIRST_STATE_OPERATOR }]);
+        this.formApi.change('receiver', [{ ...SECOND_STATE_OPERATOR }]);
+      }
       this.setState({ activeStep: data.status === 401 ? -1 : 0,  disabled: false })
     } else {
       this.setState({ open: true, textSnackbar: `Сервер временно не доступен`, error: true})
@@ -199,6 +131,11 @@ class WithOperators extends Component {
       let text = res.data.status === 0 ? 'Успешная авторизация' : res.data.text
       let error = res.data.status === 0 ? false : true
 
+      if (res.data.status === 0) {
+        this.formApi.change('sender', [{ ...FIRST_STATE_OPERATOR }]);
+        this.formApi.change('receiver', [{ ...SECOND_STATE_OPERATOR }]);
+      }
+
       this.setState({
         disabled: false,
         open: true,
@@ -232,7 +169,7 @@ class WithOperators extends Component {
 
     if (senderList) dataForm.set('sender_list', senderList ); else data.sender = ffvalue.sender
 
-    if (!senderList && !receiverList)
+    if (!senderList || !receiverList)
       dataForm.set('data', JSON.stringify(data) )
 
     axios({
@@ -250,14 +187,18 @@ class WithOperators extends Component {
       if (status === 0 || res.data.text === 'Ваша заявка принята в работу') this.setState({ activeStep: 3 })
 
       else {
-        let step = 1
-        let checkError = emptyError(sender)
-        if (checkError.checkEmpty) { // если ошибок нет на sender
-          checkError = emptyError(receiver)
-          step = 2
-        }
+        if (res.data.text) {
+          this.setState({ open: true, textSnackbar: res.data.text, error: true })
+        } else {
+          let step = 1
+          let checkError = emptyError(sender)
+          if (checkError.checkEmpty) { // если ошибок нет на sender
+            checkError = emptyError(receiver)
+            step = 2
+          }
 
-        this.setState({ open: true, textSnackbar: `${step} шаг: ${checkError.textFieldError}`, error: true })
+          this.setState({ open: true, textSnackbar: `${step} шаг: ${checkError.textFieldError}`, error: true })
+        }
         // console.log(lastError)
       }
     })
@@ -301,6 +242,7 @@ class WithOperators extends Component {
             touched
           }) => {
             const { change } = form
+
             return (
               <form onSubmit={handleSubmit}>
                 {componentWithStep({
