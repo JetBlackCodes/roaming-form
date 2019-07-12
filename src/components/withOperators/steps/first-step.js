@@ -191,7 +191,7 @@ class FirstStep extends Component {
                   </>
                 )
               })}
-              <div className={classes.cardRoot}>
+              {/* <div className={classes.cardRoot}> */}
                 <Grid item xs={12} sm={12} className={classes.buttonForm}>
                   <Button
                     variant='contained'
@@ -202,7 +202,7 @@ class FirstStep extends Component {
                     Добавить контрагента
                   </Button>
                 </Grid>
-              </div>
+              {/* </div> */}
             </>
           )}
         </FieldArray>
@@ -246,10 +246,19 @@ const styles = theme => ({
     marginTop: 20
   },
   cardRoot: {
-    width: '100%',
-    margin: 10,
-    padding: 10,
-    position: 'relative'
+    // width: '100%',
+    // margin: 10,
+    // padding: 10,
+    // position: 'relative'
+    marginTop: "8px",
+    marginBottom: "8px",
+    maxWidth: "610px",
+    padding: "10px",
+    position: "relative",
+    marginLeft: "8px"
+  },
+  buttonForm: {
+    margin: "8px"
   },
   delButton: {
     position: 'absolute',

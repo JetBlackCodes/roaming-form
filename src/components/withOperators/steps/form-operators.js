@@ -6,12 +6,12 @@ import {
   Stepper,
   Grid,
   Button,
-  Card,
+  Paper,
   Typography,
   Modal,
   Chip,
   Avatar,
-  StepButton
+  StepButton,
 } from "@material-ui/core";
 import { Help, AttachFile } from "@material-ui/icons";
 
@@ -76,7 +76,8 @@ class FormOperators extends Component {
 
     return (
       <div className={classes.root}>
-        <Card className={classes.form}>
+        <div className={classes.layout}>
+        <Paper className={classes.form}>
 
           <Typography component="h1" variant="h4" align="center">
             Заявление на подключение роуминга между контрагентами
@@ -232,7 +233,8 @@ class FormOperators extends Component {
             </Grid>
           </div>
 
-        </Card>
+        </Paper>
+        
 
         <ModalUploadList
           openModal={this.openModal}
@@ -249,6 +251,7 @@ class FormOperators extends Component {
           typeModal={typeModal}
         />
 
+      </div>
       </div>
     );
   }
@@ -469,10 +472,31 @@ const styles = theme => ({
   field: {
     minHeight: '70px'
   },
+  layout: {
+    width: "auto",
+    position: "relative",
+    marginLeft: theme.spacing.unit * 2,
+    marginRight: theme.spacing.unit * 2,
+    [theme.breakpoints.up(600 + theme.spacing.unit * 2 * 2)]: {
+      width: 600,
+      marginLeft: "auto",
+      marginRight: "auto"
+    }
+  },
   form: {
-    width: 600,
-    marginTop: 20,
-    paddingRight: 40
+    width: 630,
+    // // marginTop: 20,
+    //  paddingRight: 40,
+
+    marginTop: theme.spacing.unit * 3,
+    marginBottom: theme.spacing.unit * 3,
+    padding: theme.spacing.unit * 2,
+    [theme.breakpoints.up(600 + theme.spacing.unit * 3 * 2)]: {
+      marginTop: "30px",
+      marginBottom: "35px",
+      padding: theme.spacing.unit * 3
+    },
+    position: "relative"
   },
   cardRoot: {
     width: 620,

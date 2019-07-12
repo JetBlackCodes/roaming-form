@@ -62,10 +62,6 @@ const OperatorBlock = props => {
   let disable = true // для общий
   let disableKpp = true // для КПП так как еще 1 проверка
 
-  const innK = `innKontr${props.index}`;
-  let disable = true; // для общий
-  let disableKpp = true; // для КПП так как еще 1 проверка
-
   if (value && value[innK]) {
     disableKpp = value[innK].length === 10 ? false : true;
     if (value[innK].length === 10 || value[innK].length === 12) disable = false;
