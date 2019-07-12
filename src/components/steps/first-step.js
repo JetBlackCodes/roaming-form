@@ -33,7 +33,6 @@ class FirstStep extends Component {
     const {
       classes,
       dataMyOrganisation,
-      disableKpp,
       dop_sog,
       chipDopSog,
       upload,
@@ -41,8 +40,12 @@ class FirstStep extends Component {
       handleDelete
     } = this.props;
 
+    let disableKpp = true;
     let disable = true;
-    if (values && values.inn) disable = values.inn.length === 10 ? false : true;
+    if (values && values.inn) {
+      disableKpp = values.inn.length === 10 ? false : true;
+      if (values.inn.length === 10 || values.inn.length === 12) disable = false;
+    }
 
     return (
       <>
@@ -63,13 +66,13 @@ class FirstStep extends Component {
               name="kpp"
               label="КПП"
               parse={formatStringByPattern("999999999")}
-              disabled={disable}
-              required={!disable}
+              disabled={disableKpp}
+              required={!disableKpp}
             />
           </Grid>
 
           <Grid item xs={12}>
-            <NameAndFIO inn={values.inn} />
+            <NameAndFIO inn={values.inn} disable={disable}/>
           </Grid>
 
           <Popover
@@ -105,6 +108,8 @@ class FirstStep extends Component {
               name="id"
               label="Идентификатор"
               parse={parse}
+              disabled={disable}
+              required={!disable}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -112,12 +117,13 @@ class FirstStep extends Component {
                       <Help fontSize="small" />
                     </IconButton>
                   </InputAdornment>
-                )
+                ),
+                startAdornment: <InputAdornment position="start">2AE</InputAdornment>,
               }}
             />
           </Grid>
           <Grid item xs={12}>
-            <StyledTextField name="email" label="E-mail" type="email" />
+            <StyledTextField name="email" label="E-mail" type="email" disabled={disable} required={!disable} />
           </Grid>
         </Grid>
       </>
@@ -127,7 +133,7 @@ class FirstStep extends Component {
 
 const parse = value => {
   const someFormat = formatStringByPattern(
-    "XXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+    "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
   );
   let newValue = someFormat(value.toUpperCase());
   return newValue;

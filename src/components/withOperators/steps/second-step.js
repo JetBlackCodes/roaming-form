@@ -10,7 +10,8 @@ import {
   Card,
   Typography,
   Avatar,
-  Chip
+  Chip,
+  InputAdornment
 } from "@material-ui/core";
 import { Delete, AttachFile } from "@material-ui/icons";
 
@@ -18,6 +19,7 @@ import { TextField } from "final-form-material-ui";
 import { Field } from "react-final-form";
 import { FieldArray } from 'react-final-form-arrays'
 import formatStringByPattern from "format-string-by-pattern";
+import { SECOND_STATE_OPERATOR } from '../../../constants/customer-form'
 
 class SecondStep extends Component {
 
@@ -55,6 +57,7 @@ class SecondStep extends Component {
                     disable = true
                 }
 
+                this.props.submitFinalForm.submit()
                 return (
                   <>
                     <Card className={classes.cardRoot}>
@@ -152,7 +155,6 @@ class SecondStep extends Component {
                       <Grid item xs={12} sm={12}>
                         <Field
                           fullWidth
-                          required={!disable}
                           disabled={disable}
                           component={TextField}
                           name={`${key}.id`}
@@ -160,6 +162,9 @@ class SecondStep extends Component {
                           label='Идентификатор'
                           className={classes.field}
                           parse={parse}
+                          InputProps={{
+                            startAdornment: <InputAdornment position="start">2AE</InputAdornment>,
+                          }}
                         />
                       </Grid>
                     </Card>
@@ -172,7 +177,7 @@ class SecondStep extends Component {
                     variant='contained'
                     color='primary'
                     size='small'
-                    onClick={() => { if (fields.length <= 100) fields.push() }}
+                    onClick={() => { if (fields.length <= 100) fields.push({ ...SECOND_STATE_OPERATOR }) }}
                   >
                     Добавить контрагента
                   </Button>
@@ -188,7 +193,7 @@ class SecondStep extends Component {
 
 const parse = value => {
   const someFormat = formatStringByPattern(
-    "XXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+    "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
   );
   let newValue = someFormat(value.toUpperCase());
   return newValue;
@@ -233,8 +238,8 @@ const styles = theme => ({
   },
   delButton: {
     position: 'absolute',
-    right: 5,
-    top: 5,
+    right: -1,
+    top: -1,
     zIndex: 2
   },
   input: {

@@ -21,7 +21,7 @@ const getStepContent = numPage => {
 
 class App extends Component {
   state = {
-    value: 1
+    value: 0
   };
 
   handleChange = value => event => {

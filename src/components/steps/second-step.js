@@ -221,12 +221,12 @@ class SecondStep extends React.Component {
               <input
                 accept=".xls, .xlsx"
                 className={classes.input}
-                id="contained-button-file"
+                id="contained-button-file-receiver-list"
                 type="file"
                 onChange={this.preloadReceiverList}
                 disabled={disableFileUpload}
               />
-              <label htmlFor="contained-button-file">
+              <label htmlFor="contained-button-file-receiver-list">
                 <Button
                   fullWidth
                   component="span"
@@ -236,11 +236,7 @@ class SecondStep extends React.Component {
                   Выбрать файл
                 </Button>
               </label>
-
-            <AnalyzReceiverList // table analyz xls + xlsx
-              open={openAnalyzReceiverList}
-              objReceiverList={objReceiverList}
-            />
+              
           </div>
         </Modal>
 
@@ -352,8 +348,8 @@ const CheckTypeUploadReceiver = props => {
   }
 };
 
-const AnalyzReceiverList = props => {
-  const { open, objReceiverList } = props;
+const AnalyzReceiverList = (props) => {
+  const { open, objReceiverList } = props
   if (open) {
     return (
       <Paper>
@@ -361,35 +357,31 @@ const AnalyzReceiverList = props => {
           <TableBody>
             <TableRow>
               <TableCell>Всего контрагентов</TableCell>
-              <TableCell align="right">{objReceiverList.all}</TableCell>
+              <TableCell align='right'>{objReceiverList.all}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Из них ЮЛ</TableCell>
-              <TableCell align="right">{objReceiverList.ul}</TableCell>
+              <TableCell align='right'>{objReceiverList.ul}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Из них ИП</TableCell>
-              <TableCell align="right">{objReceiverList.ip}</TableCell>
+              <TableCell align='right'>{objReceiverList.ip}</TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Из них некорректные</TableCell>
-              <TableCell align="right">{objReceiverList.error}</TableCell>
+              <TableCell align='right'>{objReceiverList.error}</TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </Paper>
-    );
-  } else return null;
-};
+    )
+  }
+  else
+    return null
+}
 
-const InfoReceiverListChip = props => {
-  const {
-    open,
-    classes,
-    handleDeleteReceiverList,
-    chipFileName,
-    openAnalyzReceiverList
-  } = props;
+const InfoReceiverListChip = (props) => {
+  const { open, classes, handleDeleteReceiverList, chipFileName, openAnalyzReceiverList } = props
   if (open) {
     return (
       <div className={classes.infoReceiverList}>
@@ -414,9 +406,11 @@ const InfoReceiverListChip = props => {
           <Equalizer />
         </Button>
       </div>
-    );
-  } else return null;
-};
+    )
+  }
+  else
+    return null
+}
 
 const objRff = (index ) => {
   return [`innKontr${index}`,

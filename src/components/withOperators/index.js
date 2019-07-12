@@ -18,7 +18,10 @@ import Auth from './auth'
 import FormOperators from './steps/form-operators'
 import { validate } from './validate/index'
 
+import { FIRST_STATE_OPERATOR, SECOND_STATE_OPERATOR, NAMED_FIELD } from '../../constants/customer-form'
+
 import axios from "axios";
+axios.defaults.withCredentials = true;
 
 class WithOperators extends Component {
   state = {
@@ -30,112 +33,15 @@ class WithOperators extends Component {
     activeStep: -1,
     nameKontr: undefined,
     senderList: '',
-    receiverList: ''
+    receiverList: '',
   };
-
-
-  onSubmit = rffJSON => {
-    const { activeStep, senderList, receiverList } = this.state
-
-    if (activeStep === -1) {
-      this.setState({ disabled: true })
-
-      var dataForm = new FormData();
-      dataForm.set('login', rffJSON.loginAuth );
-      dataForm.set('password', rffJSON.passAuth );
-
-      axios({
-        method: 'post',
-        url: `http://roaming.api.staging.keydisk.ru/auth`,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data',
-         },
-        data: dataForm
-      })
-      .then(res => {
-        let text = res.data.status === 0 ? 'Успешная авторизация' : res.data.text
-        let error = res.data.status === 0 ? false : true
-
-        this.setState({
-          disabled: false,
-          open: true,
-          textSnackbar: text,
-          error: error,
-          activeStep: 0,
-          nameKontr: res.data.status === 0 ? res.data.text : undefined
-        })
-      })
-    } else if (activeStep === 2) {
-      // const errorTemplate = {
-      //   inn: 'ИНН',
-      //   kpp: 'КПП',
-      //   name: 'Название организации',
-      //   lastname: 'Имя',
-      //   firstname: 'Фамилия',
-      //   patronymic: 'Отчество',
-      //   id: 'Идентификатор',
-      //   number: 'Номер заявки',
-      // }
-      // let errors = validate(this.formApi.getState().values)
-      // let lastError = {id: '', text: '', step: ''}
-      // Object.keys(errors).forEach(item => {
-      //   errors[item].map((itemIndex, index) => {
-      //     Object.keys(errors[item][index]).forEach(key => {
-      //       lastError = {id: key, text: itemIndex[key], step: item === 'receiver' ? 2 : 1}
-      //     })
-      //   })
-      // })
-      // if (lastError.id)
-      //   this.setState({ open: true, textSnackbar: `Допущена ошибка на ${lastError.step} шаге. ${errorTemplate[lastError.id]}: ${lastError.text}`, error: true })
-      // console.log(lastError)
-
-      var dataForm = new FormData();
-      let check = {s: 0, r: 0}
-      let checkNum = 0
-      let data = {}
-
-      if (receiverList)
-        dataForm.set('receiver_list', receiverList )
-      else {
-        data.receiver = rffJSON.receiver
-        check.r = 1
-      }
-      if (senderList)
-        dataForm.set('sender_list', senderList )
-      else {
-        data.sender = rffJSON.sender
-        check.s = 1
-      }
-
-      if (check.s === 0 && check.r === 0)
-        checkNum = 1
-      else {
-        dataForm.set('data', JSON.stringify(data) );
-      }
-
-      axios({
-        method: 'post',
-        url: `http://roaming.api.staging.keydisk.ru/operator`,
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'multipart/form-data',
-         },
-        data: checkNum === 1 ? undefined : dataForm,
-        withCredentials: true
-      })
-      .then(res => {
-        console.log(res)
-      })
-    }
-  }
 
   handleClose = () => {
     this.setState({ open: false })
   }
 
-  componentDidMount() {
-    axios({
+  async componentDidMount() {
+    const { data, status } = await axios({
       method: 'post',
       url: `http://roaming.api.staging.keydisk.ru/operator`,
       headers: {
@@ -144,14 +50,15 @@ class WithOperators extends Component {
        },
       data: {}
     })
-    .then(res => {
-      this.formApi.change('sender', [{ inn: '', kpp: '', name: '', id: '', number: '', lastname: '', firstname: '' }]);
-      this.formApi.change('receiver', [{ inn: '', kpp: '', name: '', id: '', lastname: '', firstname: '' }]);
-      this.setState({
-         activeStep: res.data.status === 401 ? -1 : 0,
-         disabled: false
-      })
-    });
+    if (status === 200) {
+      if (data.status !== 401) {
+        this.formApi.change('sender', [{ ...FIRST_STATE_OPERATOR }]);
+        this.formApi.change('receiver', [{ ...SECOND_STATE_OPERATOR }]);
+      }
+      this.setState({ activeStep: data.status === 401 ? -1 : 0,  disabled: false })
+    } else {
+      this.setState({ open: true, textSnackbar: `Сервер временно не доступен`, error: true})
+    }
   }
 
   handleBack = () => {
@@ -204,8 +111,109 @@ class WithOperators extends Component {
     }
   }
 
+  authOperator = ffvalue => {
+    this.setState({ disabled: true })
+
+    var dataForm = new FormData();
+    dataForm.set('login', ffvalue.loginAuth );
+    dataForm.set('password', ffvalue.passAuth );
+
+    axios({
+      method: 'post',
+      url: `http://roaming.api.staging.keydisk.ru/auth`,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
+       },
+      data: dataForm,
+    })
+    .then((res, errors) => {
+      let text = res.data.status === 0 ? 'Успешная авторизация' : res.data.text
+      let error = res.data.status === 0 ? false : true
+
+      if (res.data.status === 0) {
+        this.formApi.change('sender', [{ ...FIRST_STATE_OPERATOR }]);
+        this.formApi.change('receiver', [{ ...SECOND_STATE_OPERATOR }]);
+      }
+
+      this.setState({
+        disabled: false,
+        open: true,
+        textSnackbar: text,
+        error: error,
+        activeStep: error === true ? -1 : 0,
+        nameKontr: res.data.status === 0 ? res.data.text : undefined
+      })
+    })
+    .catch(errors => {
+      let text = 'Сервер временно не отвечает'
+      let error = true
+
+      this.setState({
+        disabled: false,
+        open: true,
+        textSnackbar: text,
+        error: error,
+      })
+    })
+  }
+
+  sendDataRFFOperator = ffvalue => {
+    const { activeStep, senderList, receiverList } = this.state
+
+    var dataForm = new FormData();
+    let checkNum = false
+    let data = {}
+
+    if (receiverList) dataForm.set('receiver_list', receiverList ); else data.receiver = ffvalue.receiver
+
+    if (senderList) dataForm.set('sender_list', senderList ); else data.sender = ffvalue.sender
+
+    if (!senderList || !receiverList)
+      dataForm.set('data', JSON.stringify(data) )
+
+    axios({
+      method: 'post',
+      url: `http://roaming.api.staging.keydisk.ru/operator`,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
+       },
+      data: dataForm,
+    })
+    .then(res => {
+      const { status, sender, receiver } = res.data
+
+      if (status === 0 || res.data.text === 'Ваша заявка принята в работу') this.setState({ activeStep: 3 })
+
+      else {
+        if (res.data.text) {
+          this.setState({ open: true, textSnackbar: res.data.text, error: true })
+        } else {
+          let step = 1
+          let checkError = emptyError(sender)
+          if (checkError.checkEmpty) { // если ошибок нет на sender
+            checkError = emptyError(receiver)
+            step = 2
+          }
+
+          this.setState({ open: true, textSnackbar: `${step} шаг: ${checkError.textFieldError}`, error: true })
+        }
+        // console.log(lastError)
+      }
+    })
+  }
+
   handleDeleteSenderList = () => {
     this.setState({ senderList: '' })
+  }
+
+  onSubmitFinalForm = ffvalue => {
+    const { valid } = this.formApi.getState()
+    const { activeStep } = this.state
+
+    if (activeStep === -1 && valid) this.authOperator(ffvalue)
+    if (activeStep === 2 && valid) this.sendDataRFFOperator(ffvalue)
   }
 
   render() {
@@ -217,11 +225,11 @@ class WithOperators extends Component {
     return (
       <>
         <Form
-          onSubmit={this.onSubmit}
+          onSubmit={this.onSubmitFinalForm}
           mutators={{
             ...arrayMutators
           }}
-
+          validate={validate}
           decorators={[this.bindFormApi]}
           render={({
             handleSubmit,
@@ -233,19 +241,19 @@ class WithOperators extends Component {
             errors,
             touched
           }) => {
-            const { change, submit } = form
-            console.log(errors)
+            const { change } = form
+
             return (
               <form onSubmit={handleSubmit}>
-
                 {componentWithStep({
                   activeStep,
                   nameKontr,
                   values,
                   change,
-                  submit,
+                  errors,
                   receiverList,
                   senderList,
+                  formApi: this.formApi,
                   handleBack: this.handleBack,
                   handleNext: this.handleNext,
                   handleStep: this.handleStep,
@@ -264,7 +272,7 @@ class WithOperators extends Component {
                   }}
                   message={
                     <div className={classes.messageSnackbar}>
-                      <ErrorOutline size='small' />
+                      <ErrorOutline size='small' className={classes.iconMessageSnackbar} />
                       {textSnackbar}
                     </div>
                   }
@@ -297,9 +305,10 @@ const componentWithStep = props => {
     values,
     change,
     handleBack,
-    submit,
+    formApi,
     handleNext,
     push,
+    errors,
     handleStep,
     loadReceiverFile,
     receiverList,
@@ -321,7 +330,7 @@ const componentWithStep = props => {
         nameKontr={nameKontr}
         values={values}
         changeFinalForm={change}
-        submitFinalForm={submit}
+        submitFinalForm={formApi}
         handleBack={handleBack}
         handleNext={handleNext}
         handleStep={handleStep}
@@ -331,12 +340,30 @@ const componentWithStep = props => {
         loadSenderFile={loadSenderFile}
         handleDeleteSenderList={handleDeleteSenderList}
         senderList={senderList}
+        errorsFinalForm={errors}
       />
     )
 }
 
 function TransitionUp(props) {
   return <Slide {...props} direction="up" />;
+}
+
+const emptyError = values => {
+  let checkValue = [...values]
+  let objError = { nameFieldError: '', textFieldError: '', checkEmpty: true }
+
+  checkValue.map(key => {
+    Object.keys(key).forEach(item => {
+      if (item === 'errors') {
+        Object.keys(key[item]).forEach(nameField => {
+          if (key[item][nameField])
+            objError = { nameFieldError: nameField, textFieldError: key[item][nameField], checkEmpty: false }
+        })
+      }
+    })
+  })
+  return objError
 }
 
 const styles = theme => ({
@@ -367,6 +394,9 @@ const styles = theme => ({
     display: 'flex',
     justifyContent: 'row',
     fontSize: '13pt'
+  },
+  iconMessageSnackbar: {
+    marginRight: 10
   }
 });
 

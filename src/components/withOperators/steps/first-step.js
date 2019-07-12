@@ -8,7 +8,8 @@ import {
   Button,
   Card,
   Typography,
-  IconButton
+  IconButton,
+  InputAdornment
 } from "@material-ui/core";
 import { Delete, AttachFile } from "@material-ui/icons";
 
@@ -16,9 +17,9 @@ import { TextField } from "final-form-material-ui";
 import { Field } from "react-final-form";
 import { FieldArray } from 'react-final-form-arrays'
 import formatStringByPattern from "format-string-by-pattern";
+import { FIRST_STATE_OPERATOR } from '../../../constants/customer-form'
 
 class FirstStep extends Component {
-
 
   render() {
     const {
@@ -31,9 +32,6 @@ class FirstStep extends Component {
     } = this.props;
 
     const fieldArrayName = 'sender'
-    let checkNum = true
-    if (nameKontr !== 'XXX') // тут нужно вписать в условие Контур + Infotecs
-      checkNum = false
 
     return (
       <>
@@ -48,6 +46,7 @@ class FirstStep extends Component {
                 let disableKpp = true
                 let disable = true
                 let typeUL = true
+                let disableNumber = true
                 if (value && value['inn']) {
                   disableKpp = value['inn'].length === 10 ? false : true
                   typeUL = value['inn'].length === 12 ? false : true
@@ -56,7 +55,13 @@ class FirstStep extends Component {
                   else
                     disable = true
                 }
+                if (value && value['id'] && value['id'].length > 3) {
+                  let subValue = value['id'].substr(0, 3)
+                  if (subValue === '2AK' || subValue === '2BE' || subValue === '2BM')
+                    disableNumber = false
+                }
 
+                this.props.submitFinalForm.submit()
                 return (
                   <>
                     <Card className={classes.cardRoot}>
@@ -165,17 +170,20 @@ class FirstStep extends Component {
                         />
                       </Grid>
                       <Grid item xs={12} sm={12}>
-                        {checkNum &&
+                        {!disableNumber &&
                           <Field
                             fullWidth
-                            required={!disable}
                             disabled={disable}
+                            required={!disable}
                             component={TextField}
                             name={`${key}.number`}
                             type='text'
                             label='Номер заявки'
-                            parse={formatStringByPattern("999999999")}
+                            parse={formatStringByPattern("999999")}
                             className={classes.field}
+                            InputProps={{
+                              startAdornment: <InputAdornment position="start">O-</InputAdornment>,
+                            }}
                           />
                         }
                       </Grid>
@@ -189,7 +197,7 @@ class FirstStep extends Component {
                     variant='contained'
                     color='primary'
                     size='small'
-                    onClick={() => { if (fields.length <= 100) fields.push() }}
+                    onClick={() => fields.push()}
                   >
                     Добавить контрагента
                   </Button>
@@ -245,8 +253,8 @@ const styles = theme => ({
   },
   delButton: {
     position: 'absolute',
-    right: 5,
-    top: 5,
+    right: -1,
+    top: -1,
     zIndex: 2
   },
 });
