@@ -13,7 +13,7 @@ export const StyledTextField = props => {
     InputProps,
     autoComplete
   } = props;
-  
+
   if (type === undefined) type = "text";         //по умолчанию type = "text"
   if (required === undefined) required = "true"; //по умолчанию required = "true"
 
@@ -21,10 +21,10 @@ export const StyledTextField = props => {
     <Field
       component={TextField}
       fullWidth
-      type={type} 
+      type={type}
       name={name}
       label={label}
-      parse={parse}      
+      parse={parse}
       disabled={disabled}
       required={required}
       InputProps={InputProps}

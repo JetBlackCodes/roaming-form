@@ -127,3 +127,20 @@ export const STATE_STATUS = [
     progress: 100,
   }
 ];
+
+export const FIRST_STATE_OPERATOR = {
+  id: '',
+  inn: '',
+  kpp: '',
+  name: '',
+  lastname: '',
+  firstname: '',
+}
+
+export const SECOND_STATE_OPERATOR = {
+  inn: '',
+  kpp: '',
+  name: '',
+  lastname: '',
+  firstname: '',
+}

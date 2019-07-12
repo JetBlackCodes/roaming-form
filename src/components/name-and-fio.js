@@ -37,7 +37,7 @@ export const NameAndFIO = props => {
         <Grid item xs={12} sm={4}>
           <StyledTextField
             name={patronymic}
-            label="Отчество"            
+            label="Отчество"
             required={false}
             autoComplete={autoComplete}
           />

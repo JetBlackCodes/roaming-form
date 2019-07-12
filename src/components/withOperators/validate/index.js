@@ -3,29 +3,31 @@ export const validate = values => {
   let error = "";
   Object.keys(values).forEach(function(key) {
     // sender + receiver
-
-    if ((typeof values[key]) === 'object') {
+    if (key === 'sender' || key === 'receiver') {
+      // if object value from operators
       values[key].map((item, index) => { // цикл sender or receiver
 
-        Object.keys(item).forEach(keyItem => {
-          let value = values[key][index][keyItem]
-          let objvalues = values[key][index]
-          let type = values[key]
+        if ((typeof values[key][index]) === 'object') {
+          // easy check
+          Object.keys(values[key][index]).forEach(keyItem => {
+            // need object
+            let value = values[key][index][keyItem] // value
+            let objvalues = values[key][index] // object
+            let type = key // name global object example: sender, receiver
 
-          if (distributor[keyItem]) {
-            error = distributor[keyItem]({ value, objvalues, type });
-            if (error) {
-              if (!errors[key])
-                errors[key] = []
-              if (!errors[key][index])
-                errors[key][index] = {}
-              errors[key][index][keyItem] = error;
+            if (distributor[keyItem]) {
+              error = distributor[keyItem]({ value, objvalues, type }); //
+              if (error) { // if error value
+                if (!errors[key]) errors[key] = []
+                if (!errors[key][index]) errors[key][index] = {}
+                errors[key][index][keyItem] = error;
+              }
             }
-          }
-
-        })
+          })
+        }
 
       })
+
     }
 
   }, values);
@@ -45,47 +47,39 @@ const validationInn = ({ value, objvalues, type }) => {
 
 const validationKpp = ({ value, objvalues, type }) => {
   let kpp = "";
-  if (value && objvalues.inn && objvalues.inn.length === 10) {
-    if (value.length !== 9)
-      kpp = "Некорректный КПП"
+  if (objvalues.inn && objvalues.inn.length === 10) {
+    if (!value) kpp = "Обязательное поле"
+    if (value && value.length < 9) kpp = "Некорректный КПП"
   }
   return kpp;
 };
 
 const validationGuid = ({ value, objvalues, type }) => {
   let id = "";
-  if (!value) id = "Обязательное поле";
-  if (value && value.length < 39) id = "Некорректный идентификатор";
-  if (value && value.length > 3) {
-    if (value.substr(0, 3) !== "2AE" && type === 'receiver') id = "Некорректный идентификатор";
-  }
+  if (objvalues.inn && (objvalues.inn.length === 10 || objvalues.inn.length === 12) && !value)
+    id = type === 'sender' ? "Обязательное поле" : '';
+  if (value && value.length < 36) id = "Некорректный идентификатор";
   return id;
 };
 
 const validationName = ({ value, objvalues, type }) => {
   let name = "";
-  if (objvalues.inn && objvalues.inn.length === 10) {
-    if (!value)
-      name = "Обязательное поле";
-  }
+  if (objvalues.inn && objvalues.inn.length === 10 && !value)
+    name = "Обязательное поле";
   return name;
 };
 
 const validationLastName = ({ value, objvalues, type }) => {
   let lastname = "";
-  if (objvalues.inn && objvalues.inn.length === 12) {
-    if (!value)
-      lastname = "Обязательное поле";
-  }
+  if (objvalues.inn && objvalues.inn.length === 12 && !value)
+    lastname = "Обязательное поле";
   return lastname;
 };
 
 const validationFirstName = ({ value, objvalues, type }) => {
   let firstname = "";
-  if (objvalues.inn && objvalues.inn.length === 12) {
-    if (!value)
-      firstname = "Обязательное поле";
-  }
+  if (objvalues.inn && objvalues.inn.length === 12 && !value)
+    firstname = "Обязательное поле";
   return firstname;
 };
 
