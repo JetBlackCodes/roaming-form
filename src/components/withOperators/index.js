@@ -1,19 +1,13 @@
 import React, { Component } from "react";
 import {
   withStyles,
-  Card,
-  Button,
-  Grid,
   Snackbar,
   IconButton,
   Slide
 } from "@material-ui/core";
-import { Close, ErrorOutline, Done } from '@material-ui/icons';
-import { TextField } from "final-form-material-ui";
-import { Form, Field } from "react-final-form";
-import { purple } from '@material-ui/core/colors';
+import { Close, ErrorOutline } from '@material-ui/icons';
+import { Form } from "react-final-form";
 import arrayMutators from 'final-form-arrays'
-
 import Auth from './auth'
 import FormOperators from './steps/form-operators'
 import { validate } from './validate/index'
@@ -159,10 +153,10 @@ class WithOperators extends Component {
   }
 
   sendDataRFFOperator = ffvalue => {
-    const { activeStep, senderList, receiverList } = this.state
+    const { senderList, receiverList } = this.state
 
     var dataForm = new FormData();
-    let checkNum = false
+    // let checkNum = false
     let data = {}
 
     if (receiverList) dataForm.set('receiver_list', receiverList ); else data.receiver = ffvalue.receiver
@@ -218,7 +212,7 @@ class WithOperators extends Component {
 
   render() {
     const { classes } = this.props
-    const { open, transition, textSnackbar, disabled, error, activeStep, nameKontr, receiverList, senderList } = this.state
+    const { open, textSnackbar, error, activeStep, nameKontr, receiverList, senderList } = this.state
     const classesSnackBar = error ? { classes: { root: classes.snackbarError } } : { classes: { root: classes.snackbarSuccess } }
 
     {/* validate={validate} */}
