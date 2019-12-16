@@ -8,7 +8,7 @@ import {
   Paper,
   InputAdornment
 } from "@material-ui/core";
-import { Help, AttachFile } from "@material-ui/icons";
+import { Help } from "@material-ui/icons";
 import formatStringByPattern from "format-string-by-pattern";
 import { NameAndFIO } from "../name-and-fio";
 
@@ -32,12 +32,7 @@ class FirstStep extends Component {
     const open = Boolean(anchorEl);
     const {
       classes,
-      dataMyOrganisation,
-      dop_sog,
-      chipDopSog,
-      upload,
-      values,
-      handleDelete
+      values
     } = this.props;
 
     let disableKpp = true;
@@ -154,9 +149,6 @@ const styles = theme => ({
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
     width: 200
-  },
-  chip: {
-    margin: theme.spacing(1)
   }
 });
 

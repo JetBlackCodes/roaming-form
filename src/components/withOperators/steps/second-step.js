@@ -1,19 +1,13 @@
 import React, { Component } from "react";
 import {
   withStyles,
-  StepLabel,
-  Step,
-  Stepper,
   Grid,
   Button,
   IconButton,
   Card,
-  Typography,
-  Avatar,
-  Chip,
   InputAdornment
 } from "@material-ui/core";
-import { Delete, AttachFile } from "@material-ui/icons";
+import { Delete } from "@material-ui/icons";
 
 import { TextField } from "final-form-material-ui";
 import { Field } from "react-final-form";
@@ -27,12 +21,7 @@ class SecondStep extends Component {
     const {
       classes,
       values,
-      handleBack,
-      handleNext,
-      receiverList,
-      loadSoglash,
-      handleDeleteSoglash,
-      soglash
+      receiverList
     } = this.props;
 
     const fieldArrayName = 'receiver'
@@ -204,12 +193,6 @@ const styles = theme => ({
     display: "flex",
     justifyContent: "center",
   },
-  paperPopper: {
-    padding: 10,
-    background: theme.palette.primary.light,
-    color: "#000",
-    maxWidth: 800
-  },
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
@@ -226,10 +209,6 @@ const styles = theme => ({
     marginTop: 20
   },
   cardRoot: {
-    // width: '100%',
-    // margin: 10,
-    // padding: 10,
-    // position: 'relative'
     marginTop: "8px",
     marginBottom: "8px",
     maxWidth: "610px",
@@ -238,9 +217,6 @@ const styles = theme => ({
     marginLeft: "8px"
   },
   buttonForm: {
-    // display: 'flex',
-    // justifyContent: 'space-around',
-    // marginTop: 15,
     margin: "8px"
   },
   delButton: {
@@ -251,16 +227,7 @@ const styles = theme => ({
   },
   input: {
     display: "none"
-  },
-  labelChip: {
-    width: 100,
-    textOverflow: 'ellipsis',
-    overflow: 'hidden',
-    whiteSpace: 'nowrap',
-  },
-  chipSoglash: {
-    width: 170
-  },
+  }
 });
 
 export default withStyles(styles)(SecondStep);

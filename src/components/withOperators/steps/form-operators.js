@@ -13,12 +13,7 @@ import {
   Avatar,
   StepButton,
 } from "@material-ui/core";
-import { Help, AttachFile } from "@material-ui/icons";
-
-import { TextField } from "final-form-material-ui";
-import { Field } from "react-final-form";
-import { FieldArray } from 'react-final-form-arrays'
-import formatStringByPattern from "format-string-by-pattern";
+import { AttachFile } from "@material-ui/icons";
 
 import Auth from '../auth'
 import FirstStep from './first-step'
@@ -51,7 +46,6 @@ class FormOperators extends Component {
       activeStep,
       nameKontr,
       values,
-      changeFinalForm,
       handleBack,
       handleNext,
       submitFinalForm,
@@ -65,7 +59,7 @@ class FormOperators extends Component {
       errorsFinalForm
     } = this.props;
 
-    const { modalStyle, openModalFile, typeModal, errorStep } = this.state
+    const { modalStyle, openModalFile, typeModal } = this.state
 
     const steps = ['Данные вашего клиента', 'Контрагенты в АО Калуга Астрал', 'Проверка данных']
 
@@ -85,7 +79,6 @@ class FormOperators extends Component {
 
           <Stepper activeStep={activeStep}>
             {steps.map((label, index) => {
-              const stepProps = {};
               const labelProps = {};
               const { errors } = this.props.submitFinalForm.getState()
 
@@ -233,8 +226,7 @@ class FormOperators extends Component {
             </Grid>
           </div>
 
-        </Paper>
-        
+        </Paper>       
 
         <ModalUploadList
           openModal={this.openModal}
@@ -392,7 +384,6 @@ const GetStepFormOperators = props => {
     handleStep,
    } = props
 
-  let fieldArrayName = activeStep === 0 ? 'sender' : 'receiver'
   let checkNum = activeStep === 0 ? true : false
   if (checkNum && nameKontr !== 'XXX') // тут нужно вписать в условие Контур + Infotecs
     checkNum = false
@@ -442,35 +433,13 @@ const GetStepFormOperators = props => {
   }
 }
 
-const parse = value => {
-  const someFormat = formatStringByPattern(
-    "XXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-  );
-  let newValue = someFormat(value.toUpperCase());
-  return newValue;
-};
-
 const styles = theme => ({
   root: {
     display: "flex",
     justifyContent: "center",
   },
-  paperPopper: {
-    padding: 10,
-    background: theme.palette.primary.light,
-    color: "#000",
-    maxWidth: 500
-  },
-  textField: {
-    marginLeft: theme.spacing(1),
-    marginRight: theme.spacing(1),
-    width: 200
-  },
   chip: {
     margin: theme.spacing(1),
-  },
-  field: {
-    minHeight: '70px'
   },
   layout: {
     width: "auto",
@@ -485,9 +454,6 @@ const styles = theme => ({
   },
   form: {
     width: 630,
-    // // marginTop: 20,
-    //  paddingRight: 40,
-
     marginTop: theme.spacing.unit * 3,
     marginBottom: theme.spacing.unit * 3,
     padding: theme.spacing.unit * 2,

@@ -14,8 +14,8 @@ export const StyledTextField = props => {
     autoComplete
   } = props;
 
-  if (type === undefined) type = "text";         //по умолчанию type = "text"
-  if (required === undefined) required = "true"; //по умолчанию required = "true"
+  if (type === undefined) type = "text";
+  if (required === undefined) required = true;
 
   return (
     <Field

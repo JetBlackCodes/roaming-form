@@ -4,20 +4,16 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Fab,
-  Paper,
   Typography,
   Avatar,
   Chip,
-  Modal,
-  Card,
   ExpansionPanel,
   ExpansionPanelDetails,
   ExpansionPanelSummary,
   Button,
   withStyles,
 } from "@material-ui/core";
-import { Help, AttachFile, ExpandMore, Warning, Label } from "@material-ui/icons";
+import { AttachFile, ExpandMore, Warning, Label } from "@material-ui/icons";
 
 class Summary extends Component {
 
@@ -26,12 +22,10 @@ class Summary extends Component {
   }
 
   handleCloseModal = () => {
-    const { openModalFile } = this.state
     this.setState({ openModalFile: false })
   }
 
   handleOpenModal = () => {
-    const { openModalFile } = this.state
     this.setState({ openModalFile: true })
   }
 
@@ -50,7 +44,6 @@ class Summary extends Component {
       handleStep
     } = this.props
 
-    const { openModalFile } = this.state
     let colFiles = 0
     colFiles = senderList ? colFiles + 1 : colFiles
     colFiles = receiverList ? colFiles + 1 : colFiles
@@ -304,14 +297,6 @@ const styles = theme => ({
   cell: {
     maxWidth: '50%'
   },
-  paperFiles: {
-    width: '100%',
-    display: "flex",
-    justifyContent: "center",
-    marginTop: 15,
-    marginBottom: 15,
-    padding: 10
-  },
   labelChip: {
     width: 180,
     textOverflow: 'ellipsis',
@@ -328,14 +313,6 @@ const styles = theme => ({
   },
   chipFiles: {
     marginRight: 10
-  },
-  cardNotData: {
-    minHeight: 200,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    fontSize: '22pt',
-    color: '#f00'
   },
   iconButton: {
     marginRight: theme.spacing(1)

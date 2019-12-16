@@ -12,7 +12,7 @@ import Auth from './auth'
 import FormOperators from './steps/form-operators'
 import { validate } from './validate/index'
 
-import { FIRST_STATE_OPERATOR, SECOND_STATE_OPERATOR, NAMED_FIELD } from '../../constants/customer-form'
+import { FIRST_STATE_OPERATOR, SECOND_STATE_OPERATOR } from '../../constants/customer-form'
 
 import axios from "axios";
 axios.defaults.withCredentials = true;
@@ -28,6 +28,7 @@ class WithOperators extends Component {
     nameKontr: undefined,
     senderList: '',
     receiverList: '',
+    request_id: ''
   };
 
   handleClose = () => {
@@ -121,7 +122,7 @@ class WithOperators extends Component {
        },
       data: dataForm,
     })
-    .then((res, errors) => {
+    .then((res) => {
       let text = res.data.status === 0 ? 'Успешная авторизация' : res.data.text
       let error = res.data.status === 0 ? false : true
 
@@ -156,15 +157,16 @@ class WithOperators extends Component {
     const { senderList, receiverList } = this.state
 
     var dataForm = new FormData();
-    // let checkNum = false
-    let data = {}
+    let data = {};
 
     if (receiverList) dataForm.set('receiver_list', receiverList ); else data.receiver = ffvalue.receiver
 
     if (senderList) dataForm.set('sender_list', senderList ); else data.sender = ffvalue.sender
 
+    data.request_id = ffvalue.request_id;
+
     if (!senderList || !receiverList)
-      dataForm.set('data', JSON.stringify(data) )
+      dataForm.set('data', JSON.stringify(data))
 
     axios({
       method: 'post',
@@ -193,7 +195,6 @@ class WithOperators extends Component {
 
           this.setState({ open: true, textSnackbar: `${step} шаг: ${checkError.textFieldError}`, error: true })
         }
-        // console.log(lastError)
       }
     })
   }
@@ -215,7 +216,6 @@ class WithOperators extends Component {
     const { open, textSnackbar, error, activeStep, nameKontr, receiverList, senderList } = this.state
     const classesSnackBar = error ? { classes: { root: classes.snackbarError } } : { classes: { root: classes.snackbarSuccess } }
 
-    {/* validate={validate} */}
     return (
       <>
         <Form
@@ -227,13 +227,9 @@ class WithOperators extends Component {
           decorators={[this.bindFormApi]}
           render={({
             handleSubmit,
-            reset,
-            submitting,
-            pristine,
             values,
             form,
-            errors,
-            touched
+            errors
           }) => {
             const { change } = form
 
@@ -301,7 +297,6 @@ const componentWithStep = props => {
     handleBack,
     formApi,
     handleNext,
-    push,
     errors,
     handleStep,
     loadReceiverFile,
@@ -361,11 +356,6 @@ const emptyError = values => {
 }
 
 const styles = theme => ({
-  card: {
-    flexDirection: 'column',
-    width: '300px',
-    padding: '20px'
-  },
   button: {
     marginTop: '50px',
     width: '100%'

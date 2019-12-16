@@ -1,33 +1,25 @@
 import React, { Component } from "react";
 import {
   withStyles,
-  StepLabel,
-  Step,
-  Stepper,
   Grid,
   Button,
   Card,
-  Typography,
   IconButton,
   InputAdornment
 } from "@material-ui/core";
-import { Delete, AttachFile } from "@material-ui/icons";
+import { Delete } from "@material-ui/icons";
 
 import { TextField } from "final-form-material-ui";
 import { Field } from "react-final-form";
 import { FieldArray } from 'react-final-form-arrays'
 import formatStringByPattern from "format-string-by-pattern";
-import { FIRST_STATE_OPERATOR } from '../../../constants/customer-form'
 
 class FirstStep extends Component {
 
   render() {
     const {
       classes,
-      nameKontr,
       values,
-      handleBack,
-      handleNext,
       senderList
     } = this.props;
 
@@ -64,6 +56,15 @@ class FirstStep extends Component {
                 this.props.submitFinalForm.submit()
                 return (
                   <>
+                    <Field
+                      fullWidth
+                      required={false}
+                      component={TextField}
+                      name="request_id"
+                      type='text'
+                      label='Идентификатор заявки в системе роумингового оператора'
+                      className={classes.requestIDfield}
+                    />
                     <Card className={classes.cardRoot}>
 
                       <IconButton
@@ -191,18 +192,16 @@ class FirstStep extends Component {
                   </>
                 )
               })}
-              {/* <div className={classes.cardRoot}> */}
-                <Grid item xs={12} sm={12} className={classes.buttonForm}>
-                  <Button
-                    variant='contained'
-                    color='primary'
-                    size='small'
-                    onClick={() => fields.push()}
-                  >
-                    Добавить контрагента
+              <Grid item xs={12} sm={12} className={classes.buttonForm}>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  size='small'
+                  onClick={() => fields.push()}
+                >
+                  Добавить контрагента
                   </Button>
-                </Grid>
-              {/* </div> */}
+              </Grid>
             </>
           )}
         </FieldArray>
@@ -224,32 +223,23 @@ const styles = theme => ({
     display: "flex",
     justifyContent: "center",
   },
-  paperPopper: {
-    padding: 10,
-    background: theme.palette.primary.light,
-    color: "#000",
-    maxWidth: 800
-  },
   textField: {
     marginLeft: theme.spacing(1),
     marginRight: theme.spacing(1),
     width: 200
   },
-  chip: {
-    margin: theme.spacing(1),
-  },
   field: {
     minHeight: '70px'
+  },
+  requestIDfield: {
+    minHeight: '70px',
+    marginLeft: '5px',
   },
   form: {
     width: 600,
     marginTop: 20
   },
   cardRoot: {
-    // width: '100%',
-    // margin: 10,
-    // padding: 10,
-    // position: 'relative'
     marginTop: "8px",
     marginBottom: "8px",
     maxWidth: "610px",

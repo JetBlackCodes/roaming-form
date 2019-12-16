@@ -7,7 +7,6 @@ import {
   TableBody,
   LinearProgress,
   Tooltip,
-  Input,
   IconButton,
   Grid,
   TextField,
@@ -17,7 +16,6 @@ import {
 import { withStyles } from '@material-ui/core/styles';
 import { green, orange, yellow, lightGreen } from '@material-ui/core/colors';
 import { Clear } from "@material-ui/icons";
-
 import { STATE_OPERATORS, STATE_STATUS } from "../constants/customer-form";
 
 class State extends Component {

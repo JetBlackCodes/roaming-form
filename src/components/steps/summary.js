@@ -148,8 +148,7 @@ const OperatorList = props => {
     kpp,
     index,
     inn,
-    operator,
-    ...other
+    operator
   } = props;
   if (receiverList === "") {
     return (

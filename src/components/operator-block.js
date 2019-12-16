@@ -7,16 +7,11 @@ import { Select } from "final-form-material-ui";
 import { Field } from "react-final-form";
 import formatStringByPattern from "format-string-by-pattern";
 import MenuItem from "@material-ui/core/MenuItem";
-import Box from "@material-ui/core/Box";
-
 import { StyledTextField } from "./styled-text-field";
 import { NameAndFIO } from "./name-and-fio";
 
 const OperatorBlock = props => {
   const useStyles = makeStyles(theme => ({
-    divider: {
-      margin: theme.spacing(1, 0, 2, 0)
-    },
     select: {
       marginBottom: theme.spacing(2)
     },

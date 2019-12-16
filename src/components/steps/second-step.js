@@ -7,21 +7,15 @@ import {
   Grid,
   Chip,
   Avatar,
-  Paper,
-  Table,
-  TableBody,
-  TableRow,
-  TableCell,
   withStyles
 } from "@material-ui/core";
 import {
   DEFAULT_OPERATOR,
   MAX_OPERATORS_COUNT
 } from "../../constants/customer-form";
-import { AttachFile, Equalizer } from "@material-ui/icons";
+import { AttachFile } from "@material-ui/icons";
 import OperatorBlock from "../operator-block";
 import { UploadButton } from "../upload-button";
-import { Field } from "react-final-form";
 
 class SecondStep extends React.Component {
   state = {
@@ -79,7 +73,6 @@ class SecondStep extends React.Component {
       clearObj.map(item => changeFinalForm(item, undefined) ) // очищаем
       let newIndex = 0 // новый index
       Object.keys(values).forEach(key => { // проходим по allValues rff
-        const value = this[key]; // value keys rff
         let defIndex = key.split("Kontr") // nameField rff + indexField rff. Example: defIndex['inn', 0]
         if (defIndex[1] > index) { // если больше искомого index
           newIndex = defIndex[1] - 1 // new index
@@ -118,7 +111,7 @@ class SecondStep extends React.Component {
   preloadReceiverList = (event) => {
     const true_type = [ 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel' ]
     const file = event.target.files[0]
-    const { uploadReceiverfile, values, changeFinalForm } = this.props
+    const { values, changeFinalForm } = this.props
     if (file) {
       if (file.type === true_type[0] || file.type === true_type[1]) {
         this.setState({ operators: [{ ...DEFAULT_OPERATOR }] })
@@ -133,20 +126,16 @@ class SecondStep extends React.Component {
     const {
       values,
       classes,
-      uploadReceiverfile,
       disableFileUpload,
-      objReceiverList,
       chipFileName,
       upload,
       chipDopSog,
-      handleDelete,
-      changeFinalForm
+      handleDelete
     } = this.props
     const { open,
       modalStyle,
       openSnackbar,
       textSnackbar,
-      openAnalyzReceiverList,
       operators
     } = this.state;
     const vertical = "top";
@@ -167,7 +156,6 @@ class SecondStep extends React.Component {
 
         </Typography>
         <div style={{ position: "relative" }}>
-        {/* <Divider className={styles.divider} mb={1}/> */}
           {operators.map((item, index) => (
             <OperatorBlock
               actions={{ delOperator: this.DelOperator(index) }}
@@ -256,7 +244,7 @@ class SecondStep extends React.Component {
 }
 
 const UploadDopSoglash = (props) => {
-  const { upload, classes, chipDopSog, handleDelete, operators, values, uploadReceiverList } = props
+  const { upload, classes, chipDopSog, handleDelete, values, uploadReceiverList } = props
   let checkNeedDopSog = 0
 
   Object.keys(values).forEach(function(key) {
@@ -348,70 +336,6 @@ const CheckTypeUploadReceiver = props => {
   }
 };
 
-const AnalyzReceiverList = (props) => {
-  const { open, objReceiverList } = props
-  if (open) {
-    return (
-      <Paper>
-        <Table>
-          <TableBody>
-            <TableRow>
-              <TableCell>Всего контрагентов</TableCell>
-              <TableCell align='right'>{objReceiverList.all}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Из них ЮЛ</TableCell>
-              <TableCell align='right'>{objReceiverList.ul}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Из них ИП</TableCell>
-              <TableCell align='right'>{objReceiverList.ip}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell>Из них некорректные</TableCell>
-              <TableCell align='right'>{objReceiverList.error}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </Paper>
-    )
-  }
-  else
-    return null
-}
-
-const InfoReceiverListChip = (props) => {
-  const { open, classes, handleDeleteReceiverList, chipFileName, openAnalyzReceiverList } = props
-  if (open) {
-    return (
-      <div className={classes.infoReceiverList}>
-        <Chip
-          variant="outlined"
-          color="primary"
-          onDelete={handleDeleteReceiverList}
-          avatar={
-            <Avatar>
-              <AttachFile />
-            </Avatar>
-          }
-          label={chipFileName}
-          className={classes.fileReceiverList}
-        />
-        <Button
-          variant="contained"
-          className={classes.buttonStatusReceiverList}
-          onClick={openAnalyzReceiverList}
-        >
-          Анализ файла
-          <Equalizer />
-        </Button>
-      </div>
-    )
-  }
-  else
-    return null
-}
-
 const objRff = (index ) => {
   return [`innKontr${index}`,
     `kppKontr${index}`,
@@ -443,11 +367,6 @@ const styles = theme => ({
   input: {
     display: "none"
   },
-  infoReceiverList: {
-    marginTop: "5px",
-    display: "flex",
-    justifyContent: "space-around"
-  },
   fileReceiverListMain: {
     maxWidth: '250px',
     position: 'absolute',
@@ -456,9 +375,6 @@ const styles = theme => ({
   },
   fileReceiverList: {
     maxWidth: "50px"
-  },
-  buttonStatusReceiverList: {
-    maxHeight: "32px"
   },
   uploadReceiverList: {
     display: 'flex',

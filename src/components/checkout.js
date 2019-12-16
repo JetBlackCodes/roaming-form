@@ -11,8 +11,6 @@ import {
   Snackbar,
   SnackbarContent,
   IconButton,
-  Avatar,
-  Chip,
   Grid
 } from "@material-ui/core";
 import { Error, Close } from "@material-ui/icons";
@@ -191,7 +189,6 @@ class Checkout extends Component {
     })
 
     Object.keys(values).forEach(function(key) {
-      let value = this[key];
       if (key.indexOf('Kontr') !== -1)
         changeFinalForm(key, undefined)
 
@@ -262,7 +259,7 @@ class Checkout extends Component {
   };
 
   render() {
-    const { classes, updateData } = this.props;
+    const { classes } = this.props;
     const {
       activeStep, // текущий шаг
       operators, // контрагенты
@@ -284,7 +281,7 @@ class Checkout extends Component {
         decorators={[this.bindFormApi]}
         onSubmit={this.handleSubmit}
         validate={validate}
-        render={({ handleSubmit, reset, submitting, pristine, values, form }) => {
+        render={({ handleSubmit, submitting, values, form }) => {
           const { change } = form
           return (
             <form onSubmit={handleSubmit}>
