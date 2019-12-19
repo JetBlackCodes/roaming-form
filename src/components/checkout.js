@@ -236,7 +236,7 @@ class Checkout extends Component {
 
       axios({
         method: "post",
-        url: `http://roaming.api.staging.keydisk.ru/abonent`,
+        url: `https://roaming.edo.keydisk.ru`,
         headers: {
           Accept: "application/json",
           "Content-Type": "multipart/form-data"

@@ -38,7 +38,7 @@ class WithOperators extends Component {
   async componentDidMount() {
     const { data, status } = await axios({
       method: 'post',
-      url: `http://roaming.api.staging.keydisk.ru/operator`,
+      url: `https://roaming.edo.keydisk.ru`,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'multipart/form-data',
@@ -115,7 +115,7 @@ class WithOperators extends Component {
 
     axios({
       method: 'post',
-      url: `http://roaming.api.staging.keydisk.ru/auth`,
+      url: `https://roaming.edo.keydisk.ru`,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'multipart/form-data',
@@ -170,7 +170,7 @@ class WithOperators extends Component {
 
     axios({
       method: 'post',
-      url: `http://roaming.api.staging.keydisk.ru/operator`,
+      url: `https://roaming.edo.keydisk.ru`,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'multipart/form-data',
