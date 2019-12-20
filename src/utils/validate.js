@@ -46,6 +46,13 @@ const validationGuid = ( value ) => {
   return id;
 };
 
+const validationGuidofAbonet = ( value ) => {
+  let id = "";
+  if (!value) id = "Обязательное поле";
+  if (value && (value.length < 4 || value.length > 46)) id = "Некорректный идентификатор";
+  return id;
+};
+
 const validationName = ( value ) => {
   let name = "";
   if (!value) name = "Обязательное поле";
@@ -56,6 +63,6 @@ const distributor = {
   inn: validationInn,
   kpp: validationKpp,
   email: validationEmail,
-  id: validationGuid,
+  id: validationGuidofAbonet,
   name: validationName
 };

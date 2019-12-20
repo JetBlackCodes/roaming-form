@@ -25,11 +25,8 @@ export const validate = values => {
             }
           })
         }
-
-      })
-
+      })      
     }
-
   }, values);
   return errors;
 };
@@ -61,6 +58,14 @@ const validationGuid = ({ value, objvalues, type }) => {
   if (value && value.length < 36) id = "Некорректный идентификатор";
   return id;
 };
+
+// const validationGuidOfAbonent = ({ value, objvalues, type }) => {
+//   let id = "";
+//   if (objvalues.inn && (objvalues.inn.length === 10 || objvalues.inn.length === 12) && !value)
+//     id = type === 'sender' ? "Обязательное поле" : '';
+//   if (value && value.length < 4 && value.length > 46) id = "Некорректный идентификатор";
+//   return id;
+// };
 
 const validationName = ({ value, objvalues, type }) => {
   let name = "";

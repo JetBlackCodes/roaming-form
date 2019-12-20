@@ -167,7 +167,7 @@ class FirstStep extends Component {
                           type='text'
                           label='Идентификатор'
                           className={classes.field}
-                          parse={parse}
+                          // parse={parse}
                         />
                       </Grid>
                       <Grid item xs={12} sm={12}>
@@ -210,13 +210,15 @@ class FirstStep extends Component {
   }
 }
 
-const parse = value => {
-  const someFormat = formatStringByPattern(
-    "XXXXXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
-  );
-  let newValue = someFormat(value.toUpperCase());
-  return newValue;
-};
+// const parse = value => {
+  // const someFormat = formatStringByPattern(
+  //   "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" //here
+  // );
+  // let newValue = someFormat(value);
+
+
+//   return newValue;
+// };
 
 const styles = theme => ({
   root: {

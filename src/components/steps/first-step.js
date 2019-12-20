@@ -128,9 +128,9 @@ class FirstStep extends Component {
 
 const parse = value => {
   const someFormat = formatStringByPattern(
-    "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX"
+    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
   );
-  let newValue = someFormat(value.toUpperCase());
+  let newValue = someFormat(value);
   return newValue;
 };
 
