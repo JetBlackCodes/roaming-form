@@ -79,7 +79,7 @@ class App extends Component {
               padding: "20px",
               position: "fixed",
               bottom: "0",
-              maxWidth: "600px",
+              width: "20%",
               zIndex: "1"
             }}
           >
