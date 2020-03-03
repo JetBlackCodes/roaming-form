@@ -3,8 +3,11 @@ import Checkout from "./components/checkout";
 import State from "./components/state";
 import WithOperators from "./components/withOperators/index";
 
-import { Paper, Tab, Tabs } from "@material-ui/core";
+import { Paper, Tab, Tabs, Typography } from "@material-ui/core";
 import { Person, Business, SignalCellularAlt } from "@material-ui/icons";
+import IconButton from "@material-ui/core/IconButton";
+import DeleteIcon from "@material-ui/icons/Delete";
+import InfoIcon from "@material-ui/icons/Info";
 
 const getStepContent = numPage => {
   switch (numPage) {
@@ -21,12 +24,19 @@ const getStepContent = numPage => {
 
 class App extends Component {
   state = {
-    value: 0
+    value: 0,
+    isOpen: true
   };
 
   handleChange = value => event => {
     this.setState({
       value: parseInt(value)
+    });
+  };
+
+  handleClose = event => {
+    this.setState({
+      isOpen: false
     });
   };
 
@@ -62,6 +72,35 @@ class App extends Component {
             />
           </Tabs>
         </Paper>
+        {this.state.isOpen && (
+          <Paper
+            style={{
+              margin: "20px",
+              padding: "20px",
+              position: "fixed",
+              bottom: "0",
+              maxWidth: "600px",
+              zIndex: "1"
+            }}
+          >
+            <IconButton
+              aria-label="Delete"
+              style={{ position: "absolute", right: "0", top: "0" }}
+              onClick={this.handleClose}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+            <Typography variant="subtitle1" color="primary" >Уважаемые абоненты!</Typography>
+            <Typography variant="subtitle2" color="primary">
+              Обращаем Ваше внимание, что срок на настройку роуминга между
+              операторами АО Калуга Астрал и СКБ Контур временно увеличен в
+              связи с техническими работами.
+            </Typography>
+            <Typography variant="subtitle2" color="primary">
+              Приносим извинения за предоставленные неудобства.
+            </Typography>
+          </Paper>
+        )}
         {getStepContent(value)}
       </>
     );
